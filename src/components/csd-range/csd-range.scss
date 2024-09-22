@@ -1,11 +1,7 @@
 :host{
     box-sizing: border-box;
-    
-    *,
-    *::before,
-    *::after{
-        box-sizing: inherit;
-    }
+
+
 
     display: flex;
     flex-direction: column;
@@ -15,14 +11,20 @@
     gap: .5rem;
     padding: 1rem;
 
-    input[type="text"]{
-        width: 2.5rem;
-        text-align: center;
-        margin: 0;
-        
-    }
-    input[type="range"]{
-        width: 5rem;
-    }
+        *,
+        *::before,
+        *::after{
+            box-sizing: inherit;
+        } 
+
+        input[type="text"]{
+            width: 2.5rem;
+            text-align: center;
+            margin: 0;
+            
+        }
+        input[type="range"]{
+            width: 5rem;
+        }
 }
    

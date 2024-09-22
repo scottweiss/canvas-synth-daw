@@ -1,4 +1,5 @@
 export default({
+    base: '/canvas-synth-daw/',
     css: {
       preprocessorOptions: {
      
