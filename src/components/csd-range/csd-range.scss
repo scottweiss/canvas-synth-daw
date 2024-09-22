@@ -1,0 +1,13 @@
+:host{
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    gap: .5rem;
+    input{
+        width: 100%;
+    }
+}
+   
