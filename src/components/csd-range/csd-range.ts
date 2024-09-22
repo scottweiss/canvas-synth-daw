@@ -1,4 +1,4 @@
-import styles from  './csd-range.scss?inline';
+import styles from './csd-range.scss?inline';
 
 class CsdRange extends HTMLElement {
   // rangeDomReference;
