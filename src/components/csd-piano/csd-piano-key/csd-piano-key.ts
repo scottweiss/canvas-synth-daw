@@ -3,9 +3,10 @@ import styles from "./csd-piano-key.scss?inline";
 
 export class CsdPianoKey extends HTMLElement {
     // pianoDomReference;
-    pianoElement: HTMLElement;
+    pianoKeyElement: HTMLElement;
 
     #midiKey: number;
+    #keyboardKey: string;
 
     set midiKey(value: number) {
         this.#midiKey = value;
@@ -15,11 +16,20 @@ export class CsdPianoKey extends HTMLElement {
         return this.#midiKey;
     }
 
+    set keyboardKey(value: string){
+        this.#keyboardKey = value;
+    }
+
+    get keyboardKey(): string {
+        return this.#keyboardKey;
+    }
+
     constructor(props: any) {
         super();
 
         console.log(props)
         this.#midiKey = props.midiKey;
+        this.#keyboardKey = props.keyboardKey;
 
         // add styles
         const sheet = new CSSStyleSheet();
@@ -31,8 +41,8 @@ export class CsdPianoKey extends HTMLElement {
         if (this.isSharp()) {
             this.setAttribute('sharp', '')
         }
-        this.pianoElement = this.renderKey();
-        shadowRoot.appendChild(this.pianoElement);
+        this.pianoKeyElement = this.renderKey();
+        shadowRoot.appendChild(this.pianoKeyElement);
     }
 
     connectedCallback() {
@@ -55,6 +65,7 @@ export class CsdPianoKey extends HTMLElement {
         let key = document.createElement("button");
         key.className = this.getClasses();
         key.textContent = String(midiToNote(this.midiKey));
+        key.textContent = this.keyboardKey;
         // key.addEventListener("mousedown", () => {
         //     this.dispatchEvent(new CustomEvent('CsdPianoKeyStart', { bubbles: true, detail: { midiKey: this.midiKey } }));
         // })

@@ -53,7 +53,7 @@ class CsdPiano extends HTMLElement {
 
 
     for (let i = startingKey; i < keyCount; i++) {
-      pianoElement.append(new CsdPianoKey({ midiKey: i }));
+      pianoElement.append(new CsdPianoKey({ midiKey: i, keyboardKey:  keyboardKeyArray[i-startingKey]}));
     }
 
     return pianoElement;
