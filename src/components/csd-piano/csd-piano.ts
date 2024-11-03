@@ -37,7 +37,7 @@ class CsdPiano extends HTMLElement {
 
   renderPianoElement(): HTMLElement {
     const octives = 2;
-    let startingKey = 53;
+    let startingKey = 60;
     const keyCount = (octives * 12) + startingKey;
 
     let pianoElement = document.createElement("div");
@@ -55,9 +55,10 @@ class CsdPiano extends HTMLElement {
   playSound(midiNote = 69) {
 
     console.log(midiNote)
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    const audioContext = new (window.AudioContext)();
     const oscillator = audioContext.createOscillator();
-    oscillator.type = 'sine';
+    oscillator.type = 'square';
     oscillator.frequency.value = midiToFrequency(midiNote); // set frequency in Hz
     const gainNode = audioContext.createGain();
 
@@ -67,7 +68,7 @@ class CsdPiano extends HTMLElement {
     oscillator.start(0); // start immediately
     gainNode.gain.value = .10; // set initial gain to maximum
 
-    oscillator.stop(0.1); // start immediately
+    oscillator.stop(.1); // start immediately
 
 };
 

@@ -55,14 +55,17 @@ export class CsdPianoKey extends HTMLElement {
         let key = document.createElement("button");
         key.className = this.getClasses();
         key.textContent = String(midiToNote(this.midiKey));
-        key.addEventListener("mousedown", () => {
+        // key.addEventListener("mousedown", () => {
+        //     this.dispatchEvent(new CustomEvent('CsdPianoKeyStart', { bubbles: true, detail: { midiKey: this.midiKey } }));
+        // })
+        key.addEventListener("click", () => {
             this.dispatchEvent(new CustomEvent('CsdPianoKeyStart', { bubbles: true, detail: { midiKey: this.midiKey } }));
         })
 
 
-        key.addEventListener('mouseup', () => {
-            this.dispatchEvent(new CustomEvent('CsdPianoKeyStop', { bubbles: true, detail: { midiKey: this.midiKey } }));
-        })
+        // key.addEventListener('mouseup', () => {
+        //     this.dispatchEvent(new CustomEvent('CsdPianoKeyStop', { bubbles: true, detail: { midiKey: this.midiKey } }));
+        // })
 
         return key;
     }
