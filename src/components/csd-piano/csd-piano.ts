@@ -1,6 +1,6 @@
 import styles from "./csd-piano.scss?inline";
 import { CsdPianoKey } from "./csd-piano-key/csd-piano-key"
-import midiToFrequency from "../../midi/midi-to-frequency";
+import midiToFrequency, { keyboardKeyArray } from "../../midi/midi-to-frequency";
 
 class CsdPiano extends HTMLElement {
   // pianoDomReference;
@@ -31,12 +31,20 @@ class CsdPiano extends HTMLElement {
     this.pianoElement.addEventListener('CsdPianoKeyStop', (event) => {
       console.log(event);
     })
+    this.pianoElement.addEventListener('keydown', (event) => {
+      const index = keyboardKeyArray.indexOf(event.key);
+      if (index < 0) {
+        return
+      }
+      console.log(index, index % 12)
+      this.playSound(index + 60)
+    })
 
     
   }
 
   renderPianoElement(): HTMLElement {
-    const octives = 2;
+    const octives = 1.5;
     let startingKey = 60;
     const keyCount = (octives * 12) + startingKey;
 

@@ -87,16 +87,19 @@ const midiNoteFrequencies = [
     { midi: 106, frequency: 3729.31, note: "A#7/Bb7" },
     { midi: 107, frequency: 3951.07, note: "B7" },
     { midi: 108, frequency: 4186.01, note: "C8" }
-  ];
-  
+];
+
+export const keyboardKeyArray = [
+    'a', 'w', 's', 'e', 'd', 'f', 't', 'g', 'y', 'h', 'u', 'j', 'k', 'o', 'l', 'p', ';', '\''
+]
 
 
 export default function midiToFrequency(midiNote: number): number {
     // return 440 + 2^(miniNote - 69)/12;
     // const frequency = 440 * Math.pow(2, (midiNote - 69) / 12)
-    return midiNoteFrequencies.find(entry => entry.midi === midiNote)?.frequency || 0 ;
+    return midiNoteFrequencies.find(entry => entry.midi === midiNote)?.frequency || 0;
 }
 
-export function midiToNote(midiNote:number): string{
+export function midiToNote(midiNote: number): string {
     return midiNoteFrequencies.find(entry => entry.midi === midiNote)?.note || '';
 }
