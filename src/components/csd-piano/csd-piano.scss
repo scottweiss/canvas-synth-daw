@@ -1,0 +1,21 @@
+
+:host{
+    box-sizing: border-box;
+
+    *,
+        *::before,
+        *::after{
+            box-sizing: inherit;
+        } 
+
+    .csd-piano{
+        display: flex;
+        flex-direction: row;
+        align-items: start;
+        justify-content: center;
+        position: relative;
+    }
+    
+    
+}
+

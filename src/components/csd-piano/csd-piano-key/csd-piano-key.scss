@@ -1,0 +1,38 @@
+$csd-piano-key-height: 200px;
+$csd-piano-key-width: 60px;
+$csd-piano-key-sharp-height: $csd-piano-key-height * .7;
+$csd-piano-key-sharp-width: 40px;
+
+:host {
+    box-sizing: border-box;
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: inherit;
+    }
+
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .csd-piano-key {
+        height: $csd-piano-key-height;
+        width: $csd-piano-key-width;
+        background-color: #eee;
+        // text-orientation: sideways;
+        writing-mode: vertical-lr;
+        text-align: end;
+    }
+
+    .csd-piano-key-sharp {
+        position: relative;
+        background-color: #333;
+        color: #eee;
+        height: $csd-piano-key-sharp-height;
+        width: $csd-piano-key-sharp-width;
+        margin-block: $csd-piano-key-sharp-width / -2;
+    }
+}
