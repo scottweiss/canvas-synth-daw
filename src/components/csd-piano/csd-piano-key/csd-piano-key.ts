@@ -1,12 +1,13 @@
-import { midiToNote } from "../../../midi/midi-to-frequency";
+import midiToFrequency, { keyboardKeyArray, midiToNote } from "../../../midi/midi-to-frequency";
 import styles from "./csd-piano-key.scss?inline";
 
 export class CsdPianoKey extends HTMLElement {
     // pianoDomReference;
     pianoKeyElement: HTMLElement;
-
+    #audioContext: AudioContext;
     #midiKey: number;
     #keyboardKey: string;
+    gainNode: GainNode;
 
     set midiKey(value: number) {
         this.#midiKey = value;
@@ -16,7 +17,7 @@ export class CsdPianoKey extends HTMLElement {
         return this.#midiKey;
     }
 
-    set keyboardKey(value: string){
+    set keyboardKey(value: string) {
         this.#keyboardKey = value;
     }
 
@@ -30,6 +31,13 @@ export class CsdPianoKey extends HTMLElement {
         console.log(props)
         this.#midiKey = props.midiKey;
         this.#keyboardKey = props.keyboardKey;
+        this.#audioContext = props.audioContext;
+        this.gainNode = this.#audioContext.createGain();
+        this.gainNode.gain.setValueAtTime(0.08, 0);
+
+        // allows volume to decrease with time
+
+
 
         // add styles
         const sheet = new CSSStyleSheet();
@@ -47,6 +55,19 @@ export class CsdPianoKey extends HTMLElement {
 
     connectedCallback() {
         console.log("connectedCallback");
+        window.addEventListener('keydown', (event) => {
+            if (event.key === this.keyboardKey) {
+                this.pianoKeyElement.classList.add('active');
+                this.playNote()
+            }
+
+        });
+        window.addEventListener('keyup', (event) => {
+            if (event.key === this.keyboardKey) {
+                this.pianoKeyElement.classList.remove('active');
+                // this.playNote()
+            }
+        })
     }
 
     isSharp() {
@@ -70,6 +91,7 @@ export class CsdPianoKey extends HTMLElement {
         //     this.dispatchEvent(new CustomEvent('CsdPianoKeyStart', { bubbles: true, detail: { midiKey: this.midiKey } }));
         // })
         key.addEventListener("click", () => {
+            this.playNote();
             this.dispatchEvent(new CustomEvent('CsdPianoKeyStart', { bubbles: true, detail: { midiKey: this.midiKey } }));
         })
 
@@ -79,6 +101,38 @@ export class CsdPianoKey extends HTMLElement {
         // })
 
         return key;
+    }
+    playNote(): void {
+        let oscillator = this.#audioContext.createOscillator();
+        oscillator.frequency.setValueAtTime(midiToFrequency(this.midiKey), this.#audioContext.currentTime);
+
+        // lower gain for higher frequency notes
+        // connect gain node to destination (speakers)
+        this.gainNode.gain.setValueAtTime(0.08, this.#audioContext.currentTime);
+
+        if (midiToFrequency(this.midiKey) > 699) {
+            this.gainNode.gain.setValueAtTime(0.03, this.#audioContext.currentTime);
+        }
+
+        oscillator.connect(this.gainNode);
+
+
+
+        this.gainNode.gain.exponentialRampToValueAtTime(0.001, this.#audioContext.currentTime + 1.5);
+
+
+
+        this.gainNode.connect(this.#audioContext.destination);
+
+        oscillator.start(0);
+
+        // tone will play for 1.5 seconds 
+
+        oscillator.stop(this.#audioContext.currentTime + 1.5);
+
+
+
+
     }
 }
 

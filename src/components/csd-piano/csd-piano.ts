@@ -1,13 +1,16 @@
 import styles from "./csd-piano.scss?inline";
 import { CsdPianoKey } from "./csd-piano-key/csd-piano-key"
-import midiToFrequency, { keyboardKeyArray } from "../../midi/midi-to-frequency";
+import { keyboardKeyArray } from "../../midi/midi-to-frequency";
 
 class CsdPiano extends HTMLElement {
   // pianoDomReference;
   pianoElement: HTMLElement;
 
+  audioContext: AudioContext;
+
   constructor() {
     super();
+    this.audioContext = new window.AudioContext;
 
     // add styles
     const sheet = new CSSStyleSheet();
@@ -22,25 +25,6 @@ class CsdPiano extends HTMLElement {
 
   connectedCallback() {
     console.log("connectedCallback");
-    this.pianoElement.addEventListener('CsdPianoKeyStart', (event) => {
-      console.log(event);
-
-      this.playSound((event as CustomEvent).detail.midiKey)
-    });
-
-    this.pianoElement.addEventListener('CsdPianoKeyStop', (event) => {
-      console.log(event);
-    })
-    this.pianoElement.addEventListener('keydown', (event) => {
-      const index = keyboardKeyArray.indexOf(event.key);
-      if (index < 0) {
-        return
-      }
-      console.log(index, index % 12)
-      this.playSound(index + 60)
-    })
-
-    
   }
 
   renderPianoElement(): HTMLElement {
@@ -53,36 +37,11 @@ class CsdPiano extends HTMLElement {
 
 
     for (let i = startingKey; i < keyCount; i++) {
-      pianoElement.append(new CsdPianoKey({ midiKey: i, keyboardKey:  keyboardKeyArray[i-startingKey]}));
+      pianoElement.append(new CsdPianoKey({ midiKey: i, audioContext: this.audioContext, keyboardKey: keyboardKeyArray[i - startingKey] }));
     }
 
     return pianoElement;
   }
-
-
-  playSound(midiNote = 69) {
-
-    console.log(midiNote)
-
-    const audioContext = new (window.AudioContext)();
-    const oscillator = audioContext.createOscillator();
-    oscillator.type = 'square';
-    oscillator.frequency.value = midiToFrequency(midiNote); // set frequency in Hz
-    const gainNode = audioContext.createGain();
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    oscillator.start(0); // start immediately
-    gainNode.gain.value = .10; // set initial gain to maximum
-
-    oscillator.stop(.1); // start immediately
-
-};
-
-  
-
-
 }
 
 // Define the new element
