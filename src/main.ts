@@ -3,8 +3,7 @@ import './components/csd-range/csd-range.ts'
 import './components/csd-piano/csd-piano.ts'
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-
+  <main>
     <csd-piano></csd-piano>
-  </div>
+  </main>
 `
