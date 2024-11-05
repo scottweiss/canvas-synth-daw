@@ -1,4 +1,4 @@
-import midiToFrequency, { keyboardKeyArray, midiToNote } from "../../../midi/midi-to-frequency";
+import midiToFrequency, { midiToNote } from "../../../midi/midi-to-frequency";
 import styles from "./csd-piano-key.scss?inline";
 
 export class CsdPianoKey extends HTMLElement {
