@@ -127,11 +127,7 @@ export class CsdPianoKey extends HTMLElement {
         oscillator.start(0);
 
         // tone will play for 1.5 seconds 
-
         oscillator.stop(this.#audioContext.currentTime + 1.5);
-
-
-
 
     }
 }

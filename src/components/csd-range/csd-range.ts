@@ -27,6 +27,15 @@ class CsdRange extends HTMLElement {
       this._value = value;
       this.inputElement.value = value;
       this.rangeElement.value = value;
+
+      requestAnimationFrame(() => {
+        this.dispatchEvent(new CustomEvent("csdRange", {
+          detail: { 
+            value: this.value,
+            
+           }
+        }));
+      })
     }
 
     get value(): string {
@@ -53,8 +62,9 @@ class CsdRange extends HTMLElement {
     renderRangeElement(): HTMLInputElement {
       let rangeElement = document.createElement('input');
       rangeElement.setAttribute('type', 'range');
-      rangeElement.setAttribute('min', '-100');
-      rangeElement.setAttribute('max', '100');
+      rangeElement.setAttribute('min', '0.1');
+      rangeElement.setAttribute('max', '3');
+      rangeElement.setAttribute('step', '0.1')
       rangeElement.value = this.value;
 
       rangeElement.addEventListener('input', (event) => {
