@@ -6,7 +6,7 @@ class CsdRange extends HTMLElement {
   rangeElement: HTMLInputElement
   inputElement: HTMLInputElement;
 
-    constructor() {
+    constructor(props: any) {
       super();
       this._value = '0';
 
@@ -21,6 +21,10 @@ class CsdRange extends HTMLElement {
       shadowRoot.adoptedStyleSheets.push(sheet);
       shadowRoot.appendChild(this.inputElement);
       shadowRoot.appendChild(this.rangeElement);
+
+      if (props?.value != null) {
+        this._value = props.value;
+      }
     }
 
     set value(value: string){
@@ -32,7 +36,6 @@ class CsdRange extends HTMLElement {
         this.dispatchEvent(new CustomEvent("csdRange", {
           detail: { 
             value: this.value,
-            
            }
         }));
       })
@@ -55,9 +58,9 @@ class CsdRange extends HTMLElement {
     return rangeValueInput;
   }
     
-    connectedCallback() {
-      console.log('connectedCallback')
-    }
+    // connectedCallback() {
+    //   console.log('connectedCallback')
+    // }
 
     renderRangeElement(): HTMLInputElement {
       let rangeElement = document.createElement('input');
