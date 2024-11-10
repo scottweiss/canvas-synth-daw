@@ -2,12 +2,14 @@
     box-sizing: border-box;
     display: grid;
 
-    
-
     *,
     *::before,
     *::after {
         box-sizing: inherit;
+    }
+
+    select {
+        margin: 0 auto;
     }
     
 }

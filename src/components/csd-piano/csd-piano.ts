@@ -1,7 +1,7 @@
 import styles from "./csd-piano.scss?inline";
 import { CsdPianoKey } from "./csd-piano-key/csd-piano-key"
 import { keyboardKeyArray } from "../../midi/midi-to-frequency";
-import { Adsr, CsdAdsr } from "../csd-adsr/csd-adsr";
+import { Adsr} from "../csd-adsr/csd-adsr";
 
 export class CsdPiano extends HTMLElement {
   props: any;
@@ -9,13 +9,14 @@ export class CsdPiano extends HTMLElement {
 
   audioContext: AudioContext;
   #adsr: Adsr;
+  #waveType: any;
 
   constructor(props: any) {
     super();
-
+    
     this.audioContext = new window.AudioContext;
 
-    this.#adsr = {
+    this.#adsr = props.adsr ||{
       attack: 0.1,
       decay: 0.2,
       sustain: 0.4,
@@ -30,21 +31,31 @@ export class CsdPiano extends HTMLElement {
     // add element
     this.pianoElement = this.renderPianoElement();
 
-     shadowRoot.append(this.pianoElement);
-
-
+    shadowRoot.append(this.pianoElement);
   }
 
   set adsr(value: Adsr) {
     this.#adsr = value;
     this.pianoElement.querySelectorAll<CsdPianoKey>('csd-piano-key').forEach((pianoKey) => {
       pianoKey.adsr = this.adsr;
-     });
-}
+    });
+  }
 
-get adsr(): Adsr {
+  get adsr(): Adsr {
     return this.#adsr;
-}
+  }
+
+  set waveType(value: OscillatorType) {
+    this.#waveType = value;
+    this.pianoElement.querySelectorAll<CsdPianoKey>('csd-piano-key').forEach((pianoKey) => {
+      pianoKey.waveType = value;
+    });
+
+  }
+
+  get waveType(): OscillatorType {
+    return this.#waveType;
+  }
   renderPianoElement(): HTMLElement {
     const octives = 1.5;
     let startingKey = 60;

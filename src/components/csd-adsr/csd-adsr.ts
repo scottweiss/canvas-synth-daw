@@ -132,14 +132,16 @@ export class CsdAdsr extends HTMLElement {
     ) {
       return;
     }
-    this.#ctx.lineJoin = "round";
+
     const width = this.#canvas.clientWidth;
     const height = this.#canvas.clientHeight;
  
     const canvasWidth = this.#ctx.canvas.width;
     const canvasHeight = this.#ctx.canvas.height;
+    
     this.#canvas.width = width;
     this.#canvas.height = height;
+    
     this.#ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
     const totalDuration = this.#attack + this.#decay + this.#sustain + this.#release;
@@ -147,25 +149,30 @@ export class CsdAdsr extends HTMLElement {
     const decayWidth = (this.#decay / totalDuration) * canvasWidth;
     const sustainWidth = (this.#sustain / totalDuration) * canvasWidth;
     const releaseWidth = (this.#release / totalDuration) * canvasWidth;
+    
+    // Calculate Y position for sustain line based on ratio, not percentage
+    // const sustainY = (canvasHeight - 10) * this.#sustain;
+    const sustainY = (1 - this.#sustain) * (canvasHeight - 10) + 10;
+
+    
+    
     this.#ctx.beginPath();
     this.#ctx.lineJoin = "round";
-    this.#ctx.moveTo(10, canvasHeight - 10); // Attack 
-    this.#ctx.lineTo(attackWidth, 10); // Decay 
-    this.#ctx.lineTo(attackWidth + decayWidth, canvasHeight / 2); // Sustain 
-    this.#ctx.lineTo(attackWidth + decayWidth + sustainWidth, canvasHeight / 2); // Release 
-    this.#ctx.lineTo(attackWidth + decayWidth + sustainWidth + releaseWidth - 10 , canvasHeight - 10);
-    // this.#ctx.lineTo(canvasWidth - 10, canvasHeight - 10);
+    this.#ctx.lineCap = "round"
+    this.#ctx.moveTo(10, canvasHeight - 10);  // Attack
+    this.#ctx.lineTo(attackWidth + 10, 10);  // Decay
+    
+    // Sustain line is drawn from the top to sustainY and then to release point
+    this.#ctx.lineTo((attackWidth + decayWidth) + 10, sustainY);  
+    this.#ctx.lineTo((attackWidth + decayWidth + sustainWidth) + 10, sustainY);  // Release
+    
+    this.#ctx.lineTo((attackWidth + decayWidth + sustainWidth + releaseWidth - 10), canvasHeight - 10);
     this.#ctx.strokeStyle = 'blue';
     this.#ctx.lineWidth = 10;
-    this.#ctx.lineJoin = "round";
     this.#ctx.stroke();
-
   }
 
-
-
   connectedCallback() {
-    
     this.drawADSR();
   }
 

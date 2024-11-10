@@ -7,6 +7,8 @@ import styles from './csd-synth.scss?inline';
 export class CsdSynth extends HTMLElement {
   props: any;
   
+  waveType: OscillatorType;
+  waveTypeRef: HTMLSelectElement;
   pianoRef: CsdPiano;
   adsrRef: CsdAdsr;
   adsr: Adsr;
@@ -23,8 +25,11 @@ export class CsdSynth extends HTMLElement {
       release: .5
     }
 
+    this.waveType = "sine";
+
     this.pianoRef = new CsdPiano({adsr: this.adsr})
     this.adsrRef = new CsdAdsr({adsr: this.adsr});
+
 
 
     this.adsrRef.addEventListener('CsdAdsr', (event) => {
@@ -35,13 +40,35 @@ export class CsdSynth extends HTMLElement {
        }
      });
 
+     this.waveTypeRef = document.createElement('select');
+
+     this.waveTypeRef.append(
+        this.renderSelectOption('sawtooth', 'sawtooth'),
+        this.renderSelectOption('sine', 'sine'),
+        this.renderSelectOption('square', 'square'),
+        this.renderSelectOption('triangle', 'triangle'),
+     )
+
+     this.waveTypeRef.addEventListener('change', () => {
+        this.pianoRef.waveType = this.waveTypeRef.value as OscillatorType;
+     })
+
+     this.waveTypeRef.value = this.waveType;
+
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(styles);
 
     const shadowRoot = this.attachShadow({ mode: 'open' });
 
     shadowRoot.adoptedStyleSheets.push(sheet);
-    shadowRoot.append(this.adsrRef, this.pianoRef);
+    shadowRoot.append(this.waveTypeRef, this.adsrRef, this.pianoRef);
+  }
+
+  renderSelectOption(label: string, value: string): HTMLElement {
+    let option = document.createElement('option');
+    option.text = label;
+    option.value = value;
+    return option;
   }
 
 }

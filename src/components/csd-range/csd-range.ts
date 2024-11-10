@@ -5,11 +5,16 @@ export class CsdRange extends HTMLElement {
   _value: string;
   rangeElement: HTMLInputElement
   inputElement: HTMLInputElement;
+  min: number;
+  max: number;
 
     constructor(props: any) {
       super();
 
       this._value = '0';
+      this.min = props.min || .10;
+      this.max = props.max || 1;
+     
 
       const sheet = new CSSStyleSheet();
       sheet.replaceSync(styles);
@@ -47,6 +52,8 @@ export class CsdRange extends HTMLElement {
     }
 
 
+
+
   renderRangeValueDisplayElement(): HTMLInputElement {
     let rangeValueInput = document.createElement('input');
     rangeValueInput.setAttribute('type', 'text');
@@ -59,16 +66,14 @@ export class CsdRange extends HTMLElement {
     return rangeValueInput;
   }
     
-    // connectedCallback() {
-    //   console.log('connectedCallback')
-    // }
+
 
     renderRangeElement(): HTMLInputElement {
       let rangeElement = document.createElement('input');
       rangeElement.setAttribute('type', 'range');
-      rangeElement.setAttribute('min', '0.1');
-      rangeElement.setAttribute('max', '1');
-      rangeElement.setAttribute('step', '0.1')
+      rangeElement.setAttribute('min', String(this.min));
+      rangeElement.setAttribute('max', String(this.max));
+      rangeElement.setAttribute('step', '0.01')
       rangeElement.value = this.value;
 
       rangeElement.addEventListener('input', (event) => {

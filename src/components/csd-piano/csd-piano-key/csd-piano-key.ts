@@ -11,6 +11,7 @@ export class CsdPianoKey extends HTMLElement {
     oscillator: OscillatorNode;
     #midiKey: number;
     #keyboardKey: string;
+    #waveType: OscillatorType;
     gainNode: GainNode;
     #adsr: Adsr;
     isPlaying: boolean;
@@ -39,6 +40,16 @@ export class CsdPianoKey extends HTMLElement {
         return this.#adsr;
     }
 
+    set waveType(value: OscillatorType) {
+        this.#waveType = value;
+        this.oscillator.type = value;
+        
+    }
+
+    get waveType(): OscillatorType {
+        return this.#waveType;
+    }
+
 
 
     constructor(props: any) {
@@ -47,17 +58,18 @@ export class CsdPianoKey extends HTMLElement {
         this.#midiKey = props.midiKey;
         this.#keyboardKey = props.keyboardKey;
         this.#audioContext = props.audioContext;
+        this.#waveType = props.waveType || 'sine';
         this.gainNode = this.#audioContext.createGain();
         this.oscillator = this.#audioContext.createOscillator();
         // Connect the oscillator to the gain node
-        this.oscillator.type = "sine";//"custom" | "sawtooth" | "sine" | "square" | "triangle"
-        
+        this.oscillator.type = this.waveType;
 
         this.oscillator.connect(this.gainNode);
         // Then connect the gain node to the destination
         this.gainNode.connect(this.#audioContext.destination);
 
         this.#adsr = props.adsr;
+        this.#waveType = props.waveType || 'sine';
 
         this.oscillator.frequency.setValueAtTime(midiToFrequency(props.midiKey), this.#audioContext.currentTime);
 
@@ -112,10 +124,9 @@ export class CsdPianoKey extends HTMLElement {
         let keyLable = document.createElement("kbd");
         keyLable.textContent = this.keyboardKey;
         key.className = this.getClasses();
+        key.setAttribute('aria-label', String(midiToNote(this.midiKey)));
 
         key.append(keyLable);
-        // key.textContent = String(midiToNote(this.midiKey));
-        // key.textContent = this.keyboardKey;
 
         key.addEventListener("mousedown", () => {
             this.playNote();
@@ -145,12 +156,13 @@ export class CsdPianoKey extends HTMLElement {
     }
 
     applyADSR() {
+        console.log(this.adsr.sustain)
         const currentTime = this.#audioContext.currentTime;
         this.oscillator.frequency.setValueAtTime(midiToFrequency(this.midiKey), this.#audioContext.currentTime);
-        this.gainNode.gain.setValueAtTime(0, currentTime);
-        this.gainNode.gain.linearRampToValueAtTime(.08, currentTime + this.adsr.attack);
-        this.gainNode.gain.linearRampToValueAtTime(this.adsr.sustain, currentTime + this.adsr.attack + this.adsr.decay);
-        this.gainNode.gain.setValueAtTime(this.adsr.sustain, currentTime + this.adsr.attack + this.adsr.decay);
+        this.gainNode.gain.setValueAtTime(0.001, currentTime);
+        this.gainNode.gain.linearRampToValueAtTime(0.1, currentTime + this.adsr.attack);
+        this.gainNode.gain.linearRampToValueAtTime(this.adsr.sustain * 0.1, currentTime + this.adsr.attack + this.adsr.decay);
+        this.gainNode.gain.setValueAtTime(this.adsr.sustain * 0.1, currentTime + this.adsr.attack + this.adsr.decay);
     }
 
     releaseEnvelope() {
