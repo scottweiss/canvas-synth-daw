@@ -1,12 +1,8 @@
 import midiToFrequency, { midiToNote } from "../../../midi/midi-to-frequency";
+import { Adsr } from "../../csd-adsr/csd-adsr";
 import styles from "./csd-piano-key.scss?inline";
 
-type CdsAsdr = {
-    attack: number,
-    decay: number,
-    sustain: number,
-    release: number
-};
+
 
 export class CsdPianoKey extends HTMLElement {
     // pianoDomReference;
@@ -16,7 +12,7 @@ export class CsdPianoKey extends HTMLElement {
     #midiKey: number;
     #keyboardKey: string;
     gainNode: GainNode;
-    #adsr: CdsAsdr;
+    #adsr: Adsr;
     isPlaying: boolean;
 
     set midiKey(value: number) {
@@ -35,18 +31,28 @@ export class CsdPianoKey extends HTMLElement {
         return this.#keyboardKey;
     }
 
+    set adsr(value: Adsr) {
+        this.#adsr = value;
+    }
+
+    get adsr(): Adsr {
+        return this.#adsr;
+    }
+
+
 
     constructor(props: any) {
         super();
 
-        console.log(props)
         this.#midiKey = props.midiKey;
         this.#keyboardKey = props.keyboardKey;
         this.#audioContext = props.audioContext;
         this.gainNode = this.#audioContext.createGain();
         this.oscillator = this.#audioContext.createOscillator();
         // Connect the oscillator to the gain node
+        this.oscillator.type = "sine";//"custom" | "sawtooth" | "sine" | "square" | "triangle"
         
+
         this.oscillator.connect(this.gainNode);
         // Then connect the gain node to the destination
         this.gainNode.connect(this.#audioContext.destination);
@@ -75,7 +81,7 @@ export class CsdPianoKey extends HTMLElement {
 
     connectedCallback() {
         window.addEventListener('keydown', (event) => {
-            if(event.repeat){return}
+            if (event.repeat) { return }
             if (event.key === this.keyboardKey) {
                 this.pianoKeyElement.classList.add('active');
                 this.playNote()
@@ -103,9 +109,13 @@ export class CsdPianoKey extends HTMLElement {
     }
     renderKey(): HTMLButtonElement {
         let key = document.createElement("button");
+        let keyLable = document.createElement("kbd");
+        keyLable.textContent = this.keyboardKey;
         key.className = this.getClasses();
-        key.textContent = String(midiToNote(this.midiKey));
-        key.textContent = this.keyboardKey;
+
+        key.append(keyLable);
+        // key.textContent = String(midiToNote(this.midiKey));
+        // key.textContent = this.keyboardKey;
 
         key.addEventListener("mousedown", () => {
             this.playNote();
@@ -127,7 +137,6 @@ export class CsdPianoKey extends HTMLElement {
         return key;
     }
     playNote(): void {
-        console.log(this.#audioContext.state)
         if (!this.isPlaying) {
             this.oscillator.start()
             this.isPlaying = true;
@@ -136,22 +145,19 @@ export class CsdPianoKey extends HTMLElement {
     }
 
     applyADSR() {
-        console.log(this.#adsr);
         const currentTime = this.#audioContext.currentTime;
         this.oscillator.frequency.setValueAtTime(midiToFrequency(this.midiKey), this.#audioContext.currentTime);
         this.gainNode.gain.setValueAtTime(0, currentTime);
-        this.gainNode.gain.linearRampToValueAtTime(.08, currentTime + this.#adsr.attack);
-        this.gainNode.gain.linearRampToValueAtTime(this.#adsr.sustain, currentTime + this.#adsr.attack + this.#adsr.decay);
-        this.gainNode.gain.setValueAtTime(this.#adsr.sustain, currentTime + this.#adsr.attack + this.#adsr.decay);
-        console.log(this.gainNode, this.oscillator.frequency.value)
+        this.gainNode.gain.linearRampToValueAtTime(.08, currentTime + this.adsr.attack);
+        this.gainNode.gain.linearRampToValueAtTime(this.adsr.sustain, currentTime + this.adsr.attack + this.adsr.decay);
+        this.gainNode.gain.setValueAtTime(this.adsr.sustain, currentTime + this.adsr.attack + this.adsr.decay);
     }
 
     releaseEnvelope() {
-        console.log('release')
         const currentTime = this.#audioContext.currentTime;
         this.gainNode.gain.cancelScheduledValues(currentTime);
         this.gainNode.gain.setValueAtTime(this.gainNode.gain.value, currentTime);
-        this.gainNode.gain.linearRampToValueAtTime(0, currentTime + this.#adsr.release);
+        this.gainNode.gain.linearRampToValueAtTime(0, currentTime + this.adsr.release);
     }
 
 }

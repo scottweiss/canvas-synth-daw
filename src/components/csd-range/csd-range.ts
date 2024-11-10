@@ -1,6 +1,6 @@
 import styles from './csd-range.scss?inline';
 
-class CsdRange extends HTMLElement {
+export class CsdRange extends HTMLElement {
   // rangeDomReference;
   _value: string;
   rangeElement: HTMLInputElement
@@ -8,6 +8,7 @@ class CsdRange extends HTMLElement {
 
     constructor(props: any) {
       super();
+
       this._value = '0';
 
       const sheet = new CSSStyleSheet();
@@ -66,7 +67,7 @@ class CsdRange extends HTMLElement {
       let rangeElement = document.createElement('input');
       rangeElement.setAttribute('type', 'range');
       rangeElement.setAttribute('min', '0.1');
-      rangeElement.setAttribute('max', '3');
+      rangeElement.setAttribute('max', '1');
       rangeElement.setAttribute('step', '0.1')
       rangeElement.value = this.value;
 
