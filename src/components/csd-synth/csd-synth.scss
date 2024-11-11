@@ -1,6 +1,12 @@
 :host {
     box-sizing: border-box;
     display: grid;
+    transform: rotateX(12deg);
+    border-radius: 1rem;
+    margin: 0 auto;
+    width: 750px;
+    position: relative;
+    overflow: hidden;
 
     *,
     *::before,
@@ -11,5 +17,12 @@
     select {
         margin: 0 auto;
     }
+
+    svg{
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+    }
+    
     
 }

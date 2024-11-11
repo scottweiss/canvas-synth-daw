@@ -59,6 +59,8 @@ export class CsdPiano extends HTMLElement {
   renderPianoElement(): HTMLElement {
     const octives = 1.5;
     let startingKey = 60;
+
+    
     const keyCount = (octives * 12) + startingKey;
 
     let pianoElement = document.createElement("div");

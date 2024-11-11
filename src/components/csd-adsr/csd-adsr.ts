@@ -149,26 +149,26 @@ export class CsdAdsr extends HTMLElement {
     const decayWidth = (this.#decay / totalDuration) * canvasWidth;
     const sustainWidth = (this.#sustain / totalDuration) * canvasWidth;
     const releaseWidth = (this.#release / totalDuration) * canvasWidth;
-    
+    const margin = 20;
     // Calculate Y position for sustain line based on ratio, not percentage
     // const sustainY = (canvasHeight - 10) * this.#sustain;
-    const sustainY = (1 - this.#sustain) * (canvasHeight - 10) + 10;
+    const sustainY = (1 - this.#sustain) * (canvasHeight - margin) + margin;
 
-    
+
     
     this.#ctx.beginPath();
     this.#ctx.lineJoin = "round";
     this.#ctx.lineCap = "round"
-    this.#ctx.moveTo(10, canvasHeight - 10);  // Attack
-    this.#ctx.lineTo(attackWidth + 10, 10);  // Decay
+    this.#ctx.moveTo(margin , canvasHeight - margin );  // Attack
+    this.#ctx.lineTo(attackWidth + margin , margin );  // Decay
     
     // Sustain line is drawn from the top to sustainY and then to release point
-    this.#ctx.lineTo((attackWidth + decayWidth) + 10, sustainY);  
-    this.#ctx.lineTo((attackWidth + decayWidth + sustainWidth) + 10, sustainY);  // Release
+    this.#ctx.lineTo((attackWidth + decayWidth) + margin , sustainY);  
+    this.#ctx.lineTo((attackWidth + decayWidth + sustainWidth) + margin , sustainY);  // Release
     
-    this.#ctx.lineTo((attackWidth + decayWidth + sustainWidth + releaseWidth - 10), canvasHeight - 10);
-    this.#ctx.strokeStyle = 'blue';
-    this.#ctx.lineWidth = 10;
+    this.#ctx.lineTo((attackWidth + decayWidth + sustainWidth + releaseWidth - margin ), canvasHeight - margin );
+    this.#ctx.strokeStyle = 'orange';
+    this.#ctx.lineWidth = 8;
     this.#ctx.stroke();
   }
 
