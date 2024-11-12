@@ -152,10 +152,12 @@ export class CsdAdsr extends HTMLElement {
     const margin = 20;
     // Calculate Y position for sustain line based on ratio, not percentage
     // const sustainY = (canvasHeight - 10) * this.#sustain;
-    const sustainY = (1 - this.#sustain) * (canvasHeight - margin) + margin;
+    // const sustainY = (1 - this.#sustain) * (canvasHeight - margin) - margin;
 
 
-    
+    const sustainY = (1 - this.#sustain) * (canvasHeight -   margin - margin) + margin;
+
+
     this.#ctx.beginPath();
     this.#ctx.lineJoin = "round";
     this.#ctx.lineCap = "round"
@@ -163,12 +165,12 @@ export class CsdAdsr extends HTMLElement {
     this.#ctx.lineTo(attackWidth + margin , margin );  // Decay
     
     // Sustain line is drawn from the top to sustainY and then to release point
-    this.#ctx.lineTo((attackWidth + decayWidth) + margin , sustainY);  
-    this.#ctx.lineTo((attackWidth + decayWidth + sustainWidth) + margin , sustainY);  // Release
+    this.#ctx.lineTo((attackWidth + decayWidth), sustainY);  
+    this.#ctx.lineTo((attackWidth + decayWidth + sustainWidth), sustainY);  // Release
     
     this.#ctx.lineTo((attackWidth + decayWidth + sustainWidth + releaseWidth - margin ), canvasHeight - margin );
     this.#ctx.strokeStyle = 'orange';
-    this.#ctx.lineWidth = 8;
+    this.#ctx.lineWidth = 10;
     this.#ctx.stroke();
   }
 
