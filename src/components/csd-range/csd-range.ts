@@ -3,8 +3,9 @@ import styles from './csd-range.scss?inline';
 export class CsdRange extends HTMLElement {
   // rangeDomReference;
   _value: string;
+  label: string;
   rangeElement: HTMLInputElement
-  inputElement: HTMLInputElement;
+  inputElement: HTMLOutputElement;
   min: number;
   max: number;
 
@@ -14,7 +15,7 @@ export class CsdRange extends HTMLElement {
       this._value = '0';
       this.min = props.min || .10;
       this.max = props.max || 1;
-     
+      this.label = props.label;
 
       const sheet = new CSSStyleSheet();
       sheet.replaceSync(styles);
@@ -24,9 +25,18 @@ export class CsdRange extends HTMLElement {
       this.rangeElement = this.renderRangeElement();
       this.inputElement= this.renderRangeValueDisplayElement();
 
+
+      let rangeLabel = document.createElement('label');
+      let labelSpan = document.createElement('span');
+      labelSpan.classList.add('sr-only');
+      labelSpan.innerText = this.label;
+
+      rangeLabel.append(labelSpan, this.rangeElement);
+
+
       shadowRoot.adoptedStyleSheets.push(sheet);
       shadowRoot.appendChild(this.inputElement);
-      shadowRoot.appendChild(this.rangeElement);
+      shadowRoot.appendChild(rangeLabel);
 
       if (props?.value != null) {
         this._value = props.value;
@@ -54,8 +64,8 @@ export class CsdRange extends HTMLElement {
 
 
 
-  renderRangeValueDisplayElement(): HTMLInputElement {
-    let rangeValueInput = document.createElement('input');
+  renderRangeValueDisplayElement(): HTMLOutputElement {
+    let rangeValueInput = document.createElement('output');
     rangeValueInput.setAttribute('type', 'text');
     rangeValueInput.value = this.value;
 
@@ -70,6 +80,7 @@ export class CsdRange extends HTMLElement {
 
     renderRangeElement(): HTMLInputElement {
       let rangeElement = document.createElement('input');
+
       rangeElement.setAttribute('type', 'range');
       rangeElement.setAttribute('min', String(this.min));
       rangeElement.setAttribute('max', String(this.max));
@@ -79,6 +90,7 @@ export class CsdRange extends HTMLElement {
       rangeElement.addEventListener('input', (event) => {
         this.value = (event.target as any).value;
       });
+
       return rangeElement;
     }
 

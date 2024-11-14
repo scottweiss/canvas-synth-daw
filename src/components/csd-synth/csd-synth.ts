@@ -53,15 +53,17 @@ export class CsdSynth extends HTMLElement {
      })
 
      this.waveTypeRef.value = this.waveType;
+     let waveTypeLabel = document.createElement('label');
+     let waveTableLabelSpan = document.createElement('span').textContent = "Wave shape";
 
-
+     waveTypeLabel.append(waveTableLabelSpan, this.waveTypeRef);
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(styles);
 
     const shadowRoot = this.attachShadow({ mode: 'open' });
 
     shadowRoot.adoptedStyleSheets.push(sheet);
-    shadowRoot.append(this.renderSvg(), this.waveTypeRef, this.adsrRef, this.pianoRef);
+    shadowRoot.append(this.renderSvg(), waveTypeLabel, this.adsrRef, this.pianoRef);
   }
 
   renderSelectOption(label: string, value: string): HTMLElement {
