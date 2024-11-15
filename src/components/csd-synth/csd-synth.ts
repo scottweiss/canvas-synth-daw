@@ -94,9 +94,9 @@ export class CsdSynth extends HTMLElement {
 
 
     turbulence.setAttribute('type', 'fractalNoise');
-    turbulence.setAttribute('baseFrequency', '0.04');
+    turbulence.setAttribute('baseFrequency', '1.2');
     turbulence.setAttribute('result', 'noise');
-    turbulence.setAttribute('numOctaves', '5');
+    turbulence.setAttribute('numOctaves', '8');
 
     lighting.setAttribute('in', 'noise');
     lighting.setAttribute('lighting-color', '#333');

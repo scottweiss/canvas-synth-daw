@@ -73,7 +73,7 @@ export class CsdAdsr extends HTMLElement {
     legend.textContent = type;
 
     // const range = document.createElement('csd-range');
-    const range = new CsdRange({});
+    const range = new CsdRange({label: type});
     range.id = 'csd-adsr-' + type;
 
 
@@ -165,8 +165,8 @@ export class CsdAdsr extends HTMLElement {
     this.#ctx.lineTo(attackWidth + margin , margin );  // Decay
     
     // Sustain line is drawn from the top to sustainY and then to release point
-    this.#ctx.lineTo((attackWidth + decayWidth), sustainY);  
-    this.#ctx.lineTo((attackWidth + decayWidth + sustainWidth), sustainY);  // Release
+    this.#ctx.lineTo((attackWidth + decayWidth +  margin), sustainY);  
+    this.#ctx.lineTo((attackWidth + decayWidth + sustainWidth -  margin), sustainY);  // Release
     
     this.#ctx.lineTo((attackWidth + decayWidth + sustainWidth + releaseWidth - margin ), canvasHeight - margin );
     this.#ctx.strokeStyle = 'orange';

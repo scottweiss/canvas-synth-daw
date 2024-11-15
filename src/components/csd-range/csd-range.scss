@@ -1,4 +1,4 @@
-:host{
+:host {
     box-sizing: border-box;
 
 
@@ -9,24 +9,26 @@
     justify-content: center;
     width: 100px;
     gap: .5rem;
-    padding: 1rem;
+    // padding: 1rem;
 
-        *,
-        *::before,
-        *::after{
-            box-sizing: inherit;
-        } 
+    *,
+    *::before,
+    *::after {
+        box-sizing: inherit;
+    }
 
-        input[type="text"]{
-            width: 2.5rem;
-            text-align: center;
-            margin: 0;
-            
-        }
-        input[type="range"]{
-            width: 5rem;
-        }
-       .sr-only{
+    input[type="text"] {
+        width: 2.5rem;
+        text-align: center;
+        margin: 0;
+
+    }
+
+    input[type="range"] {
+        width: 5rem;
+    }
+
+    .sr-only {
         display: block;
         width: 1px !important;
         height: 1px !important;
@@ -36,6 +38,10 @@
         clip: rect(0, 0, 0, 0) !important;
         white-space: nowrap !important;
         border: 0 !important;
-       }
+    }
+
+    canvas {
+        width: 100px;
+        height: 100px;
+    }
 }
-   
