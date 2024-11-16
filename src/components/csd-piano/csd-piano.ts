@@ -2,11 +2,12 @@ import styles from "./csd-piano.scss?inline";
 import { CsdPianoKey } from "./csd-piano-key/csd-piano-key"
 import { keyboardKeyArray } from "../../midi/midi-to-frequency";
 import { Adsr} from "../csd-adsr/csd-adsr";
+import { AudioEngine } from "../../midi/AudioEngine";
 
 export class CsdPiano extends HTMLElement {
   props: any;
   pianoElement: HTMLElement;
-
+  audioEngine: AudioEngine;
   audioContext: AudioContext;
   #adsr: Adsr;
   #waveType: any;
@@ -14,7 +15,11 @@ export class CsdPiano extends HTMLElement {
   constructor(props: any) {
     super();
     
-    this.audioContext = new window.AudioContext;
+    this.audioEngine = AudioEngine.getInstance();
+    // this.audioContext = props?.audioEngine.audioContext || new window.AudioContext;
+    this.audioContext = this.audioEngine.audioContext;
+    // this.audioContext = new window.AudioContext;
+
 
     this.#adsr = props.adsr ||{
       attack: 0.1,
@@ -60,14 +65,13 @@ export class CsdPiano extends HTMLElement {
     const octives = 1.5;
     let startingKey = 60;
 
-    
     const keyCount = (octives * 12) + startingKey;
 
     let pianoElement = document.createElement("div");
     pianoElement.className = "csd-piano";
 
     for (let i = startingKey; i < keyCount; i++) {
-      let pianoKey = new CsdPianoKey({ midiKey: i, audioContext: this.audioContext, keyboardKey: keyboardKeyArray[i - startingKey], adsr: this.adsr });
+      let pianoKey = new CsdPianoKey({ midiKey: i, audioContext: this.audioContext, keyboardKey: keyboardKeyArray[i - startingKey], adsr: this.adsr});
       pianoElement.append(pianoKey);
     }
 
@@ -76,5 +80,4 @@ export class CsdPiano extends HTMLElement {
 
 }
 
-// Define the new element
 customElements.define("csd-piano", CsdPiano);

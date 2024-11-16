@@ -9,7 +9,7 @@ export class CsdRange extends HTMLElement {
   min: number;
   max: number;
   #canvas: HTMLCanvasElement;
-  mousePositionOnMousedown: any;
+  mousePositionOnMousedown: {x: number, y: number} | undefined;
   #ctx;
 
   constructor(props: any) {
@@ -33,6 +33,7 @@ export class CsdRange extends HTMLElement {
 
     let rangeLabel = document.createElement('label');
     let labelSpan = document.createElement('span');
+    rangeLabel.classList.add('sr-only');
     labelSpan.classList.add('sr-only');
     labelSpan.innerText = this.label;
 
@@ -40,8 +41,9 @@ export class CsdRange extends HTMLElement {
 
 
     shadowRoot.adoptedStyleSheets.push(sheet);
-    shadowRoot.appendChild(this.#canvas);
     shadowRoot.appendChild(this.inputElement);
+    shadowRoot.appendChild(this.#canvas);
+  
     shadowRoot.appendChild(rangeLabel);
 
     if (props?.value != null) {
@@ -143,10 +145,10 @@ export class CsdRange extends HTMLElement {
     this.drawCanvas();
     this.#canvas.addEventListener('mousedown', (event) => {
       this.mousePositionOnMousedown = {x: event.x, y: event.y};
-      console.log(this.mousePositionOnMousedown)
+      // console.log(this.mousePositionOnMousedown)
     });
     this.#canvas.addEventListener('mousemove', (event) => {
-      if (this.mousePositionOnMousedown === null || this.#ctx === null) {
+      if (this.mousePositionOnMousedown == null || this.#ctx === null) {
         return;
       }
       this.drawCanvas();
@@ -154,7 +156,7 @@ export class CsdRange extends HTMLElement {
       this.#ctx?.translate(25, 25);
       this.#ctx.lineDashOffset = 8
       this.#ctx.moveTo(0, 0);
-      console.log((event.x - this.mousePositionOnMousedown.x),  (event.y - this.mousePositionOnMousedown.y))
+      // console.log((event.x - this.mousePositionOnMousedown.x),  (event.y - this.mousePositionOnMousedown.y))
       this.#ctx?.lineTo((event.x - this.mousePositionOnMousedown.x),  (event.y - this.mousePositionOnMousedown.y));
   
 
@@ -164,13 +166,16 @@ export class CsdRange extends HTMLElement {
       this.#ctx.lineCap = 'round';
       // this.#ctx.lineWidth = 5;
       this.#ctx?.stroke();
-      console.log(event)
+      // console.log(event)
       this.mousePositionOnMousedown = {x: event.x, y: event.y}
       this.#ctx.restore();
     });
 
+    this.#canvas.addEventListener('mouseleave', () => {
+      this.mousePositionOnMousedown = undefined;
+    })
     this.#canvas.addEventListener('mouseup', () => {
-      this.mousePositionOnMousedown = null;
+      this.mousePositionOnMousedown = undefined;
     })
 
   }

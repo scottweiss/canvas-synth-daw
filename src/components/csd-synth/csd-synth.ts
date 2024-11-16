@@ -1,5 +1,7 @@
+import { AudioEngine } from '../../midi/AudioEngine';
 import { Adsr, CsdAdsr } from '../csd-adsr/csd-adsr';
 import { CsdPiano } from '../csd-piano/csd-piano';
+import { CsdVisualizer } from '../csd-visualizer/csd-visualizer';
 import styles from './csd-synth.scss?inline';
 
 
@@ -11,12 +13,15 @@ export class CsdSynth extends HTMLElement {
   pianoRef: CsdPiano;
   adsrRef: CsdAdsr;
   adsr: Adsr;
+  audioEngine: AudioEngine;
+  visualizer: CsdVisualizer;
  
 
   constructor(props: any) {
     super();
     this.props = props;
-
+    this.audioEngine = AudioEngine.getInstance();
+    this.visualizer = new CsdVisualizer({audioContext: this.audioEngine.audioContext});
     this.adsr = {
       attack: .5,
       decay: .5,
@@ -24,9 +29,10 @@ export class CsdSynth extends HTMLElement {
       release: .5
     }
 
+
     this.waveType = "sine";
 
-    this.pianoRef = new CsdPiano({adsr: this.adsr})
+    this.pianoRef = new CsdPiano({adsr: this.adsr, audioEngine: this.audioEngine})
     this.adsrRef = new CsdAdsr({adsr: this.adsr});
 
 
@@ -63,7 +69,7 @@ export class CsdSynth extends HTMLElement {
     const shadowRoot = this.attachShadow({ mode: 'open' });
 
     shadowRoot.adoptedStyleSheets.push(sheet);
-    shadowRoot.append(this.renderSvg(), waveTypeLabel, this.adsrRef, this.pianoRef);
+    shadowRoot.append(this.renderSvg(), waveTypeLabel, this.visualizer, this.adsrRef, this.pianoRef);
   }
 
   renderSelectOption(label: string, value: string): HTMLElement {

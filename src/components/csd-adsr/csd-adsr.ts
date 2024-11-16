@@ -143,32 +143,34 @@ export class CsdAdsr extends HTMLElement {
     this.#canvas.height = height;
     
     this.#ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-
-    const totalDuration = this.#attack + this.#decay + this.#sustain + this.#release;
-    const attackWidth = (this.#attack / totalDuration) * canvasWidth;
-    const decayWidth = (this.#decay / totalDuration) * canvasWidth;
-    const sustainWidth = (this.#sustain / totalDuration) * canvasWidth;
-    const releaseWidth = (this.#release / totalDuration) * canvasWidth;
     const margin = 20;
+    const innerWidth = canvasWidth - 1 * margin;
+    const totalDuration = this.#attack + this.#decay + this.#sustain + this.#release;
+    const attackWidth = (this.#attack / totalDuration) * innerWidth ;
+    const decayWidth = (this.#decay / totalDuration) * innerWidth;
+    const sustainWidth = (this.#sustain / totalDuration) * innerWidth;
+    const releaseWidth = (this.#release / totalDuration) * innerWidth;
+
+
     // Calculate Y position for sustain line based on ratio, not percentage
     // const sustainY = (canvasHeight - 10) * this.#sustain;
     // const sustainY = (1 - this.#sustain) * (canvasHeight - margin) - margin;
 
 
-    const sustainY = (1 - this.#sustain) * (canvasHeight -   margin - margin) + margin;
-
+    const sustainY = (1 - this.#sustain) * (canvasHeight -  margin - margin) + margin;
+   
 
     this.#ctx.beginPath();
     this.#ctx.lineJoin = "round";
     this.#ctx.lineCap = "round"
     this.#ctx.moveTo(margin , canvasHeight - margin );  // Attack
-    this.#ctx.lineTo(attackWidth + margin , margin );  // Decay
+    this.#ctx.lineTo(attackWidth + margin, margin );  // Decay
     
     // Sustain line is drawn from the top to sustainY and then to release point
-    this.#ctx.lineTo((attackWidth + decayWidth +  margin), sustainY);  
-    this.#ctx.lineTo((attackWidth + decayWidth + sustainWidth -  margin), sustainY);  // Release
+    this.#ctx.lineTo((attackWidth + decayWidth + margin), sustainY);  
+    this.#ctx.lineTo((attackWidth + decayWidth + sustainWidth ), sustainY);  // Release
     
-    this.#ctx.lineTo((attackWidth + decayWidth + sustainWidth + releaseWidth - margin ), canvasHeight - margin );
+    this.#ctx.lineTo((attackWidth + decayWidth + sustainWidth + releaseWidth), canvasHeight - margin );
     this.#ctx.strokeStyle = 'orange';
     this.#ctx.lineWidth = 10;
     this.#ctx.stroke();
