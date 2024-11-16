@@ -21,7 +21,7 @@ export class CsdSynth extends HTMLElement {
     super();
     this.props = props;
     this.audioEngine = AudioEngine.getInstance();
-    this.visualizer = new CsdVisualizer({audioContext: this.audioEngine.audioContext});
+    this.visualizer = new CsdVisualizer();
     this.adsr = {
       attack: .5,
       decay: .5,
