@@ -21,27 +21,13 @@ export class CsdSynth extends HTMLElement {
   constructor(props: any) {
     super();
     this.props = props;
-    this.adsr = {
-      attack: .5,
-      decay: .5,
-      sustain: .5,
-      release: .5
-    }
     this.audioEngine = AudioEngine.getInstance();
     this.adsr = ADSR.getInstance().adsr;
-    
-
     this.visualizer = new CsdVisualizer();
-
-
-
-
     this.waveType = "sine";
 
     this.pianoRef = new CsdPiano({adsr: this.adsr, audioEngine: this.audioEngine})
     this.adsrRef = new CsdAdsr({adsr: this.adsr});
-
-
 
     this.adsrRef.addEventListener('CsdAdsr', (event) => {
       const adsrValue = (event as CustomEvent).detail.adsr;

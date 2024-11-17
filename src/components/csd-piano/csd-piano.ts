@@ -71,7 +71,7 @@ export class CsdPiano extends HTMLElement {
     pianoElement.className = "csd-piano";
 
     for (let i = startingKey; i < keyCount; i++) {
-      let pianoKey = new CsdPianoKey({ midiKey: i, audioContext: this.audioContext, keyboardKey: keyboardKeyArray[i - startingKey], adsr: this.adsr});
+      let pianoKey = new CsdPianoKey({ midiKey: i, keyboardKey: keyboardKeyArray[i - startingKey], adsr: this.adsr});
       pianoElement.append(pianoKey);
     }
 

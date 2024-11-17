@@ -59,7 +59,7 @@ export class CsdPianoKey extends HTMLElement {
         this.gainNode.connect(this.audioEngine.audioContext.destination);
         this.gainNode.connect(this.audioEngine.getAnalyser());
         this.adsr = ADSR.getInstance().adsr;
-        this.#waveType = props.waveType || 'sine';
+  
 
 
         this.isPlaying = false;
