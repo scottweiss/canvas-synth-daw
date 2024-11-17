@@ -1,6 +1,6 @@
+import { ADSR, Adsr } from "../../../midi/ADSR";
 import { AudioEngine } from "../../../midi/AudioEngine";
 import midiToFrequency, { midiToNote } from "../../../midi/midi-to-frequency";
-import { Adsr } from "../../csd-adsr/csd-adsr";
 import styles from "./csd-piano-key.scss?inline";
 
 export class CsdPianoKey extends HTMLElement {
@@ -11,10 +11,10 @@ export class CsdPianoKey extends HTMLElement {
     #midiKey: number;
     #keyboardKey: string;
     #waveType: OscillatorType;
-    analyser: AnalyserNode;
     gainNode: GainNode;
-    #adsr: Adsr;
     isPlaying: boolean;
+    adsr: Adsr;
+
 
     set midiKey(value: number) {
         this.#midiKey = value;
@@ -32,14 +32,6 @@ export class CsdPianoKey extends HTMLElement {
         return this.#keyboardKey;
     }
 
-    set adsr(value: Adsr) {
-        this.#adsr = value;
-    }
-
-    get adsr(): Adsr {
-        return this.#adsr;
-    }
-
     set waveType(value: OscillatorType) {
         this.#waveType = value;
         this.oscillator.type = value;
@@ -54,29 +46,21 @@ export class CsdPianoKey extends HTMLElement {
 
         this.#midiKey = props.midiKey;
         this.#keyboardKey = props.keyboardKey;
-        
+
         this.audioEngine = AudioEngine.getInstance();
-
-        this.oscillator = this.audioEngine.audioContext.createOscillator();
+        this.oscillator = this.audioEngine.createOscillator(this.midiKey);
         this.gainNode = this.audioEngine.audioContext.createGain();
-        this.analyser = this.audioEngine.audioContext.createAnalyser();
-
-        // this.#audioContext = props.audioContext;
-        // this.audioEngine = props.audioEngine;
         this.#waveType = props.waveType || 'sine';
-
         // Connect the oscillator to the gain node
         this.oscillator.type = this.waveType;
 
-       // Connect the oscillator to the gain node and then to the destination
-    //    this.oscillator.connect(this.gainNode);
-       this.oscillator.connect(this.gainNode).connect(this.audioEngine.audioContext.destination);
-       this.gainNode.connect(this.audioEngine.audioContext.destination);
-      
-        this.#adsr = props.adsr;
+        // Connect the oscillator to the gain node and then to the destination
+        this.oscillator.connect(this.gainNode).connect(this.audioEngine.audioContext.destination);
+        this.gainNode.connect(this.audioEngine.audioContext.destination);
+        this.gainNode.connect(this.audioEngine.getAnalyser());
+        this.adsr = ADSR.getInstance().adsr;
         this.#waveType = props.waveType || 'sine';
 
-        this.oscillator.frequency.setValueAtTime(midiToFrequency(this.midiKey), this.audioEngine.audioContext.currentTime);
 
         this.isPlaying = false;
 
@@ -157,11 +141,11 @@ export class CsdPianoKey extends HTMLElement {
 
         this.gainNode.gain.setValueAtTime(0, this.audioEngine.audioContext.currentTime);
         this.applyADSR();
-             if (!this.isPlaying) {
+        if (!this.isPlaying) {
             this.oscillator.start()
             this.isPlaying = true;
         }
-       
+
     }
 
 

@@ -8,31 +8,33 @@ export class CsdVisualizer extends HTMLElement {
     private context: CanvasRenderingContext2D | null;
     private audioEngine: AudioEngine;
     private analyserNode: AnalyserNode;
-    private dataArray: Uint8Array;
 
     constructor() {
         super();
 
         this.audioEngine = AudioEngine.getInstance(); // get the singleton instance of AudioEngine
-        
 
         this.canvas = document.createElement('canvas');
-        const shadow = this.attachShadow({ mode: 'open' });
         this.context = this.canvas.getContext('2d');
 
         if (!this.context) {
             throw new Error('Could not get 2D rendering context from canvas.');
         }
 
+        
+
         const styleSheet = new CSSStyleSheet();
         styleSheet.replaceSync(styles);
-        shadow.adoptedStyleSheets = [styleSheet];
+        
+                
+        const shadowRoot = this.attachShadow({ mode: 'open' });
 
-        this.analyserNode = this.audioEngine.audioContext.createAnalyser(); // use the audio context from AudioEngine
-        this.analyserNode.fftSize = 32;
-        this.dataArray = new Uint8Array(this.analyserNode.frequencyBinCount);
+        shadowRoot.adoptedStyleSheets.push(styleSheet);
 
-        shadow.appendChild(this.canvas);
+        this.analyserNode = this.audioEngine.getAnalyser(); // use the audio context from AudioEngine
+        this.analyserNode.fftSize = 2048;
+
+        shadowRoot.appendChild(this.canvas);
     }
 
     connectedCallback() {
@@ -48,8 +50,8 @@ export class CsdVisualizer extends HTMLElement {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
 
-        this.dataArray = new Uint8Array(this.analyserNode.frequencyBinCount);
-        this.analyserNode.getByteTimeDomainData(this.dataArray);
+        // this.dataArray = new Uint8Array(this.analyserNode.frequencyBinCount);
+        this.analyserNode.getByteTimeDomainData(this.audioEngine.getAudioData());
 
         this.context.fillStyle = "#222";
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -65,7 +67,7 @@ export class CsdVisualizer extends HTMLElement {
 
 
         for (let i = 0; i < this.analyserNode.frequencyBinCount; i++) {
-            const v = this.dataArray[i] / 128.0;
+            const v = this.audioEngine.getAudioData()[i] / 128.0;
             const y = (v * this.canvas.height) / 2;
 
             if (i === 0) {
@@ -84,6 +86,16 @@ export class CsdVisualizer extends HTMLElement {
 
 
     private resize() {
+
+        if (
+            this.context == null
+  
+          ) {
+            return;
+          }
+
+
+
         const rect = this.getBoundingClientRect();
         this.canvas.width = rect.width;
         this.canvas.height = rect.height;

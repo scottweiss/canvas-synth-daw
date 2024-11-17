@@ -1,3 +1,4 @@
+import { ADSR } from '../../midi/ADSR';
 import { AudioEngine } from '../../midi/AudioEngine';
 import { Adsr, CsdAdsr } from '../csd-adsr/csd-adsr';
 import { CsdPiano } from '../csd-piano/csd-piano';
@@ -20,14 +21,19 @@ export class CsdSynth extends HTMLElement {
   constructor(props: any) {
     super();
     this.props = props;
-    this.audioEngine = AudioEngine.getInstance();
-    this.visualizer = new CsdVisualizer();
     this.adsr = {
       attack: .5,
       decay: .5,
       sustain: .5,
       release: .5
     }
+    this.audioEngine = AudioEngine.getInstance();
+    this.adsr = ADSR.getInstance().adsr;
+    
+
+    this.visualizer = new CsdVisualizer();
+
+
 
 
     this.waveType = "sine";
@@ -40,6 +46,7 @@ export class CsdSynth extends HTMLElement {
     this.adsrRef.addEventListener('CsdAdsr', (event) => {
       const adsrValue = (event as CustomEvent).detail.adsr;
       if  (adsrValue) {
+        ADSR.getInstance().adsr = adsrValue;
         this.adsr = adsrValue;
         this.pianoRef.adsr = this.adsr;
        }
