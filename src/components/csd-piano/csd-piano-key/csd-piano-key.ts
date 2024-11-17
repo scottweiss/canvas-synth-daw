@@ -136,7 +136,6 @@ export class CsdPianoKey extends HTMLElement {
     }
 
     playNote(): void {
-        console.log(this.audioEngine)
         if (!this.oscillator) return;
 
         this.gainNode.gain.setValueAtTime(0, this.audioEngine.audioContext.currentTime);
