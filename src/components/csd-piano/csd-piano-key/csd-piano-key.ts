@@ -16,6 +16,12 @@ export class CsdPianoKey extends HTMLElement {
     #adsr: Adsr;
     isPlaying: boolean;
 
+
+    getAnalyser(): AnalyserNode | null {
+        return this.analyser;
+    }
+
+
     set midiKey(value: number) {
         this.#midiKey = value;
     }
@@ -57,12 +63,10 @@ export class CsdPianoKey extends HTMLElement {
         
         this.audioEngine = AudioEngine.getInstance();
 
-        this.oscillator = this.audioEngine.audioContext.createOscillator();
+        this.oscillator = this.audioEngine.createOscillator(60, this.adsr);
         this.gainNode = this.audioEngine.audioContext.createGain();
         this.analyser = this.audioEngine.audioContext.createAnalyser();
 
-        // this.#audioContext = props.audioContext;
-        // this.audioEngine = props.audioEngine;
         this.#waveType = props.waveType || 'sine';
 
         // Connect the oscillator to the gain node
