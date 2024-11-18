@@ -24,7 +24,7 @@ export class CsdSynth extends HTMLElement {
 
     this.pianoRef = new CsdPiano({
       adsr: this.adsr,
-      audioEngine: this.audioEngine,
+      // audioEngine: this.audioEngine,
     });
     this.adsrRef = new CsdAdsr({ adsr: this.adsr });
 

@@ -6,7 +6,7 @@ import { AudioEngine } from "../../midi/AudioEngine";
 
 export type CsdPianoProps = {
   adsr: Adsr;
-  waveType: OscillatorType;
+  waveType?: OscillatorType;
 };
 export class CsdPiano extends HTMLElement {
   pianoElement: HTMLElement;
