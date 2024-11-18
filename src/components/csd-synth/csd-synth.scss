@@ -4,9 +4,17 @@
     transform: rotateX(12deg);
     border-radius:8px;
     margin: 0 auto;
-    width: 750px;
+    width: min-content;
     position: relative;
     overflow: hidden;
+    display: grid;
+    // gap: 8px;
+    padding: 8px 8px 0;
+    grid-template-areas:
+    "viz adsr"
+    "wave adsr"
+    "piano piano"
+    ;
 
     *,
     *::before,
@@ -23,6 +31,26 @@
         inset: 0;
         z-index: -1;
     }
+
+    fieldset{
+        display: flex;
+        flex-direction: column;
+        grid-area: wave;
+
+    }
+
+    csd-visualizer{
+        grid-area: viz;
+    }
     
+    csd-adsr{
+        grid-area: adsr;
+    }
+
+    csd-piano{
+        padding-top: 16px;
+        grid-area: piano;
+    }
+
     
 }

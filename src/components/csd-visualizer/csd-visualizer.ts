@@ -2,7 +2,6 @@
 import { AudioEngine } from '../../midi/AudioEngine';
 import styles from './csd-visualizer.scss?inline'
 
-
 export class CsdVisualizer extends HTMLElement {
     private canvas: HTMLCanvasElement;
     private context: CanvasRenderingContext2D | null;
@@ -21,19 +20,15 @@ export class CsdVisualizer extends HTMLElement {
             throw new Error('Could not get 2D rendering context from canvas.');
         }
 
-        
+        this.analyserNode = this.audioEngine.getAnalyser(); // use the audio context from AudioEngine
+        this.analyserNode.fftSize = 256;
 
         const styleSheet = new CSSStyleSheet();
         styleSheet.replaceSync(styles);
-        
-                
+
+
         const shadowRoot = this.attachShadow({ mode: 'open' });
-
         shadowRoot.adoptedStyleSheets.push(styleSheet);
-
-        this.analyserNode = this.audioEngine.getAnalyser(); // use the audio context from AudioEngine
-        this.analyserNode.fftSize = 2048;
-
         shadowRoot.appendChild(this.canvas);
     }
 
@@ -42,22 +37,58 @@ export class CsdVisualizer extends HTMLElement {
         this.draw();
     }
 
+    drawGridOverlay() {
+        if (!this.context) return;
+        this.context.save();
+        this.context.lineWidth = 2;
+        this.context.strokeStyle = "#00000033";
+        this.context.beginPath();
+        // this.context.translate(, 2)
+        const cellSize = 24
+
+        for (let i =  8; i < this.canvas.width; i += cellSize) {
+            this.context.moveTo(i, 0);
+            this.context.lineTo(i, this.canvas.height);
+
+        }
+      
+
+        for (let i = 20; i < this.canvas.height; i += cellSize) {
+            this.context.moveTo(0, i);
+            this.context.lineTo(this.canvas.width, i);
+
+        }
+        this.context.stroke();
+        this.context.closePath();
+        this.context.beginPath();
+
+        this.context.moveTo(0, this.canvas.height/2);
+        this.context.lineTo(this.canvas.width, this.canvas.height/2);
+
+
+        this.context.moveTo(this.canvas.width/2, 0);
+        this.context.lineTo(this.canvas.width/2, this.canvas.height);
+        this.context.strokeStyle = "#00000033";
+        this.context.stroke();
+        this.context.restore();
+
+
+    }
+
     private draw() {
-        // requestAnimationFrame(() => this.draw());
+        requestAnimationFrame(() => this.draw());
         if (!this.context) return;
 
-        // this.analyserNode.getByteTimeDomainData(this.dataArray);
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
 
-        // this.dataArray = new Uint8Array(this.analyserNode.frequencyBinCount);
         this.analyserNode.getByteTimeDomainData(this.audioEngine.getAudioData());
 
-        this.context.fillStyle = "#222";
+        this.context.fillStyle = "#333";
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        this.context.lineWidth = 5;
-        this.context.strokeStyle = "orange";
+        this.context.lineWidth = 2;
+        this.context.strokeStyle = "green";
 
         this.context.beginPath();
 
@@ -81,20 +112,13 @@ export class CsdVisualizer extends HTMLElement {
 
         this.context.lineTo(this.canvas.width, this.canvas.height / 2);
         this.context.stroke();
-        requestAnimationFrame(() => this.draw());
+        this.drawGridOverlay()
     }
 
-
     private resize() {
-
-        if (
-            this.context == null
-  
-          ) {
+        if ( this.context == null) {
             return;
-          }
-
-
+        }
 
         const rect = this.getBoundingClientRect();
         this.canvas.width = rect.width;

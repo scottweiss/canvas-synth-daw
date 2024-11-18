@@ -10,7 +10,7 @@ export class CsdSynth extends HTMLElement {
   props: any;
   
   waveType: OscillatorType;
-  waveTypeRef: HTMLSelectElement;
+
   pianoRef: CsdPiano;
   adsrRef: CsdAdsr;
   adsr: Adsr;
@@ -24,7 +24,7 @@ export class CsdSynth extends HTMLElement {
     this.audioEngine = AudioEngine.getInstance();
     this.adsr = ADSR.getInstance().adsr;
     this.visualizer = new CsdVisualizer();
-    this.waveType = "sine";
+    this.waveType = "sawtooth";
 
     this.pianoRef = new CsdPiano({adsr: this.adsr, audioEngine: this.audioEngine})
     this.adsrRef = new CsdAdsr({adsr: this.adsr});
@@ -38,33 +38,47 @@ export class CsdSynth extends HTMLElement {
        }
      });
 
-     this.waveTypeRef = document.createElement('select');
+     const fieldset = document.createElement('fieldset');
+     const legend = document.createElement('legend');
+     legend.textContent = 'Wave type';
 
-     this.waveTypeRef.append(
-        this.renderSelectOption('sawtooth', 'sawtooth'),
-        this.renderSelectOption('sine', 'sine'),
-        this.renderSelectOption('square', 'square'),
-        this.renderSelectOption('triangle', 'triangle'),
+     fieldset.append(
+      legend,
+      this.renderRadio('sawtooth'),
+      this.renderRadio('sine'),
+      this.renderRadio('square'),
+      this.renderRadio('triangle')
      )
 
-     this.waveTypeRef.addEventListener('change', () => {
-        this.pianoRef.waveType = this.waveTypeRef.value as OscillatorType;
-     })
-
-     this.waveTypeRef.value = this.waveType;
-     let waveTypeLabel = document.createElement('label');
-     let waveTableLabelSpan = document.createElement('span').textContent = "Wave shape";
-
-     waveTypeLabel.append(waveTableLabelSpan, this.waveTypeRef);
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(styles);
 
     const shadowRoot = this.attachShadow({ mode: 'open' });
 
     shadowRoot.adoptedStyleSheets.push(sheet);
-    shadowRoot.append(this.renderSvg(), waveTypeLabel, this.visualizer, this.adsrRef, this.pianoRef);
+    shadowRoot.append(this.renderSvg(), fieldset, this.visualizer, this.adsrRef, this.pianoRef);
   }
 
+  renderRadio(labelText: string): HTMLLabelElement{
+    const label = document.createElement('label');
+    const labelSpan = document.createElement('span');
+    labelSpan.textContent = labelText;
+    const radio = document.createElement('input');
+    radio.name = "waveType";
+    radio.type = 'radio';
+    radio.value = labelText;
+    radio.checked = this.waveType === labelText;
+
+    radio.addEventListener('click', (event) => {
+      console.log(event);
+      this.pianoRef.waveType = labelText as OscillatorType;
+
+    })
+    label.append(radio, labelSpan);
+
+
+    return label;
+  }
   renderSelectOption(label: string, value: string): HTMLElement {
     let option = document.createElement('option');
     option.text = label;
@@ -84,7 +98,6 @@ export class CsdSynth extends HTMLElement {
     svgRef.setAttribute('width', '100%');
     svgRef.setAttribute('height', '100%');
 
-    // x='0%' y='0%' width='100%' height="100%"
     filter.setAttribute('id', 'plasticTexture');
     filter.setAttribute('x', '0%');
     filter.setAttribute('y', '0%');

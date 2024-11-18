@@ -16,10 +16,8 @@ export class CsdPiano extends HTMLElement {
     super();
     
     this.audioEngine = AudioEngine.getInstance();
-    // this.audioContext = props?.audioEngine.audioContext || new window.AudioContext;
     this.audioContext = this.audioEngine.audioContext;
-    // this.audioContext = new window.AudioContext;
-
+    this.#waveType = props.waveType || 'sawtooth';
 
     this.#adsr = props.adsr ||{
       attack: 0.1,
@@ -71,7 +69,7 @@ export class CsdPiano extends HTMLElement {
     pianoElement.className = "csd-piano";
 
     for (let i = startingKey; i < keyCount; i++) {
-      let pianoKey = new CsdPianoKey({ midiKey: i, keyboardKey: keyboardKeyArray[i - startingKey], adsr: this.adsr});
+      let pianoKey = new CsdPianoKey({ midiKey: i, keyboardKey: keyboardKeyArray[i - startingKey], adsr: this.adsr, waveType: this.waveType});
       pianoElement.append(pianoKey);
     }
 

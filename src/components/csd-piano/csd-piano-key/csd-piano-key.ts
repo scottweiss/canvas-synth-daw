@@ -150,11 +150,12 @@ export class CsdPianoKey extends HTMLElement {
 
     applyADSR() {
         const currentTime = this.audioEngine.audioContext.currentTime;
+        const maxVolumne = .5;
         this.oscillator.frequency.setValueAtTime(midiToFrequency(this.midiKey), this.audioEngine.audioContext.currentTime);
         this.gainNode.gain.setValueAtTime(0.001, currentTime);
-        this.gainNode.gain.linearRampToValueAtTime(0.1, currentTime + this.adsr.attack);
-        this.gainNode.gain.linearRampToValueAtTime(this.adsr.sustain * 0.1, currentTime + this.adsr.attack + this.adsr.decay);
-        this.gainNode.gain.setValueAtTime(this.adsr.sustain * 0.1, currentTime + this.adsr.attack + this.adsr.decay);
+        this.gainNode.gain.linearRampToValueAtTime(maxVolumne, currentTime + this.adsr.attack);
+        this.gainNode.gain.linearRampToValueAtTime(this.adsr.sustain * maxVolumne, currentTime + this.adsr.attack + this.adsr.decay);
+        this.gainNode.gain.setValueAtTime(this.adsr.sustain * maxVolumne, currentTime + this.adsr.attack + this.adsr.decay);
     }
 
     releaseEnvelope() {
