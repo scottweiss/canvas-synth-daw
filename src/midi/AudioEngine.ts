@@ -6,21 +6,17 @@ export class AudioEngine {
   private dataArray: Uint8Array;
   public audioContext: AudioContext;
 
-
   private constructor() {
     this.audioContext = new window.AudioContext();
     this.analyserNode = this.audioContext.createAnalyser();
     this.dataArray = new Uint8Array(this.analyserNode.frequencyBinCount);
-
   }
-
-
 
   getAudioData(): Uint8Array {
     return this.dataArray;
   }
 
-  getAnalyser() : AnalyserNode{
+  getAnalyser(): AnalyserNode {
     return this.analyserNode;
   }
 

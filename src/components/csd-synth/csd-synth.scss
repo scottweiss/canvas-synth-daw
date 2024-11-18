@@ -1,56 +1,52 @@
 :host {
-    box-sizing: border-box;
-    display: block;
-    transform: rotateX(12deg);
-    border-radius:8px;
-    margin: 0 auto;
-    width: min-content;
-    position: relative;
-    overflow: hidden;
-    display: grid;
-    // gap: 8px;
-    padding: 8px 8px 0;
-    grid-template-areas:
+  box-sizing: border-box;
+  display: block;
+  transform: rotateX(12deg);
+  border-radius: 8px;
+  margin: 0 auto;
+  width: min-content;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  // gap: 8px;
+  padding: 8px 8px 0;
+  grid-template-areas:
     "viz adsr"
     "wave adsr"
-    "piano piano"
-    ;
+    "piano piano";
 
-    *,
-    *::before,
-    *::after {
-        box-sizing: inherit;
-    }
+  *,
+  *::before,
+  *::after {
+    box-sizing: inherit;
+  }
 
-    select {
-        margin: 0 auto;
-    }
+  select {
+    margin: 0 auto;
+  }
 
-    svg{
-        position: absolute;
-        inset: 0;
-        z-index: -1;
-    }
+  svg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
 
-    fieldset{
-        display: flex;
-        flex-direction: column;
-        grid-area: wave;
+  fieldset {
+    display: flex;
+    flex-direction: column;
+    grid-area: wave;
+  }
 
-    }
+  csd-visualizer {
+    grid-area: viz;
+  }
 
-    csd-visualizer{
-        grid-area: viz;
-    }
-    
-    csd-adsr{
-        grid-area: adsr;
-    }
+  csd-adsr {
+    grid-area: adsr;
+  }
 
-    csd-piano{
-        padding-top: 16px;
-        grid-area: piano;
-    }
-
-    
+  csd-piano {
+    padding-top: 16px;
+    grid-area: piano;
+  }
 }
