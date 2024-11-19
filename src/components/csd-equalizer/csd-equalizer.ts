@@ -1,14 +1,13 @@
 import { AudioEngine } from "../../midi/AudioEngine";
 import { Canvas } from "../../midi/Canvas";
-import styles from "./csd-visualizer.scss?inline";
+import styles from "./csd-equalizer.scss?inline";
 
-export class CsdVisualizer extends HTMLElement {
+export class CsdEqualizer extends HTMLElement {
   private canvasController: Canvas;
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D | null;
   private audioEngine: AudioEngine;
   private analyserNode: AnalyserNode;
-
 
   constructor() {
     super();
@@ -38,12 +37,10 @@ export class CsdVisualizer extends HTMLElement {
   connectedCallback() {
     this.canvasController.resize();
     this.canvasController.draw();
-    
-    // this.resize();
+
+    this.resize();
     this.draw();
   }
-
-
 
   drawGridOverlay() {
     if (!this.context) return;
@@ -65,7 +62,6 @@ export class CsdVisualizer extends HTMLElement {
     }
     this.context.stroke();
     this.context.closePath();
-
     // this.context.beginPath();
 
     // this.context.moveTo(0, this.canvas.height / 2);
@@ -75,21 +71,19 @@ export class CsdVisualizer extends HTMLElement {
     // this.context.lineTo(this.canvas.width / 2, this.canvas.height);
     // this.context.strokeStyle = "#00000033";
     // this.context.stroke();
-
     this.context.restore();
   }
 
-
-  
   private draw() {
     requestAnimationFrame(() => this.draw());
     if (!this.context) return;
+    const bufferLength = this.analyserNode.frequencyBinCount;
 
     // this.canvasController.draw()
     this.context.save();
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    this.analyserNode.getByteTimeDomainData(this.audioEngine.getAudioData());
+    this.analyserNode.getByteFrequencyData(this.audioEngine.getAudioData());
 
     this.context.fillStyle = "#333433";
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -103,12 +97,17 @@ export class CsdVisualizer extends HTMLElement {
     this.context.beginPath();
 
     const sliceWidth =
-      (this.canvas.width * 1.0) / this.analyserNode.frequencyBinCount;
+      (this.canvas.width * 1.0) / bufferLength;
+
+  // const maxLogIndex = Math.log(bufferLength / (2 * this.audioEngine.audioContext.sampleRate)) / Math.log(2) * bufferLength;
     let x = 0;
 
-    for (let i = 0; i < this.analyserNode.frequencyBinCount; i++) {
+    for (let i = 0; i < bufferLength; i++) {
+      // const  logIndex = maxLogIndex * (Math.log(i + 1) / Math.log(bufferLength)) - 1; // Calculate the log-scale index
+      // Map the log-scale index to a x coordinate on the canvas
+      // x = logIndex / maxLogIndex * this.canvas.width;
       const v = this.audioEngine.getAudioData()[i] / 128.0;
-      const y = (v * this.canvas.height) / 2;
+      const y = this.canvas.height - (v * this.canvas.height) / 2;
 
       if (i === 0) {
         this.context.moveTo(x, y);
@@ -119,22 +118,21 @@ export class CsdVisualizer extends HTMLElement {
       x += sliceWidth;
     }
 
-    // this.context.lineTo(this.canvas.width, this.canvas.height / 2);
     this.context.stroke();
 
     this.context.restore();
     this.drawGridOverlay();
   }
 
-  // private resize() {
-  //   if (this.context == null) {
-  //     return;
-  //   }
+  private resize() {
+    if (this.context == null) {
+      return;
+    }
 
-  //   const rect = this.getBoundingClientRect();
-  //   this.canvas.width = rect.width;
-  //   this.canvas.height = rect.height;
-  // }
+    const rect = this.getBoundingClientRect();
+    this.canvas.width = rect.width;
+    this.canvas.height = rect.height;
+  }
 }
 
-customElements.define("csd-visualizer", CsdVisualizer);
+customElements.define("csd-equalizer", CsdEqualizer);

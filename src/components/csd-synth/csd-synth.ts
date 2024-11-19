@@ -1,6 +1,7 @@
 import { ADSR } from "../../midi/ADSR";
 import { AudioEngine } from "../../midi/AudioEngine";
 import { Adsr, CsdAdsr } from "../csd-adsr/csd-adsr";
+import { CsdEqualizer } from "../csd-equalizer/csd-equalizer";
 import { CsdPiano } from "../csd-piano/csd-piano";
 import { CsdVisualizer } from "../csd-visualizer/csd-visualizer";
 import styles from "./csd-synth.scss?inline";
@@ -13,6 +14,7 @@ export class CsdSynth extends HTMLElement {
   adsr: Adsr;
   audioEngine: AudioEngine;
   visualizer: CsdVisualizer;
+  equalizer: CsdEqualizer;
 
   constructor() {
     super();
@@ -20,6 +22,7 @@ export class CsdSynth extends HTMLElement {
     this.audioEngine = AudioEngine.getInstance();
     this.adsr = ADSR.getInstance().adsr;
     this.visualizer = new CsdVisualizer();
+    this.equalizer = new CsdEqualizer();
     this.waveType = "sawtooth";
 
     this.pianoRef = new CsdPiano({
@@ -58,6 +61,7 @@ export class CsdSynth extends HTMLElement {
       this.renderSvg(),
       fieldset,
       this.visualizer,
+      this.equalizer,
       this.adsrRef,
       this.pianoRef,
     );

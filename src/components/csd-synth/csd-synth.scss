@@ -2,6 +2,7 @@
   box-sizing: border-box;
   display: block;
   transform: rotateX(12deg);
+ transform-style: preserve-3d;
   border-radius: 8px;
   margin: 0 auto;
   width: min-content;
@@ -11,9 +12,9 @@
   // gap: 8px;
   padding: 8px 8px 0;
   grid-template-areas:
-    "viz adsr"
-    "wave adsr"
-    "piano piano";
+    "viz eq wave"
+    "adsr adsr adsr"
+    "piano  piano piano";
 
   *,
   *::before,
@@ -51,7 +52,9 @@
   csd-visualizer {
     grid-area: viz;
   }
-
+  csd-equalizer {
+    grid-area: eq;
+  }
   csd-adsr {
     grid-area: adsr;
   }
