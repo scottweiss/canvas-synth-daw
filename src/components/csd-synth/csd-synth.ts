@@ -1,6 +1,5 @@
 import { ADSR } from "../../midi/ADSR";
 import { AudioEngine } from "../../midi/AudioEngine";
-import { Drum } from "../../midi/Drum";
 import { Adsr, CsdAdsr } from "../csd-adsr/csd-adsr";
 import { CsdDrumKit } from "../csd-drum-kit/csd-drum-kit";
 import { CsdEqualizer } from "../csd-equalizer/csd-equalizer";
