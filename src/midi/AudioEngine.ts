@@ -22,10 +22,7 @@ export class AudioEngine {
 
   createOscillator(midiKey: number): OscillatorNode {
     const oscillator = this.audioContext.createOscillator();
-
-    // Set up the oscillator
     oscillator.frequency.value = midiToFrequency(midiKey);
-
     return oscillator;
   }
 

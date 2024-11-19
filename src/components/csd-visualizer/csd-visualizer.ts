@@ -71,15 +71,19 @@ export class CsdVisualizer extends HTMLElement {
     requestAnimationFrame(() => this.draw());
     if (!this.context) return;
 
+    this.context.save();
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.analyserNode.getByteTimeDomainData(this.audioEngine.getAudioData());
 
-    this.context.fillStyle = "#333";
+    this.context.fillStyle = "#333433";
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    this.context.lineWidth = 2;
-    this.context.strokeStyle = "green";
+    this.context.lineWidth = 3;
+    this.context.strokeStyle = "#1f1";
+
+    this.context.shadowBlur = 20;
+    this.context.shadowColor = "#1f1";
 
     this.context.beginPath();
 
@@ -102,6 +106,8 @@ export class CsdVisualizer extends HTMLElement {
 
     this.context.lineTo(this.canvas.width, this.canvas.height / 2);
     this.context.stroke();
+
+    this.context.restore();
     this.drawGridOverlay();
   }
 

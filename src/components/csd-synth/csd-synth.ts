@@ -24,7 +24,6 @@ export class CsdSynth extends HTMLElement {
 
     this.pianoRef = new CsdPiano({
       adsr: this.adsr,
-      // audioEngine: this.audioEngine,
     });
     this.adsrRef = new CsdAdsr({ adsr: this.adsr });
 
@@ -71,6 +70,7 @@ export class CsdSynth extends HTMLElement {
     const radio = document.createElement("input");
     radio.name = "waveType";
     radio.type = "radio";
+    radio.classList.add("sr-only");
     radio.value = labelText;
     radio.checked = this.waveType === labelText;
 

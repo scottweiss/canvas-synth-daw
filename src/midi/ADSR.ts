@@ -11,10 +11,10 @@ export class ADSR {
 
   private constructor() {
     this.#adsr = {
-      attack: 0.5,
+      attack: 0.15,
       decay: 0.5,
-      sustain: 0.5,
-      release: 0.5,
+      sustain: 0.7,
+      release: 0.4,
     };
   }
 

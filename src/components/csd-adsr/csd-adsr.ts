@@ -80,7 +80,6 @@ export class CsdAdsr extends HTMLElement {
       case "attack":
         range.value = String(this.#attack);
         break;
-
       case "decay":
         range.value = String(this.#decay);
         break;
@@ -178,7 +177,7 @@ export class CsdAdsr extends HTMLElement {
       canvasHeight - margin,
     );
     this.#ctx.strokeStyle = "orange";
-    this.#ctx.lineWidth = 10;
+    this.#ctx.lineWidth = 4;
     this.#ctx.stroke();
   }
 
