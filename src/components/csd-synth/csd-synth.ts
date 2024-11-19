@@ -1,6 +1,8 @@
 import { ADSR } from "../../midi/ADSR";
 import { AudioEngine } from "../../midi/AudioEngine";
+import { Drum } from "../../midi/Drum";
 import { Adsr, CsdAdsr } from "../csd-adsr/csd-adsr";
+import { CsdDrumKit } from "../csd-drum-kit/csd-drum-kit";
 import { CsdEqualizer } from "../csd-equalizer/csd-equalizer";
 import { CsdPiano } from "../csd-piano/csd-piano";
 import { CsdVisualizer } from "../csd-visualizer/csd-visualizer";
@@ -15,6 +17,7 @@ export class CsdSynth extends HTMLElement {
   audioEngine: AudioEngine;
   visualizer: CsdVisualizer;
   equalizer: CsdEqualizer;
+  drumKit: CsdDrumKit;
 
   constructor() {
     super();
@@ -24,6 +27,7 @@ export class CsdSynth extends HTMLElement {
     this.visualizer = new CsdVisualizer();
     this.equalizer = new CsdEqualizer();
     this.waveType = "sawtooth";
+    this.drumKit = new CsdDrumKit; 
 
     this.pianoRef = new CsdPiano({
       adsr: this.adsr,
@@ -51,6 +55,9 @@ export class CsdSynth extends HTMLElement {
       this.renderRadio("triangle"),
     );
 
+
+
+
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(styles);
 
@@ -64,6 +71,7 @@ export class CsdSynth extends HTMLElement {
       this.equalizer,
       this.adsrRef,
       this.pianoRef,
+      this.drumKit
     );
   }
 
