@@ -10,11 +10,16 @@
   overflow: hidden;
   display: grid;
   // gap: 8px;
-  padding: 8px 8px 0;
+  // padding: 8px 8px 0;
+  padding: 12px;
   grid-template-areas:
-    "viz eq wave"
-    "adsr adsr adsr"
-    "piano  piano piano";
+    "viz eq dk"
+    "adsr adsr dk"
+    "piano piano  wave"
+    ;
+
+    justify-items: center;
+    align-items: center;
 
   *,
   *::before,
@@ -37,6 +42,7 @@
     flex-direction: column;
     grid-area: wave;
     gap: 16px;
+    width: min-content;
     input {
       outline: none;
     }
@@ -60,8 +66,12 @@
   }
 
   csd-piano {
-    padding-top: 16px;
+    // padding-top: 16px;
+    margin-bottom: -32px;
     grid-area: piano;
+  }
+  csd-drum-kit {
+    grid-area: dk;
   }
   .sr-only {
     display: block;
