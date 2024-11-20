@@ -55,24 +55,11 @@ export class CsdSynth extends HTMLElement {
       value: this.waveType
     });
     waveSelect.value = this.waveType;
-    // waveSelect.addEventListener('CsdRadioButtonGroupValueChange', (event: CustomEvent) => {
-    //   this.waveType = event.detail.value;
-    // })
     waveSelect.addEventListener('CsdRadioButtonGroupValueChange', (event: Event) => {
       this.waveType = (event as CustomEvent).detail.value
       this.pianoRef.waveType = (event as CustomEvent).detail.value as OscillatorType;
     })
-    const fieldset = document.createElement("fieldset");
-    const legend = document.createElement("legend");
-    legend.textContent = "Wave type";
 
-    fieldset.append(
-      legend,
-      this.renderRadio("sawtooth"),
-      this.renderRadio("sine"),
-      this.renderRadio("square"),
-      this.renderRadio("triangle"),
-    );
 
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(styles);
@@ -82,7 +69,6 @@ export class CsdSynth extends HTMLElement {
     shadowRoot.adoptedStyleSheets.push(sheet);
     shadowRoot.append(
       this.renderSvg(),
-      // fieldset,
       waveSelect,
       this.visualizer,
       this.equalizer,
@@ -92,32 +78,6 @@ export class CsdSynth extends HTMLElement {
     );
   }
 
-  renderRadio(labelText: string): HTMLLabelElement {
-    const label = document.createElement("label");
-    const labelSpan = document.createElement("span");
-    labelSpan.textContent = labelText;
-    const radio = document.createElement("input");
-    radio.name = "waveType";
-    radio.type = "radio";
-    radio.classList.add("sr-only");
-    radio.value = labelText;
-    radio.checked = this.waveType === labelText;
-
-    radio.addEventListener("click", (event) => {
-      console.log(event);
-      this.pianoRef.waveType = labelText as OscillatorType;
-    });
-    label.append(radio, labelSpan);
-
-    return label;
-  }
-
-  renderSelectOption(label: string, value: string): HTMLElement {
-    const option = document.createElement("option");
-    option.text = label;
-    option.value = value;
-    return option;
-  }
 
   renderSvg(): SVGSVGElement {
     const svgRef = document.createElementNS(
