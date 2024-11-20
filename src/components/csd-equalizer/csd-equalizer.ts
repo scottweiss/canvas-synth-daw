@@ -96,10 +96,9 @@ export class CsdEqualizer extends HTMLElement {
 
     this.context.beginPath();
 
-    const sliceWidth =
-      (this.canvas.width * 1.0) / bufferLength;
+    const sliceWidth = (this.canvas.width * 1.0) / bufferLength;
 
-  // const maxLogIndex = Math.log(bufferLength / (2 * this.audioEngine.audioContext.sampleRate)) / Math.log(2) * bufferLength;
+    // const maxLogIndex = Math.log(bufferLength / (2 * this.audioEngine.audioContext.sampleRate)) / Math.log(2) * bufferLength;
     let x = 0;
 
     for (let i = 0; i < bufferLength; i++) {

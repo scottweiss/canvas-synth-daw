@@ -32,13 +32,13 @@ $csd-piano-key-sharp-width: 44px;
     border-bottom-right-radius: 4px;
     padding-bottom: 8px;
     outline: none;
+    border-top: none;
 
     &:hover {
       box-shadow: inset 0px 0px 4px 0px rgba(0, 0, 200, 0.5);
     }
     &.active,
     &:active {
-      background: rgb(160, 160, 200);
       background: orange;
     }
   }

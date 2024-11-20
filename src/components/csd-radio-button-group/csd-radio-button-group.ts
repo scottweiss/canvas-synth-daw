@@ -1,27 +1,26 @@
 import styles from "./csd-radio-button-group.scss?inline";
 
 type CsdOption = {
-    id: string,
-    label: string
-}
+  id: string;
+  label: string;
+};
 
 export type CsdRadioButtonGroupProps = {
-    id: string;
-    legend: string;
-    options: Array<CsdOption>;
-    value?: string;
-
-}
+  id: string;
+  legend: string;
+  options: Array<CsdOption>;
+  value?: string;
+};
 
 export class CsdRadioButtonGroup extends HTMLElement {
-    #value: string | undefined;
+  #value: string | undefined;
 
-  constructor(props:  CsdRadioButtonGroupProps) {
+  constructor(props: CsdRadioButtonGroupProps) {
     super();
     if (props.value) {
-        this.value = props.value  
+      this.value = props.value;
     }
-   
+
     // add styles
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(styles);
@@ -31,11 +30,9 @@ export class CsdRadioButtonGroup extends HTMLElement {
     const fieldset = this.renderFieldset(props.legend);
 
     props.options.map((option) => {
-        fieldset.append(this.renderRadio(option));
-    })
-    shadowRoot.append( 
-        fieldset
-    );
+      fieldset.append(this.renderRadio(option));
+    });
+    shadowRoot.append(fieldset);
   }
 
   get value(): string | undefined {
@@ -47,15 +44,14 @@ export class CsdRadioButtonGroup extends HTMLElement {
   }
 
   renderFieldset(legend: string) {
-    const fieldsetRef = document.createElement('fieldset');
-    const legendRef = document.createElement('legend');
+    const fieldsetRef = document.createElement("fieldset");
+    const legendRef = document.createElement("legend");
     legendRef.textContent = legend;
 
     fieldsetRef.appendChild(legendRef);
     return fieldsetRef;
-  } 
+  }
 
-  
   renderRadio(option: CsdOption): HTMLLabelElement {
     const label = document.createElement("label");
     const labelSpan = document.createElement("span");
@@ -70,19 +66,20 @@ export class CsdRadioButtonGroup extends HTMLElement {
     // radio.checked = this.waveType === labelText;
 
     radio.addEventListener("click", (event) => {
-        console.log(event)
-        this.value = option.id;
-        this.dispatchEvent(new CustomEvent('CsdRadioButtonGroupValueChange', {
-            detail: {
-                value: this.value
-            }
-        }))
-    })
+      console.log(event);
+      this.value = option.id;
+      this.dispatchEvent(
+        new CustomEvent("CsdRadioButtonGroupValueChange", {
+          detail: {
+            value: this.value,
+          },
+        }),
+      );
+    });
     label.append(radio, labelSpan);
 
     return label;
   }
-
 }
 
 // Define the new element

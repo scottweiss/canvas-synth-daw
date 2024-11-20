@@ -45,21 +45,24 @@ export class CsdSynth extends HTMLElement {
 
     const waveSelect = new CsdRadioButtonGroup({
       id: "wave-select",
-      legend: "Wave type",
+      legend: "wave type",
       options: [
         { id: "sawtooth", label: "sawtooth" },
         { id: "sine", label: "sine" },
         { id: "square", label: "square" },
         { id: "triangle", label: "triangle" },
       ],
-      value: this.waveType
+      value: this.waveType,
     });
     waveSelect.value = this.waveType;
-    waveSelect.addEventListener('CsdRadioButtonGroupValueChange', (event: Event) => {
-      this.waveType = (event as CustomEvent).detail.value
-      this.pianoRef.waveType = (event as CustomEvent).detail.value as OscillatorType;
-    })
-
+    waveSelect.addEventListener(
+      "CsdRadioButtonGroupValueChange",
+      (event: Event) => {
+        this.waveType = (event as CustomEvent).detail.value;
+        this.pianoRef.waveType = (event as CustomEvent).detail
+          .value as OscillatorType;
+      },
+    );
 
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(styles);
@@ -77,7 +80,6 @@ export class CsdSynth extends HTMLElement {
       this.drumKit,
     );
   }
-
 
   renderSvg(): SVGSVGElement {
     const svgRef = document.createElementNS(

@@ -11,9 +11,16 @@
     flex-direction: column;
 
     gap: 4px;
-    border-radius: 16px;
+    border-radius: 8px;
+
+    border: 2px solid #444;
+
     legend {
-        padding-inline: 12px;
+      text-align: center;
+      padding-inline: 0.5em;
+      color: white;
+      font-size: 16px;
+      white-space: nowrap;
     }
     // width: min-content;
     input {

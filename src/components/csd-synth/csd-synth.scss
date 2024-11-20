@@ -1,8 +1,8 @@
 :host {
   box-sizing: border-box;
   display: block;
-  transform: rotateX(12deg);
- transform-style: preserve-3d;
+  transform: rotateX(15deg);
+  transform-style: preserve-3d;
   border-radius: 8px;
   margin: 0 auto;
   width: min-content;
@@ -13,13 +13,12 @@
   // padding: 8px 8px 0;
   padding: 12px;
   grid-template-areas:
-    "viz eq dk"
-    "adsr adsr dk"
-    "piano piano  wave"
-    ;
+    "viz eq dk dk"
+    "adsr adsr dk dk"
+    "piano piano piano wave ";
 
-    justify-items: center;
-    align-items: center;
+  justify-items: center;
+  align-items: center;
 
   *,
   *::before,
@@ -37,45 +36,21 @@
     z-index: -1;
   }
 
-  // fieldset {
-  //   display: flex;
-  //   flex-direction: column;
-  //   grid-area: wave;
-  //   gap: 16px;
-  //   width: min-content;
-  //   input {
-  //     outline: none;
-  //   }
-  //   label:has(input:checked) {
-  //     color: orange;
-  //     font-weight: bold;
-  //   }
-  //   label:focus-within {
-  //     outline: focus-outline;
-  //   }
-  // }
-
   csd-radio-button-group {
     grid-area: wave;
   }
 
   csd-visualizer {
     grid-area: viz;
-    // width: 100%;
-    // justify-self: flex-end;
   }
   csd-equalizer {
     grid-area: eq;
-    // width: 100%;
-    // justify-self: flex-start;
   }
   csd-adsr {
     grid-area: adsr;
   }
 
   csd-piano {
-    // padding-top: 16px;
-    // margin-bottom: -32px;
     grid-area: piano;
     align-self: end;
   }

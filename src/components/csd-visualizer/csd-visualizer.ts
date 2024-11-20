@@ -9,7 +9,6 @@ export class CsdVisualizer extends HTMLElement {
   private audioEngine: AudioEngine;
   private analyserNode: AnalyserNode;
 
-
   constructor() {
     super();
 
@@ -38,12 +37,10 @@ export class CsdVisualizer extends HTMLElement {
   connectedCallback() {
     this.canvasController.resize();
     this.canvasController.draw();
-    
+
     // this.resize();
     this.draw();
   }
-
-
 
   drawGridOverlay() {
     if (!this.context) return;
@@ -79,8 +76,6 @@ export class CsdVisualizer extends HTMLElement {
     this.context.restore();
   }
 
-
-  
   private draw() {
     requestAnimationFrame(() => this.draw());
     if (!this.context) return;

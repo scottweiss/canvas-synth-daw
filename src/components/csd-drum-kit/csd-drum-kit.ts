@@ -30,8 +30,6 @@ export class CsdDrumKit extends HTMLElement {
     this.hiHatClosed = new Drum(264, "triangle", 0.05, 0.3);
     this.hiHatOpen = new Drum(528, "square");
 
-
-
     // add styles
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(styles);
@@ -39,27 +37,27 @@ export class CsdDrumKit extends HTMLElement {
     shadowRoot.adoptedStyleSheets.push(sheet);
 
     shadowRoot.append(
-        this.renderDrumButton('kick', this.kick),
-        this.renderDrumButton('snare', this.snare),
-        this.renderDrumButton('lowTom', this.lowTom),
-        this.renderDrumButton('conga', this.conga),
-        this.renderDrumButton('rimshot', this.rimshot),
-        this.renderDrumButton('sidestick', this.sidestick),
-        this.renderDrumButton('handclap', this.handclap),
-        this.renderDrumButton('maraca', this.maraca),
-        this.renderDrumButton('cowbell', this.cowbell),
-        this.renderDrumButton('crash', this.crash),
-        this.renderDrumButton('hiHatOpen', this.hiHatClosed),
-        this.renderDrumButton('hiHatClosed', this.hiHatOpen),
+      this.renderDrumButton("kick", this.kick),
+      this.renderDrumButton("snare", this.snare),
+      this.renderDrumButton("lowTom", this.lowTom),
+      this.renderDrumButton("conga", this.conga),
+      this.renderDrumButton("rimshot", this.rimshot),
+      this.renderDrumButton("sidestick", this.sidestick),
+      this.renderDrumButton("handclap", this.handclap),
+      this.renderDrumButton("maraca", this.maraca),
+      this.renderDrumButton("cowbell", this.cowbell),
+      this.renderDrumButton("crash", this.crash),
+      this.renderDrumButton("hiHatOpen", this.hiHatClosed),
+      this.renderDrumButton("hiHatClosed", this.hiHatOpen),
     );
   }
 
   renderDrumButton(label: string, drum: Drum): HTMLButtonElement {
     const key = document.createElement("button");
     key.textContent = label;
-    key.addEventListener('click', () => {
-        drum.play();
-    })
+    key.addEventListener("click", () => {
+      drum.play();
+    });
     return key;
   }
 }
