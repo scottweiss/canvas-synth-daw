@@ -37,22 +37,26 @@
     z-index: -1;
   }
 
-  fieldset {
-    display: flex;
-    flex-direction: column;
+  // fieldset {
+  //   display: flex;
+  //   flex-direction: column;
+  //   grid-area: wave;
+  //   gap: 16px;
+  //   width: min-content;
+  //   input {
+  //     outline: none;
+  //   }
+  //   label:has(input:checked) {
+  //     color: orange;
+  //     font-weight: bold;
+  //   }
+  //   label:focus-within {
+  //     outline: focus-outline;
+  //   }
+  // }
+
+  csd-radio-button-group {
     grid-area: wave;
-    gap: 16px;
-    width: min-content;
-    input {
-      outline: none;
-    }
-    label:has(input:checked) {
-      color: orange;
-      font-weight: bold;
-    }
-    label:focus-within {
-      outline: focus-outline;
-    }
   }
 
   csd-visualizer {
@@ -67,8 +71,9 @@
 
   csd-piano {
     // padding-top: 16px;
-    margin-bottom: -32px;
+    // margin-bottom: -32px;
     grid-area: piano;
+    align-self: end;
   }
   csd-drum-kit {
     grid-area: dk;

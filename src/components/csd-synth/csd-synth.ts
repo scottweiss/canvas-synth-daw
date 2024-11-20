@@ -4,6 +4,7 @@ import { Adsr, CsdAdsr } from "../csd-adsr/csd-adsr";
 import { CsdDrumKit } from "../csd-drum-kit/csd-drum-kit";
 import { CsdEqualizer } from "../csd-equalizer/csd-equalizer";
 import { CsdPiano } from "../csd-piano/csd-piano";
+import { CsdRadioButtonGroup } from "../csd-radio-button-group/csd-radio-button-group";
 import { CsdVisualizer } from "../csd-visualizer/csd-visualizer";
 import styles from "./csd-synth.scss?inline";
 
@@ -26,7 +27,7 @@ export class CsdSynth extends HTMLElement {
     this.visualizer = new CsdVisualizer();
     this.equalizer = new CsdEqualizer();
     this.waveType = "sawtooth";
-    this.drumKit = new CsdDrumKit; 
+    this.drumKit = new CsdDrumKit();
 
     this.pianoRef = new CsdPiano({
       adsr: this.adsr,
@@ -42,6 +43,25 @@ export class CsdSynth extends HTMLElement {
       }
     });
 
+    const waveSelect = new CsdRadioButtonGroup({
+      id: "wave-select",
+      legend: "Wave type",
+      options: [
+        { id: "sawtooth", label: "sawtooth" },
+        { id: "sine", label: "sine" },
+        { id: "square", label: "square" },
+        { id: "triangle", label: "triangle" },
+      ],
+      value: this.waveType
+    });
+    waveSelect.value = this.waveType;
+    // waveSelect.addEventListener('CsdRadioButtonGroupValueChange', (event: CustomEvent) => {
+    //   this.waveType = event.detail.value;
+    // })
+    waveSelect.addEventListener('CsdRadioButtonGroupValueChange', (event: Event) => {
+      this.waveType = (event as CustomEvent).detail.value
+      this.pianoRef.waveType = (event as CustomEvent).detail.value as OscillatorType;
+    })
     const fieldset = document.createElement("fieldset");
     const legend = document.createElement("legend");
     legend.textContent = "Wave type";
@@ -54,9 +74,6 @@ export class CsdSynth extends HTMLElement {
       this.renderRadio("triangle"),
     );
 
-
-
-
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(styles);
 
@@ -65,12 +82,13 @@ export class CsdSynth extends HTMLElement {
     shadowRoot.adoptedStyleSheets.push(sheet);
     shadowRoot.append(
       this.renderSvg(),
-      fieldset,
+      // fieldset,
+      waveSelect,
       this.visualizer,
       this.equalizer,
       this.adsrRef,
       this.pianoRef,
-      this.drumKit
+      this.drumKit,
     );
   }
 
@@ -93,6 +111,7 @@ export class CsdSynth extends HTMLElement {
 
     return label;
   }
+
   renderSelectOption(label: string, value: string): HTMLElement {
     const option = document.createElement("option");
     option.text = label;
