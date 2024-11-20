@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "pretty": "npx prettier ./src --write"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",

@@ -45,8 +45,8 @@ export class CsdVisualizer extends HTMLElement {
   drawGridOverlay() {
     if (!this.context) return;
     this.context.save();
-    this.context.lineWidth = 2;
-    this.context.strokeStyle = "#00000033";
+    this.context.lineWidth = .5;
+    this.context.strokeStyle = "#00000066";
     this.context.beginPath();
     // this.context.translate(, 2)
     const cellSize = 24;
