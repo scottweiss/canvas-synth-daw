@@ -42,13 +42,13 @@ export class Drum {
 
   play() {
     const now = this.audioEngine.audioContext.currentTime;
-
+    const maxVolumne = 0.1;
     if (!this.isPlaying) {
       this.oscillator.start(now);
       this.isPlaying = true;
     }
     this.gainNode.gain.linearRampToValueAtTime(
-      0.9,
+      maxVolumne,
       this.audioEngine.audioContext.currentTime + this.attackTime,
     );
     this.gainNode.gain.linearRampToValueAtTime(
