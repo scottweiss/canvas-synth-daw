@@ -45,7 +45,7 @@ export class CsdEqualizer extends HTMLElement {
   drawGridOverlay() {
     if (!this.context) return;
     this.context.save();
-    this.context.lineWidth = .5;
+    this.context.lineWidth = 0.5;
     this.context.strokeStyle = "#00000066";
     this.context.beginPath();
     // this.context.translate(, 2)

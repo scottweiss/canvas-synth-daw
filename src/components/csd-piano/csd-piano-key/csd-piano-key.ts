@@ -63,6 +63,7 @@ export class CsdPianoKey extends HTMLElement {
       .connect(this.gainNode)
       .connect(this.audioEngine.audioContext.destination);
     this.gainNode.connect(this.audioEngine.audioContext.destination);
+
     this.gainNode.connect(this.audioEngine.getAnalyser());
     this.adsr = ADSR.getInstance().adsr;
 
@@ -170,7 +171,7 @@ export class CsdPianoKey extends HTMLElement {
 
   applyADSR() {
     const currentTime = this.audioEngine.audioContext.currentTime;
-    const maxVolumne = 0.1;
+    const maxVolumne = 0.5;
     this.oscillator.frequency.setValueAtTime(
       midiToFrequency(this.midiKey),
       this.audioEngine.audioContext.currentTime,

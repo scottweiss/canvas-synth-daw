@@ -24,7 +24,7 @@ export class CsdVisualizer extends HTMLElement {
     }
 
     this.analyserNode = this.audioEngine.getAnalyser(); // use the audio context from AudioEngine
-    this.analyserNode.fftSize = 256;
+    this.analyserNode.fftSize = 512;
 
     const styleSheet = new CSSStyleSheet();
     styleSheet.replaceSync(styles);
@@ -45,7 +45,7 @@ export class CsdVisualizer extends HTMLElement {
   drawGridOverlay() {
     if (!this.context) return;
     this.context.save();
-    this.context.lineWidth = .5;
+    this.context.lineWidth = 0.5;
     this.context.strokeStyle = "#00000066";
     this.context.beginPath();
     // this.context.translate(, 2)

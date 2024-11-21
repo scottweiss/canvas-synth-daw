@@ -58,9 +58,9 @@ export class CsdAdsr extends HTMLElement {
   }
 
   renderAdsr(): Array<HTMLElement> {
-    const canvasWrapper = document.createElement('div');
-    canvasWrapper.classList.add('canvas-wrapper');
-    canvasWrapper.append(this.#canvas)
+    const canvasWrapper = document.createElement("div");
+    canvasWrapper.classList.add("canvas-wrapper");
+    canvasWrapper.append(this.#canvas);
     return [
       canvasWrapper,
       this.renderFieldset("attack"),
@@ -190,14 +190,13 @@ export class CsdAdsr extends HTMLElement {
 
     this.#ctx.stroke();
     this.#ctx.restore();
-    this.drawGridOverlay()
+    this.drawGridOverlay();
   }
-
 
   drawGridOverlay() {
     if (!this.#ctx) return;
     this.#ctx.save();
-    this.#ctx.lineWidth = .5;
+    this.#ctx.lineWidth = 0.5;
     this.#ctx.strokeStyle = "#00000066";
     this.#ctx.beginPath();
     // this.#ctx.translate(, 2)
@@ -225,7 +224,6 @@ export class CsdAdsr extends HTMLElement {
     // this.#ctx.stroke();
     this.#ctx.restore();
   }
-
 
   connectedCallback() {
     this.drawADSR();
