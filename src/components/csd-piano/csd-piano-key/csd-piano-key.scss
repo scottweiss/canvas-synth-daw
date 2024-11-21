@@ -13,7 +13,6 @@ $csd-piano-key-perspective: 9999px;
   align-items: center;
   justify-content: center;
 
-  // transform: rotateX(15deg);
   *,
   *::before,
   *::after {
@@ -24,9 +23,7 @@ $csd-piano-key-perspective: 9999px;
     height: $csd-piano-key-height;
     width: $csd-piano-key-width;
     background: #eee;
-    // text-orientation: sideways;
-    // writing-mode: vertical-lr;
-    // text-align: end;
+
     display: flex;
     align-items: flex-end;
     justify-content: center;
@@ -35,26 +32,20 @@ $csd-piano-key-perspective: 9999px;
     border-bottom-right-radius: 2px;
 
     padding-bottom: 8px;
-    outline: none;
     border-top: none;
-    transform-style: preserve-3d;
-    transform-origin: top;
-    border-color: transparent;
+outline: none;
 
-  
-    transform: perspective($csd-piano-key-perspective) rotateX(0deg);
     transition: all 80ms linear;
-    box-shadow: 0px 8px #ccc;
-    margin-inline: 1px;
+
     border-bottom: none;
 
     &:hover {
-      transform: perspective($csd-piano-key-perspective) rotateX(-2.5deg);
+      box-shadow:inset  0px 3px #ccc;
     }
     &.active,
     &:active {
-      transform: perspective($csd-piano-key-perspective) rotateX(-5deg);
-      box-shadow: 0px 7px #ccc;
+      box-shadow:inset 0px 0px #ccc;
+     
     }
   }
 
@@ -72,8 +63,8 @@ $csd-piano-key-perspective: 9999px;
     color: #eee;
     height: $csd-piano-key-sharp-height;
     width: $csd-piano-key-sharp-width;
-    margin-inline: math.div($csd-piano-key-sharp-width, -2) ;
-    z-index: 1;
+    margin-inline: math.div($csd-piano-key-sharp-width, - 1) ;
+    // z-index: 1;
     box-shadow: 0px 8px #444;
 
     &.active,

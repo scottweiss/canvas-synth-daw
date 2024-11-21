@@ -58,8 +58,11 @@ export class CsdAdsr extends HTMLElement {
   }
 
   renderAdsr(): Array<HTMLElement> {
+    const canvasWrapper = document.createElement('div');
+    canvasWrapper.classList.add('canvas-wrapper');
+    canvasWrapper.append(this.#canvas)
     return [
-      this.#canvas,
+      canvasWrapper,
       this.renderFieldset("attack"),
       this.renderFieldset("decay"),
       this.renderFieldset("sustain"),
@@ -135,7 +138,7 @@ export class CsdAdsr extends HTMLElement {
     ) {
       return;
     }
-
+    this.#ctx.save();
     const width = this.#canvas.clientWidth;
     const height = this.#canvas.clientHeight;
 
@@ -145,7 +148,15 @@ export class CsdAdsr extends HTMLElement {
     this.#canvas.width = width;
     this.#canvas.height = height;
 
-    this.#ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    // this.#ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    this.#ctx.fillStyle = "#333433";
+    this.#ctx.fillRect(0, 0, this.#canvas.width, this.#canvas.height);
+    this.#ctx.lineWidth = 3;
+    this.#ctx.strokeStyle = "#1f1";
+
+    this.#ctx.shadowBlur = 20;
+    this.#ctx.shadowColor = "#1f1";
+
     const margin = 20;
     const innerWidth = canvasWidth - 1 * margin;
     const totalDuration =
@@ -176,10 +187,45 @@ export class CsdAdsr extends HTMLElement {
       attackWidth + decayWidth + sustainWidth + releaseWidth,
       canvasHeight - margin,
     );
-    this.#ctx.strokeStyle = "orange";
-    this.#ctx.lineWidth = 4;
+
     this.#ctx.stroke();
+    this.#ctx.restore();
+    this.drawGridOverlay()
   }
+
+
+  drawGridOverlay() {
+    if (!this.#ctx) return;
+    this.#ctx.save();
+    this.#ctx.lineWidth = .5;
+    this.#ctx.strokeStyle = "#00000066";
+    this.#ctx.beginPath();
+    // this.#ctx.translate(, 2)
+    const cellSize = 24;
+
+    for (let i = 8; i < this.#canvas.width; i += cellSize) {
+      this.#ctx.moveTo(i, 0);
+      this.#ctx.lineTo(i, this.#canvas.height);
+    }
+
+    for (let i = 20; i < this.#canvas.height; i += cellSize) {
+      this.#ctx.moveTo(0, i);
+      this.#ctx.lineTo(this.#canvas.width, i);
+    }
+    this.#ctx.stroke();
+    this.#ctx.closePath();
+    // this.#ctx.beginPath();
+
+    // this.#ctx.moveTo(0, this.canvas.height / 2);
+    // this.#ctx.lineTo(this.canvas.width, this.canvas.height / 2);
+
+    // this.#ctx.moveTo(this.canvas.width / 2, 0);
+    // this.#ctx.lineTo(this.canvas.width / 2, this.canvas.height);
+    // this.#ctx.strokeStyle = "#00000033";
+    // this.#ctx.stroke();
+    this.#ctx.restore();
+  }
+
 
   connectedCallback() {
     this.drawADSR();

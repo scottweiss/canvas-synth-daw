@@ -1,17 +1,19 @@
 :host {
   box-sizing: border-box;
   display: block;
-  transform: rotateX(15deg);
-  transform-style: preserve-3d;
-  border-radius: 8px;
-  margin: 0 auto;
+  // transform: rotateX(15deg);
+  // transform-style: preserve-3d;
+  // border-radius: 8px;
+  border-end-end-radius: 16px;
+  // margin: 0 auto;
   width: min-content;
   position: relative;
   overflow: hidden;
   display: grid;
-  gap: 12px;
+  // gap: 12px;
   // padding: 8px 8px 0;
   padding: 12px;
+  height: min-content;
   grid-template-areas:
     "viz eq dk dk"
     "adsr adsr dk dk"

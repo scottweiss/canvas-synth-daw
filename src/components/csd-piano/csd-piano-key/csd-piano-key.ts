@@ -170,7 +170,7 @@ export class CsdPianoKey extends HTMLElement {
 
   applyADSR() {
     const currentTime = this.audioEngine.audioContext.currentTime;
-    const maxVolumne = 0.5;
+    const maxVolumne = 0.1;
     this.oscillator.frequency.setValueAtTime(
       midiToFrequency(this.midiKey),
       this.audioEngine.audioContext.currentTime,
