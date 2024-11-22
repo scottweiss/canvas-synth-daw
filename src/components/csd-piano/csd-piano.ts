@@ -54,12 +54,11 @@ export class CsdPiano extends HTMLElement {
     window.addEventListener("keydown", (event) => {
       if (event.key === "z") {
         this.octiveOffset--;
-        console.log(this.pianoElement.querySelectorAll("button"));
         this.octiveDownRef.classList.add("active");
       }
       if (event.key === "x") {
         this.octiveOffset++;
-        this.octiveDownRef.classList.add("active");
+        this.octiveUpRef.classList.add("active");
       }
     });
 
@@ -68,18 +67,19 @@ export class CsdPiano extends HTMLElement {
         this.octiveDownRef.classList.remove("active");
       }
       if (event.key === "x") {
-        this.octiveDownRef.classList.remove("active");
+        this.octiveUpRef.classList.remove("active");
       }
     });
   }
 
   set adsr(value: Adsr) {
     this.#adsr = value;
-    this.pianoElement
-      .querySelectorAll<CsdPianoKey>("csd-piano-key")
-      .forEach((pianoKey) => {
-        pianoKey.adsr = this.adsr;
-      });
+    // console.log(value, )
+    // this.pianoElement
+    //   .querySelectorAll<CsdPianoKey>("csd-piano-key")
+    //   .forEach((pianoKey) => {
+    //     pianoKey.adsr = this.#adsr;
+    //   });
   }
 
   get adsr(): Adsr {

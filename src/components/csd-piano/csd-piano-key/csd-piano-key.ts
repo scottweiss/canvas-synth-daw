@@ -1,4 +1,3 @@
-import { ADSR, Adsr } from "../../../midi/ADSR";
 import { AudioEngine } from "../../../midi/AudioEngine";
 import midiToFrequency, { midiToNote } from "../../../midi/midi-to-frequency";
 import styles from "./csd-piano-key.scss?inline";
@@ -9,19 +8,23 @@ export type CsdPianoKeyProps = {
   waveType: OscillatorType;
 };
 export class CsdPianoKey extends HTMLElement {
-  // pianoDomReference;
   pianoKeyElement: HTMLElement;
+  keyNoteRef: HTMLElement;
   audioEngine: AudioEngine;
   oscillator: OscillatorNode;
   #midiKey: number;
   #keyboardKey: string;
+  #midiNote: string;
   #waveType: OscillatorType;
   gainNode: GainNode;
   isPlaying: boolean;
-  adsr: Adsr;
+ 
 
   set midiKey(value: number) {
     this.#midiKey = value;
+    this.keyNoteRef.textContent = String(midiToNote(value));
+    this.oscillator.frequency.setValueAtTime(midiToFrequency(value), 0);
+    this.pianoKeyElement.setAttribute('aria-label', midiToNote(value));
   }
 
   get midiKey(): number {
@@ -45,27 +48,39 @@ export class CsdPianoKey extends HTMLElement {
     return this.#waveType;
   }
 
+  set midiNote(note: string) {
+    this.#midiNote = note;
+  }
+
+  get midiNote(): string {
+    return this.#midiNote;
+  }
+
   constructor(props: CsdPianoKeyProps) {
     super();
 
     this.#midiKey = props.midiKey;
+    this.#midiNote = String(midiToNote(this.midiKey));
     this.#keyboardKey = props.keyboardKey;
+    this.keyNoteRef = document.createElement('span');
+    this.keyNoteRef.classList.add('key-note');
+    this.keyNoteRef.textContent =  String(midiToNote(this.midiKey));
 
     this.audioEngine = AudioEngine.getInstance();
     this.oscillator = this.audioEngine.createOscillator(this.midiKey);
     this.gainNode = this.audioEngine.audioContext.createGain();
     this.#waveType = props.waveType || "sine";
     // Connect the oscillator to the gain node
-    this.oscillator.type = this.waveType;
+    this.oscillator.type = this.#waveType;
+
 
     // Connect the oscillator to the gain node and then to the destination
     this.oscillator
-      .connect(this.gainNode)
-      .connect(this.audioEngine.audioContext.destination);
+      .connect(this.gainNode);
+      // .connect(this.audioEngine.audioContext.destination);
     this.gainNode.connect(this.audioEngine.audioContext.destination);
 
     this.gainNode.connect(this.audioEngine.getAnalyser());
-    this.adsr = ADSR.getInstance().adsr;
 
     this.isPlaying = false;
 
@@ -145,61 +160,28 @@ export class CsdPianoKey extends HTMLElement {
   }
   renderKey(): HTMLButtonElement {
     const key = document.createElement("button");
-    const keyLable = document.createElement("kbd");
-    keyLable.textContent = this.keyboardKey;
+    const keyKeyboardLable = document.createElement("kbd");
+    keyKeyboardLable.textContent = this.keyboardKey;
     key.className = this.getClasses();
     key.setAttribute("aria-label", String(midiToNote(this.midiKey)));
 
-    key.append(keyLable);
+    key.append(this.keyNoteRef, keyKeyboardLable);
 
     return key;
   }
 
   playNote(): void {
-    if (!this.oscillator) return;
-
-    this.gainNode.gain.setValueAtTime(
-      0,
-      this.audioEngine.audioContext.currentTime,
-    );
-    this.applyADSR();
-    if (!this.isPlaying) {
+  if (!this.isPlaying) {
       this.oscillator.start();
       this.isPlaying = true;
     }
+    this.audioEngine.playNote(this.oscillator, this.gainNode)
   }
 
-  applyADSR() {
-    const currentTime = this.audioEngine.audioContext.currentTime;
-    const maxVolumne = 0.5;
-    this.oscillator.frequency.setValueAtTime(
-      midiToFrequency(this.midiKey),
-      this.audioEngine.audioContext.currentTime,
-    );
-    this.gainNode.gain.setValueAtTime(0.001, currentTime);
-    this.gainNode.gain.linearRampToValueAtTime(
-      maxVolumne,
-      currentTime + this.adsr.attack,
-    );
-    this.gainNode.gain.linearRampToValueAtTime(
-      this.adsr.sustain * maxVolumne,
-      currentTime + this.adsr.attack + this.adsr.decay,
-    );
-    this.gainNode.gain.setValueAtTime(
-      this.adsr.sustain * maxVolumne,
-      currentTime + this.adsr.attack + this.adsr.decay,
-    );
-  }
 
   releaseEnvelope() {
-    const currentTime = this.audioEngine.audioContext.currentTime;
-    this.gainNode.gain.cancelScheduledValues(currentTime);
-    this.gainNode.gain.setValueAtTime(this.gainNode.gain.value, currentTime);
-    this.gainNode.gain.linearRampToValueAtTime(
-      0,
-      currentTime + this.adsr.release,
-    );
-    // this.oscillator.stop();
+
+    this.audioEngine.releaseEnvelope(this.gainNode);
   }
 }
 

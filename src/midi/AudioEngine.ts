@@ -1,15 +1,19 @@
+import { Adsr, ADSR } from "./ADSR";
 import midiToFrequency from "./midi-to-frequency";
 
 export class AudioEngine {
   private static instance: AudioEngine;
   private analyserNode: AnalyserNode;
   private dataArray: Uint8Array;
+  private adsr: Adsr;
   public audioContext: AudioContext;
+
 
   private constructor() {
     this.audioContext = new window.AudioContext();
     this.analyserNode = this.audioContext.createAnalyser();
     this.dataArray = new Uint8Array(this.analyserNode.frequencyBinCount);
+    this.adsr = ADSR.getInstance().adsr;
   }
 
   getAudioData(): Uint8Array {
@@ -20,9 +24,61 @@ export class AudioEngine {
     return this.analyserNode;
   }
 
+  playNote(oscillator: OscillatorNode, gainNode: GainNode): void {
+    if (!oscillator) return;
+    // if (oscillator.context.state == "suspended") {
+    
+    //   oscillator.start();
+    //   }
+
+    gainNode.gain.setValueAtTime(
+      0,
+      this.audioContext.currentTime,
+    );
+    this.applyADSR(gainNode);
+ 
+  }
+
+  applyADSR(gainNode: GainNode) {
+    const currentTime = this.audioContext.currentTime;
+    const maxVolumne = 0.5;
+    const adsr = ADSR.getInstance().adsr;
+    // oscillator.frequency.setValueAtTime(
+    //   midiToFrequency(midiKey),
+    //   this.audioContext.currentTime,
+    // );
+    gainNode.gain.setValueAtTime(0.001, currentTime);
+    gainNode.gain.linearRampToValueAtTime(
+      maxVolumne,
+      currentTime + adsr.attack,
+    );
+    gainNode.gain.linearRampToValueAtTime(
+      adsr.sustain * maxVolumne,
+      currentTime + adsr.attack + adsr.decay,
+    );
+    gainNode.gain.setValueAtTime(
+      adsr.sustain * maxVolumne,
+      currentTime + adsr.attack + adsr.decay,
+    );
+  }
+
+  releaseEnvelope(gainNode: GainNode) {
+    const release = ADSR.getInstance().adsr.release;
+    const currentTime = this.audioContext.currentTime;
+    gainNode.gain.cancelScheduledValues(currentTime);
+    gainNode.gain.setValueAtTime(gainNode.gain.value, currentTime);
+    gainNode.gain.linearRampToValueAtTime(
+      0,
+      currentTime + release,
+    );
+    // this.oscillator.stop();
+  }
+
+
   createOscillator(midiKey: number): OscillatorNode {
     const oscillator = this.audioContext.createOscillator();
     oscillator.frequency.value = midiToFrequency(midiKey);
+    // oscillator.connect(this.audioContext.destination)
     return oscillator;
   }
 
