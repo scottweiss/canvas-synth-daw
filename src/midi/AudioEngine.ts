@@ -1,19 +1,16 @@
-import { Adsr, ADSR } from "./ADSR";
+import { ADSR } from "./ADSR";
 import midiToFrequency from "./midi-to-frequency";
 
 export class AudioEngine {
   private static instance: AudioEngine;
   private analyserNode: AnalyserNode;
   private dataArray: Uint8Array;
-  private adsr: Adsr;
   public audioContext: AudioContext;
-
 
   private constructor() {
     this.audioContext = new window.AudioContext();
     this.analyserNode = this.audioContext.createAnalyser();
     this.dataArray = new Uint8Array(this.analyserNode.frequencyBinCount);
-    this.adsr = ADSR.getInstance().adsr;
   }
 
   getAudioData(): Uint8Array {
@@ -27,16 +24,12 @@ export class AudioEngine {
   playNote(oscillator: OscillatorNode, gainNode: GainNode): void {
     if (!oscillator) return;
     // if (oscillator.context.state == "suspended") {
-    
+
     //   oscillator.start();
     //   }
 
-    gainNode.gain.setValueAtTime(
-      0,
-      this.audioContext.currentTime,
-    );
+    gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
     this.applyADSR(gainNode);
- 
   }
 
   applyADSR(gainNode: GainNode) {
@@ -67,13 +60,9 @@ export class AudioEngine {
     const currentTime = this.audioContext.currentTime;
     gainNode.gain.cancelScheduledValues(currentTime);
     gainNode.gain.setValueAtTime(gainNode.gain.value, currentTime);
-    gainNode.gain.linearRampToValueAtTime(
-      0,
-      currentTime + release,
-    );
+    gainNode.gain.linearRampToValueAtTime(0, currentTime + release);
     // this.oscillator.stop();
   }
-
 
   createOscillator(midiKey: number): OscillatorNode {
     const oscillator = this.audioContext.createOscillator();

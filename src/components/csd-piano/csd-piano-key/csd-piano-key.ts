@@ -18,13 +18,12 @@ export class CsdPianoKey extends HTMLElement {
   #waveType: OscillatorType;
   gainNode: GainNode;
   isPlaying: boolean;
- 
 
   set midiKey(value: number) {
     this.#midiKey = value;
     this.keyNoteRef.textContent = String(midiToNote(value));
     this.oscillator.frequency.setValueAtTime(midiToFrequency(value), 0);
-    this.pianoKeyElement.setAttribute('aria-label', midiToNote(value));
+    this.pianoKeyElement.setAttribute("aria-label", midiToNote(value));
   }
 
   get midiKey(): number {
@@ -62,9 +61,9 @@ export class CsdPianoKey extends HTMLElement {
     this.#midiKey = props.midiKey;
     this.#midiNote = String(midiToNote(this.midiKey));
     this.#keyboardKey = props.keyboardKey;
-    this.keyNoteRef = document.createElement('span');
-    this.keyNoteRef.classList.add('key-note');
-    this.keyNoteRef.textContent =  String(midiToNote(this.midiKey));
+    this.keyNoteRef = document.createElement("span");
+    this.keyNoteRef.classList.add("key-note");
+    this.keyNoteRef.textContent = String(midiToNote(this.midiKey));
 
     this.audioEngine = AudioEngine.getInstance();
     this.oscillator = this.audioEngine.createOscillator(this.midiKey);
@@ -73,11 +72,9 @@ export class CsdPianoKey extends HTMLElement {
     // Connect the oscillator to the gain node
     this.oscillator.type = this.#waveType;
 
-
     // Connect the oscillator to the gain node and then to the destination
-    this.oscillator
-      .connect(this.gainNode);
-      // .connect(this.audioEngine.audioContext.destination);
+    this.oscillator.connect(this.gainNode);
+    // .connect(this.audioEngine.audioContext.destination);
     this.gainNode.connect(this.audioEngine.audioContext.destination);
 
     this.gainNode.connect(this.audioEngine.getAnalyser());
@@ -171,16 +168,14 @@ export class CsdPianoKey extends HTMLElement {
   }
 
   playNote(): void {
-  if (!this.isPlaying) {
+    if (!this.isPlaying) {
       this.oscillator.start();
       this.isPlaying = true;
     }
-    this.audioEngine.playNote(this.oscillator, this.gainNode)
+    this.audioEngine.playNote(this.oscillator, this.gainNode);
   }
 
-
   releaseEnvelope() {
-
     this.audioEngine.releaseEnvelope(this.gainNode);
   }
 }

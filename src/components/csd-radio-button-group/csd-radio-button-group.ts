@@ -47,6 +47,7 @@ export class CsdRadioButtonGroup extends HTMLElement {
     const fieldsetRef = document.createElement("fieldset");
     const legendRef = document.createElement("legend");
     legendRef.textContent = legend;
+    legendRef.setAttribute("hidden", "");
 
     fieldsetRef.appendChild(legendRef);
     return fieldsetRef;
@@ -60,6 +61,7 @@ export class CsdRadioButtonGroup extends HTMLElement {
     radio.name = "waveType";
     radio.type = "radio";
     radio.classList.add("sr-only");
+    radio.setAttribute("hidden", "");
 
     radio.checked = option.id == this.value;
     // radio.value = option;
