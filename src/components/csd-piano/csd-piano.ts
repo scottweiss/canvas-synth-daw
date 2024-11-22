@@ -17,7 +17,6 @@ export class CsdPiano extends HTMLElement {
   #octiveOffset: number;
   octiveUpRef: HTMLElement;
   octiveDownRef: HTMLElement;
-  
 
   constructor(props: CsdPianoProps) {
     super();
@@ -44,35 +43,32 @@ export class CsdPiano extends HTMLElement {
     this.octiveUpRef = this.renderOctiveUp();
     this.octiveDownRef = this.renderOctiveDown();
 
-    const container = document.createElement('div');
-    container.classList.add('octive-controller');
+    const container = document.createElement("div");
+    container.classList.add("octive-controller");
 
-    container.append(this.octiveUpRef, this.octiveDownRef)
-
+    container.append(this.octiveUpRef, this.octiveDownRef);
 
     shadowRoot.append(container, this.pianoElement);
   }
   connectedCallback() {
     window.addEventListener("keydown", (event) => {
-  
-      if (event.key === 'z') {
+      if (event.key === "z") {
         this.octiveOffset--;
-        console.log(this.pianoElement.querySelectorAll('button'))
-        this.octiveDownRef.classList.add('active');
+        console.log(this.pianoElement.querySelectorAll("button"));
+        this.octiveDownRef.classList.add("active");
       }
-      if (event.key === 'x') {
-        this.octiveOffset++
-        this.octiveDownRef.classList.add('active');
+      if (event.key === "x") {
+        this.octiveOffset++;
+        this.octiveDownRef.classList.add("active");
       }
     });
 
     window.addEventListener("keyup", (event) => {
-  
-      if (event.key === 'z') {
-        this.octiveDownRef.classList.remove('active');
+      if (event.key === "z") {
+        this.octiveDownRef.classList.remove("active");
       }
-      if (event.key === 'x') {
-        this.octiveDownRef.classList.remove('active');
+      if (event.key === "x") {
+        this.octiveDownRef.classList.remove("active");
       }
     });
   }
@@ -137,35 +133,33 @@ export class CsdPiano extends HTMLElement {
   }
 
   renderOctiveUp(): HTMLElement {
-    const octiveUp = document.createElement('button');
+    const octiveUp = document.createElement("button");
     const upkeyLable = document.createElement("kbd");
-    upkeyLable.textContent = 'x';
-    const upSpan = document.createElement('span');
-    upSpan.textContent = "+"
+    upkeyLable.textContent = "x";
+    const upSpan = document.createElement("span");
+    upSpan.textContent = "+";
     octiveUp.append(upSpan, upkeyLable);
 
-    octiveUp.addEventListener('click', () => {
+    octiveUp.addEventListener("click", () => {
       this.octiveOffset++;
-    })
-
+    });
 
     return octiveUp;
   }
 
   renderOctiveDown(): HTMLElement {
-    const octivedown = document.createElement('button');
+    const octivedown = document.createElement("button");
     const downKeyLabel = document.createElement("kbd");
-    downKeyLabel.textContent = 'z';
-    const downSpan = document.createElement('span');
-    downSpan.textContent = "-"
-    octivedown.append(downSpan, downKeyLabel)
+    downKeyLabel.textContent = "z";
+    const downSpan = document.createElement("span");
+    downSpan.textContent = "-";
+    octivedown.append(downSpan, downKeyLabel);
 
-     octivedown.addEventListener('click', () => {
+    octivedown.addEventListener("click", () => {
       this.octiveOffset--;
-    })
+    });
 
-    return octivedown
-
+    return octivedown;
   }
 }
 
