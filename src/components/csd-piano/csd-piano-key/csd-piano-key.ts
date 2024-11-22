@@ -111,8 +111,24 @@ export class CsdPianoKey extends HTMLElement {
         this.releaseEnvelope();
       }
     });
+    this.pianoKeyElement.addEventListener('touchstart', (event) =>{
+      console.log(event);
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      this.playNote()
+      this.pianoKeyElement.classList.add("active");
+      // if (event.key === this.keyboardKey) {
+      //   this.pianoKeyElement.classList.add("active");
+      //   this.playNote();
+      // }
+    })
+    this.pianoKeyElement.addEventListener('touchend', () =>{
+      this.releaseEnvelope();
+      this.pianoKeyElement.classList.remove("active");
+    })
 
-    this.pianoKeyElement.addEventListener("mousedown", () => {
+    this.pianoKeyElement.addEventListener("mousedown", (event: MouseEvent) => {
+      console.log(event)
       this.playNote();
       this.dispatchEvent(
         new CustomEvent("CsdPianoKeyStart", {

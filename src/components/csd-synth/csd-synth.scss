@@ -19,17 +19,18 @@
     "adsr adsr dk dk"
     "piano piano piano wave ";
 
-  justify-items: center;
-  align-items: center;
+    // grid-template-areas:
+    // "viz eq "
+    // "adsr adsr "
+    // "piano wave";
+
+  // justify-items: center;
+  // align-items: center;
 
   *,
   *::before,
   *::after {
     box-sizing: inherit;
-  }
-
-  select {
-    margin: 0 auto;
   }
 
   svg {
