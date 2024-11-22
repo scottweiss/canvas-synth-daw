@@ -103,7 +103,7 @@ export class CsdEqualizer extends HTMLElement {
 
     for (let i = 0; i < bufferLength; i++) {
       // const  logIndex = maxLogIndex * (Math.log(i + 1) / Math.log(bufferLength)) - 1; // Calculate the log-scale index
-      // Map the log-scale index to a x coordinate on the canvas
+      // // Map the log-scale index to a x coordinate on the canvas
       // x = logIndex / maxLogIndex * this.canvas.width;
       const v = this.audioEngine.getAudioData()[i] / 128.0;
       const y = this.canvas.height - (v * this.canvas.height) / 2;

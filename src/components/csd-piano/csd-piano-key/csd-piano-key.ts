@@ -14,7 +14,6 @@ export class CsdPianoKey extends HTMLElement {
   oscillator: OscillatorNode;
   #midiKey: number;
   #keyboardKey: string;
-  #midiNote: string;
   #waveType: OscillatorType;
   gainNode: GainNode;
   isPlaying: boolean;
@@ -47,19 +46,10 @@ export class CsdPianoKey extends HTMLElement {
     return this.#waveType;
   }
 
-  set midiNote(note: string) {
-    this.#midiNote = note;
-  }
-
-  get midiNote(): string {
-    return this.#midiNote;
-  }
-
   constructor(props: CsdPianoKeyProps) {
     super();
 
     this.#midiKey = props.midiKey;
-    this.#midiNote = String(midiToNote(this.midiKey));
     this.#keyboardKey = props.keyboardKey;
     this.keyNoteRef = document.createElement("span");
     this.keyNoteRef.classList.add("key-note");
@@ -111,24 +101,24 @@ export class CsdPianoKey extends HTMLElement {
         this.releaseEnvelope();
       }
     });
-    this.pianoKeyElement.addEventListener('touchstart', (event) =>{
+    this.pianoKeyElement.addEventListener("touchstart", (event) => {
       console.log(event);
       event.preventDefault();
       event.stopImmediatePropagation();
-      this.playNote()
+      this.playNote();
       this.pianoKeyElement.classList.add("active");
       // if (event.key === this.keyboardKey) {
       //   this.pianoKeyElement.classList.add("active");
       //   this.playNote();
       // }
-    })
-    this.pianoKeyElement.addEventListener('touchend', () =>{
+    });
+    this.pianoKeyElement.addEventListener("touchend", () => {
       this.releaseEnvelope();
       this.pianoKeyElement.classList.remove("active");
-    })
+    });
 
     this.pianoKeyElement.addEventListener("mousedown", (event: MouseEvent) => {
-      console.log(event)
+      console.log(event);
       this.playNote();
       this.dispatchEvent(
         new CustomEvent("CsdPianoKeyStart", {
