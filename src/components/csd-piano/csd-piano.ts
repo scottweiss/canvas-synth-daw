@@ -14,6 +14,10 @@ export class CsdPiano extends HTMLElement {
   audioContext: AudioContext;
   #adsr: Adsr;
   #waveType: OscillatorType;
+  #octiveOffset: number;
+  octiveUpRef: HTMLElement;
+  octiveDownRef: HTMLElement;
+  
 
   constructor(props: CsdPianoProps) {
     super();
@@ -21,7 +25,7 @@ export class CsdPiano extends HTMLElement {
     this.audioEngine = AudioEngine.getInstance();
     this.audioContext = this.audioEngine.audioContext;
     this.#waveType = props.waveType || "sawtooth";
-
+    this.#octiveOffset = 0;
     this.#adsr = props.adsr || {
       attack: 0.1,
       decay: 0.2,
@@ -37,7 +41,40 @@ export class CsdPiano extends HTMLElement {
     // add element
     this.pianoElement = this.renderPianoElement();
 
-    shadowRoot.append(this.pianoElement);
+    this.octiveUpRef = this.renderOctiveUp();
+    this.octiveDownRef = this.renderOctiveDown();
+
+    const container = document.createElement('div');
+    container.classList.add('octive-controller');
+
+    container.append(this.octiveUpRef, this.octiveDownRef)
+
+
+    shadowRoot.append(container, this.pianoElement);
+  }
+  connectedCallback() {
+    window.addEventListener("keydown", (event) => {
+  
+      if (event.key === 'z') {
+        this.octiveOffset--;
+        console.log(this.pianoElement.querySelectorAll('button'))
+        this.octiveDownRef.classList.add('active');
+      }
+      if (event.key === 'x') {
+        this.octiveOffset++
+        this.octiveDownRef.classList.add('active');
+      }
+    });
+
+    window.addEventListener("keyup", (event) => {
+  
+      if (event.key === 'z') {
+        this.octiveDownRef.classList.remove('active');
+      }
+      if (event.key === 'x') {
+        this.octiveDownRef.classList.remove('active');
+      }
+    });
   }
 
   set adsr(value: Adsr) {
@@ -51,6 +88,19 @@ export class CsdPiano extends HTMLElement {
 
   get adsr(): Adsr {
     return this.#adsr;
+  }
+
+  set octiveOffset(offset: number) {
+    this.#octiveOffset = offset;
+    this.pianoElement
+      .querySelectorAll<CsdPianoKey>("csd-piano-key")
+      .forEach((pianoKey, index) => {
+        pianoKey.midiKey = 60 + index + this.octiveOffset * 12;
+      });
+  }
+
+  get octiveOffset(): number {
+    return this.#octiveOffset;
   }
 
   set waveType(value: OscillatorType) {
@@ -67,7 +117,7 @@ export class CsdPiano extends HTMLElement {
   }
   renderPianoElement(): HTMLElement {
     const octives = 1.5;
-    const startingKey = 60;
+    const startingKey = 60 + this.octiveOffset * 12;
 
     const keyCount = octives * 12 + startingKey;
 
@@ -84,6 +134,38 @@ export class CsdPiano extends HTMLElement {
     }
 
     return pianoElement;
+  }
+
+  renderOctiveUp(): HTMLElement {
+    const octiveUp = document.createElement('button');
+    const upkeyLable = document.createElement("kbd");
+    upkeyLable.textContent = 'x';
+    const upSpan = document.createElement('span');
+    upSpan.textContent = "+"
+    octiveUp.append(upSpan, upkeyLable);
+
+    octiveUp.addEventListener('click', () => {
+      this.octiveOffset++;
+    })
+
+
+    return octiveUp;
+  }
+
+  renderOctiveDown(): HTMLElement {
+    const octivedown = document.createElement('button');
+    const downKeyLabel = document.createElement("kbd");
+    downKeyLabel.textContent = 'z';
+    const downSpan = document.createElement('span');
+    downSpan.textContent = "-"
+    octivedown.append(downSpan, downKeyLabel)
+
+     octivedown.addEventListener('click', () => {
+      this.octiveOffset--;
+    })
+
+    return octivedown
+
   }
 }
 
