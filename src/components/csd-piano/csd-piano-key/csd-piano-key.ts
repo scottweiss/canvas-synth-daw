@@ -1,4 +1,4 @@
-import { AudioEngine } from "../../../midi/AudioEngine";
+import { AudioEngine } from "../../../audio/AudioEngine";
 import midiToFrequency, { midiToNote } from "../../../midi/midi-to-frequency";
 import styles from "./csd-piano-key.scss?inline";
 

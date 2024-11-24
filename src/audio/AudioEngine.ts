@@ -1,5 +1,5 @@
-import { ADSR } from "./ADSR";
-import midiToFrequency from "./midi-to-frequency";
+import { ADSR } from "../audio/ADSR";
+import midiToFrequency from "../midi/midi-to-frequency";
 
 export class AudioEngine {
   private static instance: AudioEngine;

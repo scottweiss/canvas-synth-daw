@@ -2,7 +2,7 @@ import styles from "./csd-piano.scss?inline";
 import { CsdPianoKey } from "./csd-piano-key/csd-piano-key";
 import { keyboardKeyArray } from "../../midi/midi-to-frequency";
 import { Adsr } from "../csd-adsr/csd-adsr";
-import { AudioEngine } from "../../midi/AudioEngine";
+import { AudioEngine } from "../../audio/AudioEngine";
 
 export type CsdPianoProps = {
   adsr: Adsr;

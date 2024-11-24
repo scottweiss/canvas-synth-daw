@@ -1,4 +1,4 @@
-import { AudioEngine } from "./AudioEngine";
+import { AudioEngine } from "../audio/AudioEngine";
 
 export class Drum {
   gainNode: GainNode;
