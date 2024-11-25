@@ -102,7 +102,6 @@ export class CsdPianoKey extends HTMLElement {
       }
     });
     this.pianoKeyElement.addEventListener("touchstart", (event) => {
-      console.log(event);
       event.preventDefault();
       event.stopImmediatePropagation();
       this.playNote();
@@ -118,7 +117,6 @@ export class CsdPianoKey extends HTMLElement {
     });
 
     this.pianoKeyElement.addEventListener("mousedown", (event: MouseEvent) => {
-      console.log(event);
       this.playNote();
       this.dispatchEvent(
         new CustomEvent("CsdPianoKeyStart", {

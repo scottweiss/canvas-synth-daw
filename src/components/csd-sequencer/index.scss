@@ -1,10 +1,4 @@
-@use "sass:math";
-$csd-piano-key-height: 200px;
-$csd-piano-key-width: 60px;
-$csd-piano-key-sharp-height: $csd-piano-key-height * 0.7;
-$csd-piano-key-sharp-width: 44px;
 
-$csd-piano-key-perspective: 9999px;
 :host {
   box-sizing: border-box;
 
@@ -19,83 +13,4 @@ $csd-piano-key-perspective: 9999px;
     box-sizing: inherit;
   }
 
-  .csd-piano-key {
-    height: $csd-piano-key-height;
-    width: $csd-piano-key-width;
-    background: #eee;
-
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
-
-    padding-bottom: 8px;
-    border-top: none;
-    outline: none;
-
-    transition: all 80ms linear;
-
-    flex-direction: column;
-    align-items: center;
-    justify-content: end;
-
-    // border-bottom: none;
-
-    &:hover {
-      background: orchid;
-    }
-    &.active,
-    &:active {
-      background: orange;
-      box-shadow: inset 0px 0px #ccc;
-    }
-
-    &[aria-label="C4 (Middle C)"] .key-note {
-      // color: green;
-      text-orientation: sideways;
-      writing-mode: vertical-lr;
-      inset-block-end: 12px;
-      position: relative;
-
-      flex-grow: 1;
-    }
-  }
-
-  .key-note {
-    margin-bottom: 4px;
-  }
-
-  kbd {
-    border: 1px solid gray;
-    border-radius: 4px;
-    padding: 2px 4px;
-    font-size: 12px;
-    line-height: 1;
-  }
-
-  .csd-piano-key-sharp {
-    position: relative;
-    background: #333;
-    color: #eee;
-    height: $csd-piano-key-sharp-height;
-    width: $csd-piano-key-sharp-width;
-    margin-inline: math.div($csd-piano-key-sharp-width, -1);
-    // z-index: 1;
-    // box-shadow: 0px 8px #444;
-
-    .key-note {
-      text-orientation: sideways;
-      writing-mode: vertical-lr;
-      margin-bottom: auto;
-      margin-top: 16px;
-    }
-
-    &.active,
-    &:active,
-    &:hover {
-      color: #333;
-    }
-  }
 }

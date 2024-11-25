@@ -3,6 +3,7 @@ import { CsdPianoKey } from "./csd-piano-key/csd-piano-key";
 import { keyboardKeyArray } from "../../midi/midi-to-frequency";
 import { Adsr } from "../csd-adsr/csd-adsr";
 import { AudioEngine } from "../../audio/AudioEngine";
+import { MidiApi } from "../../midi/MidiApi";
 
 export type CsdPianoProps = {
   adsr: Adsr;
@@ -17,6 +18,7 @@ export class CsdPiano extends HTMLElement {
   #octiveOffset: number;
   octiveUpRef: HTMLElement;
   octiveDownRef: HTMLElement;
+  midiApi: MidiApi;
 
   constructor(props: CsdPianoProps) {
     super();
@@ -37,6 +39,7 @@ export class CsdPiano extends HTMLElement {
     const shadowRoot = this.attachShadow({ mode: "open" });
     shadowRoot.adoptedStyleSheets.push(sheet);
 
+    this.midiApi = new MidiApi();
     // add element
     this.pianoElement = this.renderPianoElement();
 

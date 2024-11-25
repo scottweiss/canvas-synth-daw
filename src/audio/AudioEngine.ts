@@ -1,16 +1,27 @@
 import { ADSR } from "../audio/ADSR";
 import midiToFrequency from "../midi/midi-to-frequency";
 
+
 export class AudioEngine {
   private static instance: AudioEngine;
   private analyserNode: AnalyserNode;
   private dataArray: Uint8Array;
   public audioContext: AudioContext;
+  #bpm: number;
 
   private constructor() {
     this.audioContext = new window.AudioContext();
     this.analyserNode = this.audioContext.createAnalyser();
     this.dataArray = new Uint8Array(this.analyserNode.frequencyBinCount);
+    this.#bpm = 120;
+  }
+
+  get bpm(): number {
+    return this.#bpm;
+  }
+
+  set bpm(value: number) {
+    this.#bpm = value;
   }
 
   getAudioData(): Uint8Array {
@@ -40,7 +51,8 @@ export class AudioEngine {
     //   midiToFrequency(midiKey),
     //   this.audioContext.currentTime,
     // );
-    gainNode.gain.setValueAtTime(0.001, currentTime);
+    
+    gainNode.gain.setValueAtTime(gainNode.gain.value || 0.001, currentTime);
     gainNode.gain.linearRampToValueAtTime(
       maxVolumne,
       currentTime + adsr.attack,
