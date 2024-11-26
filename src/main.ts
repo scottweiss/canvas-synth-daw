@@ -4,6 +4,5 @@ import "./components/csd-synth/csd-synth.ts";
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
   <main>
     <csd-synth></csd-synth>
-    <csd-sequencer></csd-sequencer>
   </main>
 `;

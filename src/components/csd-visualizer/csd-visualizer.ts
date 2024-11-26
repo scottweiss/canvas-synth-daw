@@ -35,7 +35,6 @@ export class CsdVisualizer extends HTMLElement {
   }
 
   connectedCallback() {
-    // this.context = this.canvas.getContext('2d');
     this.canvasController.resize();
     this.canvasController.draw(0, this.draw.bind(this));
   }

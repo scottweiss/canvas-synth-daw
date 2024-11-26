@@ -1,7 +1,6 @@
 import { ADSR } from "../audio/ADSR";
 import midiToFrequency from "../midi/midi-to-frequency";
 
-
 export class AudioEngine {
   private static instance: AudioEngine;
   private analyserNode: AnalyserNode;
@@ -51,7 +50,7 @@ export class AudioEngine {
     //   midiToFrequency(midiKey),
     //   this.audioContext.currentTime,
     // );
-    
+
     gainNode.gain.setValueAtTime(gainNode.gain.value || 0.001, currentTime);
     gainNode.gain.linearRampToValueAtTime(
       maxVolumne,

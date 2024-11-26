@@ -57,6 +57,5 @@ export class Drum {
         this.attackTime +
         this.releaseTime,
     );
-   
   }
 }
