@@ -1,0 +1,108 @@
+:host {
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  // background: rgb(85, 85, 85);
+  // padding: 1px;
+  // border: 8px inset rgb(119, 119, 119);
+  border-radius: 4px;
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: inherit;
+  }
+
+  canvas {
+    height: 26px;
+    width: 100%;
+  }
+
+  .csd-sequencer-step-table {
+    border: none;
+    border-collapse: collapse;
+
+    button {
+      margin: 0;
+      height: 26px;
+      width: 100%;
+      border: none;
+      background-color: green;
+      color: #fff;
+      font-size: 16px;
+      font-weight: bold;
+      // padding: 4px 8px
+      transition: background-color 80ms linear;
+      &.is-playing{
+        background-color: red;
+      }
+    }
+    th,
+    td {
+      // padding: 0;
+      font-size: 16px;
+    }
+    td:has(canvas),
+    th:has(button) {
+      padding: 0;
+    }
+
+    th {
+      text-align: end;
+      text-wrap: nowrap;
+      background: #eee;
+      padding-inline: 8px;
+    }
+    td {
+      aspect-ratio: 1;
+      line-height: 0;
+      padding: 0;
+      input {
+        aspect-ratio: 1;
+        padding: 0;
+        margin: 0;
+        width: 32px;
+        appearance: none;
+        cursor: pointer;
+        background-color: transparent;
+        transition: background-color 80ms linear;
+
+        &:hover {
+          background-color: orchid;
+        }
+        &:focus {
+          background-color: orchid;
+        }
+
+        &:checked {
+          background-color: orange;
+        }
+      }
+    }
+    tr {
+      td {
+        background-color: #eee;
+        color: #333;
+      }
+      background-color: #eee;
+      color: #333;
+      &.is-sharp {
+        td {
+          background: #555;
+          color: #eee;
+        }
+
+        th {
+          background: #333;
+          color: #eee;
+        }
+      }
+    }
+    td:has(input:checked) {
+      background: orange;
+    }
+  }
+}

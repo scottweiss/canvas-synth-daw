@@ -1,4 +1,4 @@
-import { AudioEngine } from "./AudioEngine";
+import { AudioEngine } from "../audio/AudioEngine";
 
 export class Drum {
   gainNode: GainNode;
@@ -57,6 +57,5 @@ export class Drum {
         this.attackTime +
         this.releaseTime,
     );
-    console.log(this);
   }
 }

@@ -1,9 +1,9 @@
-import { AudioEngine } from "../../midi/AudioEngine";
-import { Canvas } from "../../midi/Canvas";
+import { AudioEngine } from "../../audio/AudioEngine";
+import { CanvasController } from "../../canvas/CanvasController";
 import styles from "./csd-visualizer.scss?inline";
 
 export class CsdVisualizer extends HTMLElement {
-  private canvasController: Canvas;
+  private canvasController: CanvasController;
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D | null;
   private audioEngine: AudioEngine;
@@ -13,11 +13,11 @@ export class CsdVisualizer extends HTMLElement {
     super();
 
     this.audioEngine = AudioEngine.getInstance(); // get the singleton instance of AudioEngine
-    this.canvasController = new Canvas();
+    this.canvasController = new CanvasController();
 
     this.canvas = this.canvasController.getCanvasElement();
     // this.canvas = document.createElement("canvas");
-    this.context = this.canvasController.getCtx();
+    this.context = this.canvas.getContext("2d");
 
     if (!this.context) {
       throw new Error("Could not get 2D rendering context from canvas.");
@@ -36,10 +36,7 @@ export class CsdVisualizer extends HTMLElement {
 
   connectedCallback() {
     this.canvasController.resize();
-    this.canvasController.draw();
-
-    // this.resize();
-    this.draw();
+    this.canvasController.draw(0, this.draw.bind(this));
   }
 
   drawGridOverlay() {
@@ -77,10 +74,10 @@ export class CsdVisualizer extends HTMLElement {
   }
 
   private draw() {
-    requestAnimationFrame(() => this.draw());
-    if (!this.context) return;
+    if (!this.context) {
+      return;
+    }
 
-    // this.canvasController.draw()
     this.context.save();
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -120,16 +117,6 @@ export class CsdVisualizer extends HTMLElement {
     this.context.restore();
     this.drawGridOverlay();
   }
-
-  // private resize() {
-  //   if (this.context == null) {
-  //     return;
-  //   }
-
-  //   const rect = this.getBoundingClientRect();
-  //   this.canvas.width = rect.width;
-  //   this.canvas.height = rect.height;
-  // }
 }
 
 customElements.define("csd-visualizer", CsdVisualizer);

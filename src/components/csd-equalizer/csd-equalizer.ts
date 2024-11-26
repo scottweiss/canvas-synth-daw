@@ -1,9 +1,10 @@
-import { AudioEngine } from "../../midi/AudioEngine";
-import { Canvas } from "../../midi/Canvas";
+import { AudioEngine } from "../../audio/AudioEngine";
+
+import { CanvasController } from "../../canvas/CanvasController";
 import styles from "./csd-equalizer.scss?inline";
 
 export class CsdEqualizer extends HTMLElement {
-  private canvasController: Canvas;
+  private canvasController: CanvasController;
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D | null;
   private audioEngine: AudioEngine;
@@ -13,7 +14,7 @@ export class CsdEqualizer extends HTMLElement {
     super();
 
     this.audioEngine = AudioEngine.getInstance(); // get the singleton instance of AudioEngine
-    this.canvasController = new Canvas();
+    this.canvasController = new CanvasController();
 
     this.canvas = this.canvasController.getCanvasElement();
     // this.canvas = document.createElement("canvas");
@@ -35,11 +36,8 @@ export class CsdEqualizer extends HTMLElement {
   }
 
   connectedCallback() {
+    this.canvasController.draw(0, this.draw.bind(this));
     this.canvasController.resize();
-    this.canvasController.draw();
-
-    this.resize();
-    this.draw();
   }
 
   drawGridOverlay() {
@@ -75,8 +73,8 @@ export class CsdEqualizer extends HTMLElement {
   }
 
   private draw() {
-    requestAnimationFrame(() => this.draw());
     if (!this.context) return;
+
     const bufferLength = this.analyserNode.frequencyBinCount;
 
     // this.canvasController.draw()
@@ -121,16 +119,6 @@ export class CsdEqualizer extends HTMLElement {
 
     this.context.restore();
     this.drawGridOverlay();
-  }
-
-  private resize() {
-    if (this.context == null) {
-      return;
-    }
-
-    const rect = this.getBoundingClientRect();
-    this.canvas.width = rect.width;
-    this.canvas.height = rect.height;
   }
 }
 

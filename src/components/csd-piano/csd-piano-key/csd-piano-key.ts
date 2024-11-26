@@ -1,4 +1,4 @@
-import { AudioEngine } from "../../../midi/AudioEngine";
+import { AudioEngine } from "../../../audio/AudioEngine";
 import midiToFrequency, { midiToNote } from "../../../midi/midi-to-frequency";
 import styles from "./csd-piano-key.scss?inline";
 
@@ -86,6 +86,7 @@ export class CsdPianoKey extends HTMLElement {
   }
 
   connectedCallback() {
+    this.gainNode.gain.setValueAtTime(0.001, 0);
     window.addEventListener("keydown", (event) => {
       if (event.repeat) {
         return;
@@ -102,7 +103,6 @@ export class CsdPianoKey extends HTMLElement {
       }
     });
     this.pianoKeyElement.addEventListener("touchstart", (event) => {
-      console.log(event);
       event.preventDefault();
       event.stopImmediatePropagation();
       this.playNote();
@@ -117,8 +117,7 @@ export class CsdPianoKey extends HTMLElement {
       this.pianoKeyElement.classList.remove("active");
     });
 
-    this.pianoKeyElement.addEventListener("mousedown", (event: MouseEvent) => {
-      console.log(event);
+    this.pianoKeyElement.addEventListener("mousedown", () => {
       this.playNote();
       this.dispatchEvent(
         new CustomEvent("CsdPianoKeyStart", {
