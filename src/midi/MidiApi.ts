@@ -7,9 +7,9 @@ export class MidiApi {
   oscilators: Array<Drum>;
 
   constructor() {
-    if (navigator.requestMIDIAccess) {
+    if (navigator.requestMIDIAccess ) {
       navigator
-        .requestMIDIAccess()
+        .requestMIDIAccess({ sysex: false })
         .then(this.onMIDISuccess, this.onMIDIFailure);
     } else {
       console.log("WebMIDI is not supported in this browser.");

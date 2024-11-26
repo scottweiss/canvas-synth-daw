@@ -52,14 +52,18 @@ export class CsdSequencerTrack {
   renderCell(index: number): HTMLTableCellElement {
     const cell = document.createElement("td");
 
+    const label = document.createElement('label');
+    label.setAttribute('aria-label', `${midiToNote(this.note)}, Step ${index + 1} of 16`);
+
     const check = document.createElement("input");
     check.type = "checkbox";
     check.addEventListener("change", () => {
       this.track[index] = check.checked;
       // console.log(this.track)
     });
+    label.append(check);
 
-    cell.append(check);
+    cell.append(label);
 
     return cell;
   }

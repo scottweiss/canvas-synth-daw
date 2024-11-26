@@ -17,7 +17,7 @@
   }
 
   canvas {
-    height: 20px;
+    height: 26px;
     width: 100%;
   }
 
@@ -27,13 +27,18 @@
 
     button {
       margin: 0;
-      height: auto;
+      height: 26px;
       width: 100%;
       border: none;
       background-color: green;
-      color: #eee;
-      font-size: 14px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: bold;
       // padding: 4px 8px
+      transition: background-color 80ms linear;
+      &.is-playing{
+        background-color: red;
+      }
     }
     th,
     td {

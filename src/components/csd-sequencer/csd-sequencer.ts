@@ -17,10 +17,12 @@ export class CsdSequencer extends HTMLElement {
   snare: Drum;
   play: boolean = false;
   tracks: Array<CsdSequencerTrack> = [];
+  playToggle: HTMLButtonElement;
 
   constructor() {
     super();
     this.context = this.canvasController.getCtx();
+    this.playToggle = this.renderPlayToggle();
     this.kick = new Drum(700, "triangle", 0.1, 0.1);
     this.snare = new Drum(600, "triangle", 0.1, 0.1);
     // add styles
@@ -39,17 +41,24 @@ export class CsdSequencer extends HTMLElement {
     this.timer.draw(0, this.beatCallback.bind(this));
   }
 
+  renderPlayToggle(): HTMLButtonElement {
+    const playToggle = document.createElement("button");
+    playToggle.innerText = "Start";
+    playToggle.onclick = () => {
+      this.play = !this.play;
+      playToggle.innerText = `${this.play ? "Stop" : "Start"}`;
+      playToggle.classList.toggle('is-playing')
+    };
+
+    return playToggle
+  }
+
   buildTrackTable(): HTMLTableElement {
     for (let i = 60; i < 78; i++) {
       const track = new CsdSequencerTrack({ note: i });
       this.tracks.push(track);
     }
-    const checkbox = document.createElement("button");
-    checkbox.innerText = "Start";
-    checkbox.onclick = () => {
-      this.play = !this.play;
-      checkbox.innerText = `${this.play ? "Stop" : "Start"}`;
-    };
+
 
     const table = document.createElement("table");
     table.classList.add("csd-sequencer-step-table");
@@ -60,7 +69,7 @@ export class CsdSequencer extends HTMLElement {
     canvasCell.setAttribute("colspan", "16");
     canvasCell.append(this.canvasController.getCanvasElement());
     const playCell = document.createElement("th");
-    playCell.append(checkbox);
+    playCell.append(this.playToggle);
     canvasRow.append(playCell, canvasCell);
     head.append(canvasRow);
 
