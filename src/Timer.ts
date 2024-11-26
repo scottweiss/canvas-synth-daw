@@ -5,7 +5,7 @@ export class Timer {
   // private audioEngine: AudioEngine;
   // private canvasController: CanvasController;
   private then: number = 0;
-  private bpm: number = 60000 / 480;
+  private bpm: number = 60000 / 360;
 
   public draw(timestamp: number, callback?: (e: number) => void): void {
     requestAnimationFrame((timestamp) => this.draw(timestamp, callback));
