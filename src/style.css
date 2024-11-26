@@ -24,8 +24,10 @@ body {
 }
 
 main {
-  perspective: 1000px;
-  transform-style: preserve-3d;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
 }
 
 #app {

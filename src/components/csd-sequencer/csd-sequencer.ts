@@ -47,10 +47,10 @@ export class CsdSequencer extends HTMLElement {
     playToggle.onclick = () => {
       this.play = !this.play;
       playToggle.innerText = `${this.play ? "Stop" : "Start"}`;
-      playToggle.classList.toggle('is-playing')
+      playToggle.classList.toggle("is-playing");
     };
 
-    return playToggle
+    return playToggle;
   }
 
   buildTrackTable(): HTMLTableElement {
@@ -58,7 +58,6 @@ export class CsdSequencer extends HTMLElement {
       const track = new CsdSequencerTrack({ note: i });
       this.tracks.push(track);
     }
-
 
     const table = document.createElement("table");
     table.classList.add("csd-sequencer-step-table");

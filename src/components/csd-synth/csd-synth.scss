@@ -15,9 +15,9 @@
   padding: 12px;
   height: min-content;
   grid-template-areas:
-    "viz eq seq seq seq seq"
-    "adsr adsr seq seq seq seq "
-    "piano piano piano   wave . .";
+    "viz eq . ."
+    "adsr adsr . ."
+    "piano piano  piano  wave ";
 
   // grid-template-areas:
   // "viz eq "
@@ -64,6 +64,7 @@
   csd-sequencer {
     grid-area: seq;
     align-self: start;
+    align-items: start;
   }
   .sr-only {
     display: block;

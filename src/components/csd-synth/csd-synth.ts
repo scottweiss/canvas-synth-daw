@@ -80,7 +80,7 @@ export class CsdSynth extends HTMLElement {
       this.equalizer,
       this.adsrRef,
       this.pianoRef,
-      this.sequencer,
+      // this.sequencer,
       // this.drumKit,
     );
   }
