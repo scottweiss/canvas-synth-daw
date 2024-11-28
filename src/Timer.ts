@@ -1,24 +1,43 @@
-// import { AudioEngine } from "./audio/AudioEngine";
-// import { CanvasController } from "./canvas/CanvasController";
+import { AudioEngine } from "./audio/AudioEngine";
 
+export type TimerProps = {
+  bpm?: number;
+};
 export class Timer {
-  // private audioEngine: AudioEngine;
-  // private canvasController: CanvasController;
+  private static instance: Timer;
+  private audioEngine: AudioEngine = AudioEngine.getInstance();
+  // private fpsInterval: number = 1000 / 60; // 60 fps
   private then: number = 0;
-  private bpm: number = 60000 / 360;
 
-  public draw(timestamp: number, callback?: (e: number) => void): void {
-    requestAnimationFrame((timestamp) => this.draw(timestamp, callback));
+  public beat(timestamp: number, callback?: (e: number) => void): void {
+    requestAnimationFrame((timestamp) => this.beat(timestamp, callback));
+    const bpm = this.audioEngine.bpm;
+    if (timestamp < this.then + 6000 / bpm) return;
 
-    if (timestamp < this.then + this.bpm) return; // Skip frames to maintain 60 fps
-
-    this.then = timestamp - ((timestamp - this.then) % this.bpm);
+    this.then = timestamp - ((timestamp - this.then) % (6000 / bpm));
 
     if (callback) {
-      // Clear the canvas before drawing each frame
-
-      // Call the provided draw callback function
       callback(this.then / 1000);
     }
+  }
+
+  // public draw(timestamp: number, callback?: () => void): void {
+  //   requestAnimationFrame((timestamp) => this.draw(timestamp, callback));
+
+  //   if (timestamp < this.then + this.fpsInterval) return; // Skip frames to maintain 60 fps
+
+  //   this.then = timestamp - ((timestamp - this.then) % this.fpsInterval);
+
+  //   if (callback) {
+  //     // Call the provided draw callback function
+  //     callback();
+  //   }
+  // }
+
+  public static getInstance(): Timer {
+    if (!Timer.instance) {
+      Timer.instance = new Timer();
+    }
+    return Timer.instance;
   }
 }

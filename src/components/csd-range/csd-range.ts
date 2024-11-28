@@ -1,32 +1,41 @@
+import { CanvasController } from "../../canvas/CanvasController";
 import styles from "./csd-range.scss?inline";
 
 export type CsdRangeProps = {
   min?: number;
   max?: number;
+  stepSize?: number;
   label: string;
-  value?: string;
+  value?: number;
 };
 
 export class CsdRange extends HTMLElement {
   // rangeDomReference;
-  _value: string;
+  _value: number;
   label: string;
   rangeElement: HTMLInputElement;
-  inputElement: HTMLOutputElement;
+  outputElement: HTMLOutputElement;
   min: number;
   max: number;
+  stepSize: number;
+  canvasController: CanvasController;
   #canvas: HTMLCanvasElement;
   mousePositionOnMousedown: { x: number; y: number } | undefined;
   #ctx;
 
   constructor(props: CsdRangeProps) {
     super();
-    this.#canvas = document.createElement("canvas");
-    this.#ctx = this.#canvas.getContext("2d");
+    console.log(props);
 
-    this._value = "0";
+    this.canvasController = new CanvasController();
+
+    this.#canvas = this.canvasController.getCanvasElement();
+    this.#ctx = this.canvasController.getCtx();
+
+    this._value = props.value || 0;
     this.min = props.min || 0.1;
     this.max = props.max || 1;
+    this.stepSize = props.stepSize || 0.01;
     this.label = props.label;
 
     const sheet = new CSSStyleSheet();
@@ -35,7 +44,7 @@ export class CsdRange extends HTMLElement {
     const shadowRoot = this.attachShadow({ mode: "open" });
 
     this.rangeElement = this.renderRangeElement();
-    this.inputElement = this.renderRangeValueDisplayElement();
+    this.outputElement = this.renderRangeValueDisplayElement();
 
     const rangeLabel = document.createElement("label");
     const labelSpan = document.createElement("span");
@@ -46,7 +55,7 @@ export class CsdRange extends HTMLElement {
     rangeLabel.append(labelSpan, this.rangeElement);
 
     shadowRoot.adoptedStyleSheets.push(sheet);
-    shadowRoot.appendChild(this.inputElement);
+    shadowRoot.appendChild(this.outputElement);
     shadowRoot.appendChild(this.#canvas);
 
     shadowRoot.appendChild(rangeLabel);
@@ -56,10 +65,10 @@ export class CsdRange extends HTMLElement {
     }
   }
 
-  set value(value: string) {
+  set value(value: number) {
     this._value = value;
-    this.inputElement.value = value;
-    this.rangeElement.value = value;
+    this.outputElement.value = String(value);
+    this.rangeElement.value = String(value);
 
     requestAnimationFrame(() => {
       this.dispatchEvent(
@@ -73,14 +82,14 @@ export class CsdRange extends HTMLElement {
     this.drawCanvas();
   }
 
-  get value(): string {
+  get value(): number {
     return this._value;
   }
 
   renderRangeValueDisplayElement(): HTMLOutputElement {
     const rangeValueInput = document.createElement("output");
     rangeValueInput.setAttribute("type", "text");
-    rangeValueInput.value = this.value;
+    rangeValueInput.value = String(this.value);
 
     // rangeValueInput.addEventListener('input', (event) => {
     //   this.value = (event.target as ).value;
@@ -91,15 +100,15 @@ export class CsdRange extends HTMLElement {
 
   renderRangeElement(): HTMLInputElement {
     const rangeElement = document.createElement("input");
-
+    console.log(this.value);
     rangeElement.setAttribute("type", "range");
     rangeElement.setAttribute("min", String(this.min));
     rangeElement.setAttribute("max", String(this.max));
-    rangeElement.setAttribute("step", "0.01");
-    rangeElement.value = this.value;
+    rangeElement.setAttribute("step", String(this.stepSize));
+    rangeElement.value = String(this.value);
 
     rangeElement.addEventListener("input", (event) => {
-      this.value = (event.target as HTMLInputElement).value;
+      this.value = Number((event.target as HTMLInputElement).value);
     });
 
     return rangeElement;
@@ -132,21 +141,29 @@ export class CsdRange extends HTMLElement {
     this.#ctx.stroke();
     this.#ctx.fill();
     // Draw the line that represents the current volume level
-    const angle = (180 - Number(this.value) * 180) * (Math.PI / 180);
-
+    const normalizedAnglePerStepSize =
+      (this.value - this.min) / (this.max - this.min);
+    const angle = (315 - normalizedAnglePerStepSize * 360) * (Math.PI / 270);
     this.#ctx.beginPath();
-    this.#ctx.moveTo(canvasWidth / 2, canvasHeight / 2);
+    // this.#ctx.moveTo(canvasWidth / 2, canvasHeight / 2);
+    this.#ctx.moveTo(
+      canvasWidth / 2 + radius * Math.cos(angle),
+      canvasHeight / 2 - radius * Math.sin(angle),
+    );
     this.#ctx.lineTo(
       canvasWidth / 2 + radius * Math.cos(angle),
       canvasHeight / 2 - radius * Math.sin(angle),
     );
+
     this.#ctx.strokeStyle = "orange";
-    this.#ctx.lineWidth = 4;
+    this.#ctx.lineWidth = 8;
     this.#ctx.stroke();
   }
 
   connectedCallback() {
-    this.drawCanvas();
+    this.canvasController.draw(0, this.drawCanvas.bind(this));
+    this.canvasController.resize();
+
     this.#canvas.addEventListener("mousedown", (event) => {
       this.mousePositionOnMousedown = { x: event.x, y: event.y };
       // console.log(this.mousePositionOnMousedown)
@@ -170,10 +187,10 @@ export class CsdRange extends HTMLElement {
         Math.min(
           Math.max(
             Number(this.value) -
-              (event.y - this.mousePositionOnMousedown.y) / 100,
-            0,
+              (event.y - this.mousePositionOnMousedown.y) * this.stepSize,
+            this.min,
           ),
-          1,
+          this.max,
         ).toFixed(2),
       );
 

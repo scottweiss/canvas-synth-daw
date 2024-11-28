@@ -2,6 +2,7 @@ import { AudioEngine } from "../../audio/AudioEngine";
 import { CanvasController } from "../../canvas/CanvasController";
 import { Drum } from "../../midi/Drum";
 import { Timer } from "../../Timer";
+import { CsdRange } from "../csd-range/csd-range";
 import { CsdSequencerTrack } from "./csd-sequencer-track/csd-sequencer-track";
 import styles from "./index.scss?inline";
 
@@ -18,6 +19,7 @@ export class CsdSequencer extends HTMLElement {
   play: boolean = false;
   tracks: Array<CsdSequencerTrack> = [];
   playToggle: HTMLButtonElement;
+  bpmRange: CsdRange;
 
   constructor() {
     super();
@@ -25,20 +27,35 @@ export class CsdSequencer extends HTMLElement {
     this.playToggle = this.renderPlayToggle();
     this.kick = new Drum(700, "triangle", 0.1, 0.1);
     this.snare = new Drum(600, "triangle", 0.1, 0.1);
+    this.bpmRange = new CsdRange({
+      label: "bpm",
+      min: 24,
+      max: 250,
+      stepSize: 1,
+      value: this.audioEngine.bpm,
+    });
+    this.bpmRange.addEventListener("csdRange", (event) => {
+      const newValue = (event as CustomEvent).detail.value;
+      if (newValue == null) {
+        return;
+      }
+      this.audioEngine.bpm = newValue / 4;
+    });
+
     // add styles
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(styles);
     const shadowRoot = this.attachShadow({ mode: "open" });
     shadowRoot.adoptedStyleSheets.push(sheet);
 
-    shadowRoot.append(this.buildTrackTable());
+    shadowRoot.append(this.bpmRange, this.buildTrackTable());
   }
 
   connectedCallback() {
     this.canvasController.resize();
     this.canvasController.draw(0, this.draw.bind(this));
 
-    this.timer.draw(0, this.beatCallback.bind(this));
+    this.timer.beat(0, this.beatCallback.bind(this));
   }
 
   renderPlayToggle(): HTMLButtonElement {
