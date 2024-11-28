@@ -183,7 +183,7 @@ export class CsdRange extends HTMLElement {
         event.y - this.mousePositionOnMousedown.y,
       );
 
-      this.value = String(
+      this.value = Number(
         Math.min(
           Math.max(
             Number(this.value) -

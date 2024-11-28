@@ -81,16 +81,16 @@ export class CsdAdsr extends HTMLElement {
 
     switch (type) {
       case "attack":
-        range.value = String(this.#attack);
+        range.value = this.#attack;
         break;
       case "decay":
-        range.value = String(this.#decay);
+        range.value = this.#decay;
         break;
       case "sustain":
-        range.value = String(this.#sustain);
+        range.value = this.#sustain;
         break;
       case "release":
-        range.value = String(this.#release);
+        range.value = this.#release;
         break;
     }
 
