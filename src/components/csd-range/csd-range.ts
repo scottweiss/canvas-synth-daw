@@ -25,7 +25,6 @@ export class CsdRange extends HTMLElement {
 
   constructor(props: CsdRangeProps) {
     super();
-    console.log(props);
 
     this.canvasController = new CanvasController();
 
@@ -100,7 +99,6 @@ export class CsdRange extends HTMLElement {
 
   renderRangeElement(): HTMLInputElement {
     const rangeElement = document.createElement("input");
-    console.log(this.value);
     rangeElement.setAttribute("type", "range");
     rangeElement.setAttribute("min", String(this.min));
     rangeElement.setAttribute("max", String(this.max));
@@ -147,17 +145,43 @@ export class CsdRange extends HTMLElement {
     this.#ctx.beginPath();
     // this.#ctx.moveTo(canvasWidth / 2, canvasHeight / 2);
     this.#ctx.moveTo(
-      canvasWidth / 2 + radius * Math.cos(angle),
-      canvasHeight / 2 - radius * Math.sin(angle),
+      canvasWidth / 2 + radius * 0.7 * Math.cos(angle),
+      canvasHeight / 2 - radius * 0.7 * Math.sin(angle),
     );
     this.#ctx.lineTo(
-      canvasWidth / 2 + radius * Math.cos(angle),
-      canvasHeight / 2 - radius * Math.sin(angle),
+      canvasWidth / 2 + radius * 0.7 * Math.cos(angle),
+      canvasHeight / 2 - radius * 0.7 * Math.sin(angle),
     );
 
     this.#ctx.strokeStyle = "orange";
-    this.#ctx.lineWidth = 8;
+    this.#ctx.lineWidth = 6;
     this.#ctx.stroke();
+    this.#ctx.closePath();
+    this.#ctx.beginPath();
+
+    for (let i = 315; i > -60; i = i - 30) {
+      const newAngle = i * (Math.PI / 270);
+
+      this.#ctx.moveTo(
+        canvasWidth / 2 + radius * 1.5 * Math.cos(newAngle),
+        canvasHeight / 2 - radius * 1.5 * Math.sin(newAngle),
+      );
+
+      const longLines = [315, 135, -45];
+      let lineWidth = radius * 1.9;
+      if (longLines.includes(i)) {
+        lineWidth = radius * 2.2;
+      }
+      this.#ctx.lineTo(
+        canvasWidth / 2 + lineWidth * Math.cos(newAngle),
+        canvasHeight / 2 - lineWidth * Math.sin(newAngle),
+      );
+    }
+
+    this.#ctx.lineWidth = 2;
+    this.#ctx.strokeStyle = "white";
+    this.#ctx.stroke();
+    this.#ctx.closePath();
   }
 
   connectedCallback() {
@@ -166,7 +190,6 @@ export class CsdRange extends HTMLElement {
 
     this.#canvas.addEventListener("mousedown", (event) => {
       this.mousePositionOnMousedown = { x: event.x, y: event.y };
-      // console.log(this.mousePositionOnMousedown)
     });
     this.#canvas.addEventListener("mousemove", (event) => {
       if (this.mousePositionOnMousedown == null || this.#ctx === null) {
@@ -177,7 +200,6 @@ export class CsdRange extends HTMLElement {
       this.#ctx?.translate(25, 25);
       this.#ctx.lineDashOffset = 8;
       this.#ctx.moveTo(0, 0);
-      // console.log((event.x - this.mousePositionOnMousedown.x),  (event.y - this.mousePositionOnMousedown.y))
       this.#ctx?.lineTo(
         event.x - this.mousePositionOnMousedown.x,
         event.y - this.mousePositionOnMousedown.y,
@@ -197,7 +219,6 @@ export class CsdRange extends HTMLElement {
       this.#ctx.lineCap = "round";
       // this.#ctx.lineWidth = 5;
       this.#ctx?.stroke();
-      // console.log(event)
       this.mousePositionOnMousedown = { x: event.x, y: event.y };
       this.#ctx.restore();
     });

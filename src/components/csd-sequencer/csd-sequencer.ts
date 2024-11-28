@@ -35,8 +35,6 @@ export class CsdSequencer extends HTMLElement {
       value: this.audioEngine.bpm,
     });
 
-    // this.audioEngine.bpm = this.audioEngine.bp
-
     this.bpmRange.addEventListener("csdRange", (event) => {
       const newValue = (event as CustomEvent).detail.value;
       if (newValue == null) {
