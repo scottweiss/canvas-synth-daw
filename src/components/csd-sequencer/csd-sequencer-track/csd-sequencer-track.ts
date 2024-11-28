@@ -9,6 +9,7 @@ export class CsdSequencerTrack {
   note: number;
   track: Array<boolean> = [];
   drum: Drum;
+
   constructor(props: CsdSequencerTrackProps) {
     this.note = props.note;
     this.drum = new Drum(midiToFrequency(this.note), "triangle", 0.1, 0.1);
@@ -21,12 +22,16 @@ export class CsdSequencerTrack {
 
     // shadowRoot.append(this.render());
     // return this.render()
-    //     this.append(this.render())
+    // this.append(this.render())
+    const localStorageTracks = localStorage.getItem(
+      `csd-sequencer-track-${this.note}`,
+    );
+
+    if (localStorageTracks) {
+      this.track = JSON.parse(localStorageTracks);
+    }
   }
 
-  // connectedCallback() {
-
-  // }
   public render(): HTMLElement {
     const row = document.createElement("tr");
 
@@ -60,10 +65,19 @@ export class CsdSequencerTrack {
 
     const check = document.createElement("input");
     check.type = "checkbox";
+
+    if (this.track[index]) {
+      check.checked = true;
+    }
+
     check.addEventListener("change", () => {
       this.track[index] = check.checked;
-      // console.log(this.track)
+      localStorage.setItem(
+        `csd-sequencer-track-${this.note}`,
+        JSON.stringify(this.track),
+      );
     });
+
     label.append(check);
 
     cell.append(label);

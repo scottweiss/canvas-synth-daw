@@ -7,13 +7,25 @@ export class MidiApi {
   oscilators: Array<Drum>;
 
   constructor() {
-    if (navigator.requestMIDIAccess) {
-      navigator
-        .requestMIDIAccess({ sysex: false })
-        .then(this.onMIDISuccess, this.onMIDIFailure);
-    } else {
-      console.log("WebMIDI is not supported in this browser.");
-    }
+    // if (navigator.requestMIDIAccess) {
+    //   navigator
+    //     .requestMIDIAccess({ sysex: false })
+    //     .then(this.onMIDISuccess, this.onMIDIFailure);
+    // } else {
+    //   console.log("WebMIDI is not supported in this browser.");
+    // }
+    const permissionName = "midi" as PermissionName;
+    // const sysexPermissionDescripton = true as PermissionDescriptor;
+    navigator.permissions.query({ name: permissionName }).then((result) => {
+      if (result.state === "granted") {
+        // Access granted.
+        console.log("hello world");
+      } else if (result.state === "prompt") {
+        console.log("oh no");
+        // Using API will prompt for permission
+      }
+      // Permission was denied by user prompt or permission policy
+    });
 
     this.oscilators = [];
   }
