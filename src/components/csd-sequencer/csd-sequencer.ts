@@ -11,7 +11,6 @@ export class CsdSequencer extends HTMLElement {
   canvasController: CanvasController = new CanvasController();
   canvas: HTMLCanvasElement = this.canvasController.getCanvasElement();
   context: CanvasRenderingContext2D | null;
-  frame: number = 0;
   beat: number = 0;
   timer: Timer = new Timer();
   kick: Drum;
@@ -27,6 +26,7 @@ export class CsdSequencer extends HTMLElement {
     this.playToggle = this.renderPlayToggle();
     this.kick = new Drum(700, "triangle", 0.1, 0.1);
     this.snare = new Drum(600, "triangle", 0.1, 0.1);
+
     this.bpmRange = new CsdRange({
       label: "bpm",
       min: 24,
@@ -34,12 +34,15 @@ export class CsdSequencer extends HTMLElement {
       stepSize: 1,
       value: this.audioEngine.bpm,
     });
+
+    // this.audioEngine.bpm = this.audioEngine.bp
+
     this.bpmRange.addEventListener("csdRange", (event) => {
       const newValue = (event as CustomEvent).detail.value;
       if (newValue == null) {
         return;
       }
-      this.audioEngine.bpm = newValue / 4;
+      this.audioEngine.bpm = newValue;
     });
 
     // add styles
@@ -108,16 +111,10 @@ export class CsdSequencer extends HTMLElement {
     this.context.save();
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    if (this.frame % 2) {
-      this.context.fillStyle = "#333433";
-    } else {
-      this.context.fillStyle = "#333433";
-    }
-
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.context.restore();
-    this.frame++;
+
     this.drawRetangle(0);
     this.drawRetangle(1);
     this.drawRetangle(2);
