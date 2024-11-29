@@ -67,8 +67,8 @@ export class CsdRadioButtonGroup extends HTMLElement {
     // radio.value = option;
     // radio.checked = this.waveType === labelText;
 
-    radio.addEventListener("click", (event) => {
-      console.log(event);
+    radio.addEventListener("click", () => {
+     
       this.value = option.id;
       this.dispatchEvent(
         new CustomEvent("CsdRadioButtonGroupValueChange", {

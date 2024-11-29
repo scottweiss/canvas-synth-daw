@@ -222,7 +222,6 @@ export class CsdRange extends HTMLElement {
         canvasWidth / 2 + radius * 1.5 * Math.cos(newAngle),
         canvasHeight / 2 - radius * 1.5 * Math.sin(newAngle),
       );
-      console.log(i);
       const longLines = [315, 235, 135, -45, 35];
       let lineWidth = radius * 1.9;
       if (longLines.includes(i)) {
