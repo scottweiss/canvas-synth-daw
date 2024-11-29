@@ -119,25 +119,81 @@ export class CsdRange extends HTMLElement {
     // const width = this.#canvas.clientWidth;
     // const height = this.#canvas.clientHeight;
 
-    const canvasWidth = this.#ctx.canvas.width;
-    const canvasHeight = this.#ctx.canvas.height;
-
     this.#canvas.width = 100;
     this.#canvas.height = 100;
+
+    const canvasWidth = this.#canvas.width;
+    const canvasHeight = this.#canvas.height;
 
     this.#ctx.lineJoin = "round";
     this.#ctx.lineCap = "round";
     // Calculate the radius of the knob
     const radius = Math.min(canvasWidth / 2, canvasHeight / 2) - 30;
 
+    // // Draw the circle for the knob
+    // this.#ctx.beginPath();
+    // this.#ctx.arc(canvasWidth / 2, canvasHeight / 2, radius, 0, 2 * Math.PI);
+    // this.#ctx.strokeStyle = "#333";
+    // this.#ctx.fillStyle = "#222";
+    // this.#ctx.lineWidth = 5;
+    // this.#ctx.stroke();
+    // this.#ctx.fill();
+
+    const angleG = this.canvasController.getAngleToLightSource();
+    this.#ctx.save(); // Save current state of context
+
+    this.#ctx.translate(canvasWidth / 2, canvasHeight / 2);
+    // Rotate context by calculated angle in radians
+    this.#ctx.rotate(360 - (-angleG * Math.PI) / 180);
+    // Move rotation point to center of canvas
+    // this.#ctx.translate(canvasWidth / 2, canvasHeight / 2);
+
+    // Create a new linear gradient with the color stops at 0 and 100%
+    const gradient = this.#ctx.createLinearGradient(0, -radius, 0, radius);
+    gradient.addColorStop(0, "rgba(255, 255, 255, 0.3"); // White at the top of circle    (0%)
+    gradient.addColorStop(1, "rgba(0,0,0, .1"); // Black at the bottom of circle    (100%)
+    this.#ctx.fillStyle = gradient;
+
     // Draw the circle for the knob
     this.#ctx.beginPath();
-    this.#ctx.arc(canvasWidth / 2, canvasHeight / 2, radius, 0, 2 * Math.PI);
-    this.#ctx.strokeStyle = "#333";
-    this.#ctx.fillStyle = "#222";
-    this.#ctx.lineWidth = 5;
-    this.#ctx.stroke();
+    this.#ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+    this.#ctx.closePath();
+
+    const x = 0;
+    const y = 0;
+
+    const darkGray = "#333";
+    const ligntGray = "#111";
+    // Create a radial gradient with multiple colors
+    const grd = this.#ctx.createRadialGradient(x, y, 1, x, y, radius);
+    grd.addColorStop(0, ligntGray); // #ddd at the center  (0%)
+    grd.addColorStop(0.05, darkGray); // #ddd at the center  (0%)
+    grd.addColorStop(0.1, ligntGray); // #ddd at the center  (0%)
+    grd.addColorStop(0.15, darkGray); // #ddd at the center  (0%)
+    grd.addColorStop(0.2, ligntGray); // #ddd at the center  (0%)
+    grd.addColorStop(0.25, darkGray); // #ddd at the center  (0%)
+    grd.addColorStop(0.3, ligntGray); // #ddd at the center  (0%)
+    grd.addColorStop(0.35, darkGray); // #ddd at the center  (0%)
+    grd.addColorStop(0.4, ligntGray); // #ddd at the center  (0%)
+    grd.addColorStop(0.45, darkGray); // #ddd at the center  (0%)
+    grd.addColorStop(0.5, ligntGray); // #ddd at the center  (0%)
+    grd.addColorStop(0.55, darkGray); // #ddd at the center  (0%)
+    grd.addColorStop(0.6, ligntGray); // #ddd at the center  (0%)
+    grd.addColorStop(0.65, darkGray); // #ddd at the center  (0%)
+    grd.addColorStop(0.7, ligntGray); // #ddd at the center  (0%)
+    grd.addColorStop(0.75, darkGray); // #ddd at the center  (0%)
+    grd.addColorStop(0.8, ligntGray); // #ddd at the center  (0%)
+    grd.addColorStop(0.85, darkGray); // #ddd at the center  (0%)
+    grd.addColorStop(0.9, ligntGray); // #ddd at the center  (0%)
+    grd.addColorStop(0.9, darkGray); // #ddd at the center  (0%)
+    grd.addColorStop(1, ligntGray); // #ddd at the center  (0%)
+
+    this.#ctx.fillStyle = grd;
+    this.#ctx.fill(); // Fill the circle with the current fill style (the gradient)
+    this.#ctx.fillStyle = gradient;
     this.#ctx.fill();
+    this.#ctx.restore(); // Restore the context state to its original saved state
+
     // Draw the line that represents the current volume level
     const normalizedAnglePerStepSize =
       (this.value - this.min) / (this.max - this.min);
@@ -159,15 +215,15 @@ export class CsdRange extends HTMLElement {
     this.#ctx.closePath();
     this.#ctx.beginPath();
 
-    for (let i = 315; i > -60; i = i - 30) {
+    for (let i = 315; i > -60; i = i - 20) {
       const newAngle = i * (Math.PI / 270);
 
       this.#ctx.moveTo(
         canvasWidth / 2 + radius * 1.5 * Math.cos(newAngle),
         canvasHeight / 2 - radius * 1.5 * Math.sin(newAngle),
       );
-
-      const longLines = [315, 135, -45];
+      console.log(i);
+      const longLines = [315, 235, 135, -45, 35];
       let lineWidth = radius * 1.9;
       if (longLines.includes(i)) {
         lineWidth = radius * 2.2;
