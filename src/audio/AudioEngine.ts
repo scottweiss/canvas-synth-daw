@@ -1,5 +1,5 @@
-import { ADSR } from "../audio/ADSR";
-import midiToFrequency from "../midi/midi-to-frequency";
+import { ADSR } from '../audio/ADSR';
+import midiToFrequency from '../midi/midi-to-frequency';
 
 export class AudioEngine {
   private static instance: AudioEngine;
@@ -42,7 +42,7 @@ export class AudioEngine {
     this.applyADSR(gainNode);
   }
 
-  applyADSR(gainNode: GainNode) {
+  applyADSR(gainNode: GainNode): void {
     const currentTime = this.audioContext.currentTime;
     const maxVolumne = 0.5;
     const adsr = ADSR.getInstance().adsr;
@@ -54,19 +54,19 @@ export class AudioEngine {
     gainNode.gain.setValueAtTime(gainNode.gain.value || 0.001, currentTime);
     gainNode.gain.linearRampToValueAtTime(
       maxVolumne,
-      currentTime + adsr.attack,
+      currentTime + adsr.attack
     );
     gainNode.gain.linearRampToValueAtTime(
       adsr.sustain * maxVolumne,
-      currentTime + adsr.attack + adsr.decay,
+      currentTime + adsr.attack + adsr.decay
     );
     gainNode.gain.setValueAtTime(
       adsr.sustain * maxVolumne,
-      currentTime + adsr.attack + adsr.decay,
+      currentTime + adsr.attack + adsr.decay
     );
   }
 
-  releaseEnvelope(gainNode: GainNode) {
+  releaseEnvelope(gainNode: GainNode): void {
     const release = ADSR.getInstance().adsr.release;
     const currentTime = this.audioContext.currentTime;
     gainNode.gain.cancelScheduledValues(currentTime);

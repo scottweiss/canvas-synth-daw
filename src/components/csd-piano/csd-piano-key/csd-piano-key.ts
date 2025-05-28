@@ -1,6 +1,6 @@
-import { AudioEngine } from "../../../audio/AudioEngine";
-import midiToFrequency, { midiToNote } from "../../../midi/midi-to-frequency";
-import styles from "./csd-piano-key.scss?inline";
+import { AudioEngine } from '../../../audio/AudioEngine';
+import midiToFrequency, { midiToNote } from '../../../midi/midi-to-frequency';
+import styles from './csd-piano-key.scss?inline';
 
 export type CsdPianoKeyProps = {
   midiKey: number;
@@ -22,7 +22,7 @@ export class CsdPianoKey extends HTMLElement {
     this.#midiKey = value;
     this.keyNoteRef.textContent = String(midiToNote(value));
     this.oscillator.frequency.setValueAtTime(midiToFrequency(value), 0);
-    this.pianoKeyElement.setAttribute("aria-label", midiToNote(value));
+    this.pianoKeyElement.setAttribute('aria-label', midiToNote(value));
   }
 
   get midiKey(): number {
@@ -51,14 +51,14 @@ export class CsdPianoKey extends HTMLElement {
 
     this.#midiKey = props.midiKey;
     this.#keyboardKey = props.keyboardKey;
-    this.keyNoteRef = document.createElement("span");
-    this.keyNoteRef.classList.add("key-note");
+    this.keyNoteRef = document.createElement('span');
+    this.keyNoteRef.classList.add('key-note');
     this.keyNoteRef.textContent = String(midiToNote(this.midiKey));
 
     this.audioEngine = AudioEngine.getInstance();
     this.oscillator = this.audioEngine.createOscillator(this.midiKey);
     this.gainNode = this.audioEngine.audioContext.createGain();
-    this.#waveType = props.waveType || "sine";
+    this.#waveType = props.waveType || 'sine';
     // Connect the oscillator to the gain node
     this.oscillator.type = this.#waveType;
 
@@ -74,98 +74,98 @@ export class CsdPianoKey extends HTMLElement {
     // add styles
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(styles);
-    const shadowRoot = this.attachShadow({ mode: "open" });
+    const shadowRoot = this.attachShadow({ mode: 'open' });
     shadowRoot.adoptedStyleSheets.push(sheet);
 
     // add element
     if (this.isSharp()) {
-      this.setAttribute("sharp", "");
+      this.setAttribute('sharp', '');
     }
     this.pianoKeyElement = this.renderKey();
     shadowRoot.appendChild(this.pianoKeyElement);
   }
 
-  connectedCallback() {
+  connectedCallback(): void {
     this.gainNode.gain.setValueAtTime(0.001, 0);
-    window.addEventListener("keydown", (event) => {
+    window.addEventListener('keydown', (event) => {
       if (event.repeat) {
         return;
       }
       if (event.key === this.keyboardKey) {
-        this.pianoKeyElement.classList.add("active");
+        this.pianoKeyElement.classList.add('active');
         this.playNote();
       }
     });
-    window.addEventListener("keyup", (event) => {
+    window.addEventListener('keyup', (event) => {
       if (event.key === this.keyboardKey) {
-        this.pianoKeyElement.classList.remove("active");
+        this.pianoKeyElement.classList.remove('active');
         this.releaseEnvelope();
       }
     });
-    this.pianoKeyElement.addEventListener("touchstart", (event) => {
+    this.pianoKeyElement.addEventListener('touchstart', (event) => {
       event.preventDefault();
       event.stopImmediatePropagation();
       this.playNote();
-      this.pianoKeyElement.classList.add("active");
+      this.pianoKeyElement.classList.add('active');
       // if (event.key === this.keyboardKey) {
       //   this.pianoKeyElement.classList.add("active");
       //   this.playNote();
       // }
     });
-    this.pianoKeyElement.addEventListener("touchend", () => {
+    this.pianoKeyElement.addEventListener('touchend', () => {
       this.releaseEnvelope();
-      this.pianoKeyElement.classList.remove("active");
+      this.pianoKeyElement.classList.remove('active');
     });
 
-    this.pianoKeyElement.addEventListener("mousedown", () => {
+    this.pianoKeyElement.addEventListener('mousedown', () => {
       this.playNote();
       this.dispatchEvent(
-        new CustomEvent("CsdPianoKeyStart", {
+        new CustomEvent('CsdPianoKeyStart', {
           bubbles: true,
           detail: { midiKey: this.midiKey },
-        }),
+        })
       );
     });
 
-    this.pianoKeyElement.addEventListener("mouseup", () => {
+    this.pianoKeyElement.addEventListener('mouseup', () => {
       this.dispatchEvent(
-        new CustomEvent("CsdPianoKeyStop", {
+        new CustomEvent('CsdPianoKeyStop', {
           bubbles: true,
           detail: { midiKey: this.midiKey },
-        }),
+        })
       );
       this.releaseEnvelope();
     });
 
-    this.pianoKeyElement.addEventListener("mouseleave", () => {
+    this.pianoKeyElement.addEventListener('mouseleave', () => {
       this.dispatchEvent(
-        new CustomEvent("CsdPianoKeyStop", {
+        new CustomEvent('CsdPianoKeyStop', {
           bubbles: true,
           detail: { midiKey: this.midiKey },
-        }),
+        })
       );
       this.releaseEnvelope();
     });
   }
 
-  isSharp() {
+  isSharp(): boolean {
     const sharps = [1, 3, 6, 8, 10]; // Representing the sharp note steps in an octave
     return sharps.includes(this.midiKey % 12);
   }
 
   getClasses(): string {
-    const classes = ["csd-piano-key"];
+    const classes = ['csd-piano-key'];
     if (this.isSharp()) {
-      classes.push("csd-piano-key-sharp");
+      classes.push('csd-piano-key-sharp');
     }
-    return classes.join(" ");
+    return classes.join(' ');
   }
   renderKey(): HTMLButtonElement {
-    const key = document.createElement("button");
-    const keyKeyboardLable = document.createElement("kbd");
+    const key = document.createElement('button');
+    const keyKeyboardLable = document.createElement('kbd');
     keyKeyboardLable.textContent = this.keyboardKey;
     key.className = this.getClasses();
-    key.setAttribute("aria-label", String(midiToNote(this.midiKey)));
+    key.setAttribute('aria-label', String(midiToNote(this.midiKey)));
 
     key.append(this.keyNoteRef, keyKeyboardLable);
 
@@ -180,10 +180,10 @@ export class CsdPianoKey extends HTMLElement {
     this.audioEngine.playNote(this.oscillator, this.gainNode);
   }
 
-  releaseEnvelope() {
+  releaseEnvelope(): void {
     this.audioEngine.releaseEnvelope(this.gainNode);
   }
 }
 
 // Define the new element
-customElements.define("csd-piano-key", CsdPianoKey);
+customElements.define('csd-piano-key', CsdPianoKey);

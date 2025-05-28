@@ -1,10 +1,10 @@
-import { AudioEngine } from "../../audio/AudioEngine";
-import { CanvasController } from "../../canvas/CanvasController";
-import { Drum } from "../../midi/Drum";
-import { Timer } from "../../Timer";
-import { CsdRange } from "../csd-range/csd-range";
-import { CsdSequencerTrack } from "./csd-sequencer-track/csd-sequencer-track";
-import styles from "./index.scss?inline";
+import { AudioEngine } from '../../audio/AudioEngine';
+import { CanvasController } from '../../canvas/CanvasController';
+import { Drum } from '../../midi/Drum';
+import { Timer } from '../../Timer';
+import { CsdRange } from '../csd-range/csd-range';
+import { CsdSequencerTrack } from './csd-sequencer-track/csd-sequencer-track';
+import styles from './index.scss?inline';
 
 export class CsdSequencer extends HTMLElement {
   audioEngine: AudioEngine = AudioEngine.getInstance();
@@ -24,18 +24,18 @@ export class CsdSequencer extends HTMLElement {
     super();
     this.context = this.canvasController.getCtx();
     this.playToggle = this.renderPlayToggle();
-    this.kick = new Drum(700, "triangle", 0.1, 0.1);
-    this.snare = new Drum(600, "triangle", 0.1, 0.1);
+    this.kick = new Drum(30, 'square', 0.1, 0.1);
+    this.snare = new Drum(600, 'triangle', 0.1, 0.1);
 
     this.bpmRange = new CsdRange({
-      label: "bpm",
+      label: 'bpm',
       min: 24,
       max: 250,
       stepSize: 1,
       value: this.audioEngine.bpm,
     });
 
-    this.bpmRange.addEventListener("csdRange", (event) => {
+    this.bpmRange.addEventListener('csdRange', (event) => {
       const newValue = (event as CustomEvent).detail.value;
       if (newValue == null) {
         return;
@@ -46,13 +46,13 @@ export class CsdSequencer extends HTMLElement {
     // add styles
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(styles);
-    const shadowRoot = this.attachShadow({ mode: "open" });
+    const shadowRoot = this.attachShadow({ mode: 'open' });
     shadowRoot.adoptedStyleSheets.push(sheet);
 
     shadowRoot.append(this.bpmRange, this.buildTrackTable());
   }
 
-  connectedCallback() {
+  connectedCallback(): void {
     this.canvasController.resize();
     this.canvasController.draw(0, this.draw.bind(this));
 
@@ -60,32 +60,41 @@ export class CsdSequencer extends HTMLElement {
   }
 
   renderPlayToggle(): HTMLButtonElement {
-    const playToggle = document.createElement("button");
-    playToggle.innerText = "Start";
-    playToggle.onclick = () => {
+    const playToggle = document.createElement('button');
+    playToggle.innerText = 'Start';
+    playToggle.onclick = (): void => {
       this.play = !this.play;
-      playToggle.innerText = `${this.play ? "Stop" : "Start"}`;
-      playToggle.classList.toggle("is-playing");
+      playToggle.innerText = `${this.play ? 'Stop' : 'Start'}`;
+      playToggle.classList.toggle('is-playing');
     };
 
     return playToggle;
   }
 
   buildTrackTable(): HTMLTableElement {
+    const kick: CsdSequencerTrack = new CsdSequencerTrack({
+      note: 'kick',
+      drum: this.kick,
+    });
+    const snare: CsdSequencerTrack = new CsdSequencerTrack({
+      note: 'snare',
+      drum: this.snare,
+    });
+    this.tracks.push(kick, snare);
     for (let i = 60; i < 78; i++) {
       const track = new CsdSequencerTrack({ note: i });
       this.tracks.push(track);
     }
 
-    const table = document.createElement("table");
-    table.classList.add("csd-sequencer-step-table");
-    const body = document.createElement("tbody");
-    const head = document.createElement("thead");
-    const canvasRow = document.createElement("tr");
-    const canvasCell = document.createElement("td");
-    canvasCell.setAttribute("colspan", "16");
+    const table = document.createElement('table');
+    table.classList.add('csd-sequencer-step-table');
+    const body = document.createElement('tbody');
+    const head = document.createElement('thead');
+    const canvasRow = document.createElement('tr');
+    const canvasCell = document.createElement('td');
+    canvasCell.setAttribute('colspan', '16');
     canvasCell.append(this.canvasController.getCanvasElement());
-    const playCell = document.createElement("th");
+    const playCell = document.createElement('th');
     playCell.append(this.playToggle);
     canvasRow.append(playCell, canvasCell);
     head.append(canvasRow);
@@ -94,14 +103,14 @@ export class CsdSequencer extends HTMLElement {
     body.append(
       ...this.tracks.map((track) => {
         return track.render();
-      }),
+      })
     );
     table.append(head, body);
 
     return table;
   }
 
-  private draw() {
+  private draw(): void {
     if (!this.context) {
       return;
     }
@@ -141,15 +150,15 @@ export class CsdSequencer extends HTMLElement {
     const xPosition = (this.canvas.width / 16) * number;
 
     if ((this.beat - number) % 16 !== 1) {
-      this.context.fillStyle = "orchid";
+      this.context.fillStyle = 'orchid';
     } else {
-      this.context.fillStyle = "orange";
+      this.context.fillStyle = 'orange';
     }
     this.context.fillRect(
       xPosition,
       0,
       this.canvas.width / 16 + xPosition,
-      this.canvas.height,
+      this.canvas.height
     );
   }
 
@@ -166,4 +175,4 @@ export class CsdSequencer extends HTMLElement {
 }
 
 // Define the new element
-customElements.define("csd-sequencer", CsdSequencer);
+customElements.define('csd-sequencer', CsdSequencer);

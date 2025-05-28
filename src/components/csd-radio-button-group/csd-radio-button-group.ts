@@ -1,4 +1,4 @@
-import styles from "./csd-radio-button-group.scss?inline";
+import styles from './csd-radio-button-group.scss?inline';
 
 type CsdOption = {
   id: string;
@@ -24,7 +24,7 @@ export class CsdRadioButtonGroup extends HTMLElement {
     // add styles
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(styles);
-    const shadowRoot = this.attachShadow({ mode: "open" });
+    const shadowRoot = this.attachShadow({ mode: 'open' });
     shadowRoot.adoptedStyleSheets.push(sheet);
 
     const fieldset = this.renderFieldset(props.legend);
@@ -43,39 +43,38 @@ export class CsdRadioButtonGroup extends HTMLElement {
     this.#value = value;
   }
 
-  renderFieldset(legend: string) {
-    const fieldsetRef = document.createElement("fieldset");
-    const legendRef = document.createElement("legend");
+  renderFieldset(legend: string): HTMLFieldSetElement {
+    const fieldsetRef = document.createElement('fieldset');
+    const legendRef = document.createElement('legend');
     legendRef.textContent = legend;
-    legendRef.setAttribute("hidden", "");
+    legendRef.setAttribute('hidden', '');
 
     fieldsetRef.appendChild(legendRef);
     return fieldsetRef;
   }
 
   renderRadio(option: CsdOption): HTMLLabelElement {
-    const label = document.createElement("label");
-    const labelSpan = document.createElement("span");
+    const label = document.createElement('label');
+    const labelSpan = document.createElement('span');
     labelSpan.textContent = option.label;
-    const radio = document.createElement("input");
-    radio.name = "waveType";
-    radio.type = "radio";
-    radio.classList.add("sr-only");
-    radio.setAttribute("hidden", "");
+    const radio = document.createElement('input');
+    radio.name = 'waveType';
+    radio.type = 'radio';
+    radio.classList.add('sr-only');
+    radio.setAttribute('hidden', '');
 
     radio.checked = option.id == this.value;
     // radio.value = option;
     // radio.checked = this.waveType === labelText;
 
-    radio.addEventListener("click", () => {
-     
+    radio.addEventListener('click', () => {
       this.value = option.id;
       this.dispatchEvent(
-        new CustomEvent("CsdRadioButtonGroupValueChange", {
+        new CustomEvent('CsdRadioButtonGroupValueChange', {
           detail: {
             value: this.value,
           },
-        }),
+        })
       );
     });
     label.append(radio, labelSpan);
@@ -85,4 +84,4 @@ export class CsdRadioButtonGroup extends HTMLElement {
 }
 
 // Define the new element
-customElements.define("csd-radio-button-group", CsdRadioButtonGroup);
+customElements.define('csd-radio-button-group', CsdRadioButtonGroup);

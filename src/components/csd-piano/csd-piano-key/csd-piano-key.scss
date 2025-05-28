@@ -1,4 +1,4 @@
-@use "sass:math";
+@use 'sass:math';
 $csd-piano-key-height: 200px;
 $csd-piano-key-width: 60px;
 $csd-piano-key-sharp-height: $csd-piano-key-height * 0.7;
@@ -52,7 +52,7 @@ $csd-piano-key-perspective: 9999px;
       box-shadow: inset 0px 0px #ccc;
     }
 
-    &[aria-label="C4 (Middle C)"] .key-note {
+    &[aria-label='C4 (Middle C)'] .key-note {
       // color: green;
       text-orientation: sideways;
       writing-mode: vertical-lr;

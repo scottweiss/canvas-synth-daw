@@ -1,13 +1,7 @@
-import styles from "./csd-adsr.scss?inline";
-import "../csd-range/csd-range";
-import { CsdRange } from "../csd-range/csd-range";
-
-export type Adsr = {
-  attack: number;
-  decay: number;
-  sustain: number;
-  release: number;
-};
+import styles from './csd-adsr.scss?inline';
+import '../csd-range/csd-range';
+import { CsdRange } from '../csd-range/csd-range';
+import { IAdsr } from '../../audio/ADSR';
 
 export class CsdAdsr extends HTMLElement {
   #attack: number;
@@ -15,32 +9,32 @@ export class CsdAdsr extends HTMLElement {
   #sustain: number;
   #release: number;
   #canvas: HTMLCanvasElement;
-  #ctx;
+  #ctx: CanvasRenderingContext2D | null;
 
-  constructor(props: { adsr: Adsr }) {
+  constructor(props: { adsr: IAdsr }) {
     super();
     this.adsr = props.adsr;
     this.#attack = props.adsr.attack;
     this.#decay = props.adsr.decay;
     this.#sustain = props.adsr.sustain;
     this.#release = props.adsr.release;
-    this.#canvas = document.createElement("canvas");
-    this.#ctx = this.#canvas.getContext("2d");
+    this.#canvas = document.createElement('canvas');
+    this.#ctx = this.#canvas.getContext('2d');
 
     if (this.#ctx != null) {
-      this.#ctx.lineJoin = "round";
+      this.#ctx.lineJoin = 'round';
     }
 
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(styles);
 
-    const shadowRoot = this.attachShadow({ mode: "open" });
+    const shadowRoot = this.attachShadow({ mode: 'open' });
 
     shadowRoot.adoptedStyleSheets.push(sheet);
     shadowRoot.append(...this.renderAdsr());
   }
 
-  get adsr(): Adsr {
+  get adsr(): IAdsr {
     return {
       attack: this.#attack,
       decay: this.#decay,
@@ -49,7 +43,7 @@ export class CsdAdsr extends HTMLElement {
     };
   }
 
-  set adsr(adsr: Adsr) {
+  set adsr(adsr: IAdsr) {
     this.#attack = adsr.attack;
     this.#decay = adsr.decay;
     this.#sustain = adsr.sustain;
@@ -58,68 +52,68 @@ export class CsdAdsr extends HTMLElement {
   }
 
   renderAdsr(): Array<HTMLElement> {
-    const canvasWrapper = document.createElement("div");
-    canvasWrapper.classList.add("canvas-wrapper");
+    const canvasWrapper = document.createElement('div');
+    canvasWrapper.classList.add('canvas-wrapper');
     canvasWrapper.append(this.#canvas);
     return [
       canvasWrapper,
-      this.renderFieldset("attack"),
-      this.renderFieldset("decay"),
-      this.renderFieldset("sustain"),
-      this.renderFieldset("release"),
+      this.renderFieldset('attack'),
+      this.renderFieldset('decay'),
+      this.renderFieldset('sustain'),
+      this.renderFieldset('release'),
     ];
   }
 
   renderFieldset(type: string): HTMLElement {
-    const fieldset = document.createElement("fieldset");
-    const legend = document.createElement("legend");
+    const fieldset = document.createElement('fieldset');
+    const legend = document.createElement('legend');
     legend.textContent = type;
 
     // const range = document.createElement('csd-range');
     const range = new CsdRange({ label: type });
-    range.id = "csd-adsr-" + type;
+    range.id = 'csd-adsr-' + type;
 
     switch (type) {
-      case "attack":
+      case 'attack':
         range.value = this.#attack;
         break;
-      case "decay":
+      case 'decay':
         range.value = this.#decay;
         break;
-      case "sustain":
+      case 'sustain':
         range.value = this.#sustain;
         break;
-      case "release":
+      case 'release':
         range.value = this.#release;
         break;
     }
 
-    range.addEventListener("csdRange", (event) => {
+    range.addEventListener('csdRange', (event) => {
       const newValue = (event as CustomEvent).detail.value;
       if (newValue == null) {
         return;
       }
       switch (type) {
-        case "attack":
+        case 'attack':
           this.#attack = Number(newValue);
           break;
-        case "decay":
+        case 'decay':
           this.#decay = Number(newValue);
           break;
-        case "sustain":
+        case 'sustain':
           this.#sustain = Number(newValue);
           break;
-        case "release":
+        case 'release':
           this.#release = Number(newValue);
           break;
       }
 
       this.drawADSR();
       this.dispatchEvent(
-        new CustomEvent("CsdAdsr", {
+        new CustomEvent('CsdAdsr', {
           detail: { adsr: this.adsr },
           bubbles: true,
-        }),
+        })
       );
     });
 
@@ -128,7 +122,7 @@ export class CsdAdsr extends HTMLElement {
     return fieldset;
   }
 
-  drawADSR() {
+  drawADSR(): void {
     if (
       this.#ctx == null ||
       this.#attack == null ||
@@ -149,13 +143,13 @@ export class CsdAdsr extends HTMLElement {
     this.#canvas.height = height;
 
     // this.#ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-    this.#ctx.fillStyle = "#333433";
+    this.#ctx.fillStyle = '#333433';
     this.#ctx.fillRect(0, 0, this.#canvas.width, this.#canvas.height);
     this.#ctx.lineWidth = 3;
-    this.#ctx.strokeStyle = "#1f1";
+    this.#ctx.strokeStyle = '#1f1';
 
     this.#ctx.shadowBlur = 20;
-    this.#ctx.shadowColor = "#1f1";
+    this.#ctx.shadowColor = '#1f1';
 
     const margin = 20;
     const innerWidth = canvasWidth - 1 * margin;
@@ -174,8 +168,8 @@ export class CsdAdsr extends HTMLElement {
       (1 - this.#sustain) * (canvasHeight - margin - margin) + margin;
 
     this.#ctx.beginPath();
-    this.#ctx.lineJoin = "round";
-    this.#ctx.lineCap = "round";
+    this.#ctx.lineJoin = 'round';
+    this.#ctx.lineCap = 'round';
     this.#ctx.moveTo(margin, canvasHeight - margin); // Attack
     this.#ctx.lineTo(attackWidth + margin, margin); // Decay
 
@@ -185,7 +179,7 @@ export class CsdAdsr extends HTMLElement {
 
     this.#ctx.lineTo(
       attackWidth + decayWidth + sustainWidth + releaseWidth,
-      canvasHeight - margin,
+      canvasHeight - margin
     );
 
     this.#ctx.stroke();
@@ -193,11 +187,11 @@ export class CsdAdsr extends HTMLElement {
     this.drawGridOverlay();
   }
 
-  drawGridOverlay() {
+  drawGridOverlay(): void {
     if (!this.#ctx) return;
     this.#ctx.save();
     this.#ctx.lineWidth = 0.5;
-    this.#ctx.strokeStyle = "#00000066";
+    this.#ctx.strokeStyle = '#00000066';
     this.#ctx.beginPath();
     // this.#ctx.translate(, 2)
     const cellSize = 24;
@@ -225,10 +219,10 @@ export class CsdAdsr extends HTMLElement {
     this.#ctx.restore();
   }
 
-  connectedCallback() {
+  connectedCallback(): void {
     this.drawADSR();
   }
 }
 
 // Define the new element
-customElements.define("csd-adsr", CsdAdsr);
+customElements.define('csd-adsr', CsdAdsr);

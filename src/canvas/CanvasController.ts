@@ -6,11 +6,11 @@ export class CanvasController {
   public lightAngle: number;
 
   constructor() {
-    this.canvas = document.createElement("canvas");
-    this.context = this.canvas.getContext("2d");
+    this.canvas = document.createElement('canvas');
+    this.context = this.canvas.getContext('2d');
     this.lightAngle = this.getAngleToLightSource();
 
-    window.addEventListener("resize", () => this.handleResize);
+    window.addEventListener('resize', () => this.handleResize());
 
     // this.handleResize()
 
@@ -26,11 +26,11 @@ export class CanvasController {
     this.canvas.height = rect.height;
   }
 
-  public resize() {
+  public resize(): void {
     if (this.context == null) {
       return;
     }
-    this.getAngleToLightSource();
+    this.lightAngle = this.getAngleToLightSource();
 
     const rect = this.canvas.getBoundingClientRect();
     this.canvas.width = rect.width;

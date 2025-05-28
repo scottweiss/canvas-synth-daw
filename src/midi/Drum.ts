@@ -1,4 +1,4 @@
-import { AudioEngine } from "../audio/AudioEngine";
+import { AudioEngine } from '../audio/AudioEngine';
 
 export class Drum {
   gainNode: GainNode;
@@ -12,7 +12,7 @@ export class Drum {
     frequency: number,
     type: OscillatorType,
     attackTime: number = 0.1,
-    releaseTime: number = 2,
+    releaseTime: number = 2
   ) {
     this.isPlaying = false;
     this.audioEngine = AudioEngine.getInstance();
@@ -22,7 +22,7 @@ export class Drum {
     this.oscillator.frequency.value = frequency; // value in hertz
     this.gainNode.gain.setValueAtTime(
       0,
-      this.audioEngine.audioContext.currentTime,
+      this.audioEngine.audioContext.currentTime
     );
 
     this.oscillator
@@ -40,7 +40,7 @@ export class Drum {
     // this.gainNode.gain.linearRampToValueAtTime(0, this.audioEngine.audioContext.currentTime + attackTime + releaseTime);
   }
 
-  play() {
+  play(): void {
     const now = this.audioEngine.audioContext.currentTime;
     const maxVolumne = 0.5;
     if (!this.isPlaying) {
@@ -49,13 +49,13 @@ export class Drum {
     }
     this.gainNode.gain.linearRampToValueAtTime(
       maxVolumne,
-      this.audioEngine.audioContext.currentTime + this.attackTime,
+      this.audioEngine.audioContext.currentTime + this.attackTime
     );
     this.gainNode.gain.linearRampToValueAtTime(
       0,
       this.audioEngine.audioContext.currentTime +
         this.attackTime +
-        this.releaseTime,
+        this.releaseTime
     );
   }
 }

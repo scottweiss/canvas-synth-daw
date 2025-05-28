@@ -1,6 +1,6 @@
-import { AudioEngine } from "../../audio/AudioEngine";
-import { CanvasController } from "../../canvas/CanvasController";
-import styles from "./csd-visualizer.scss?inline";
+import { AudioEngine } from '../../audio/AudioEngine';
+import { CanvasController } from '../../canvas/CanvasController';
+import styles from './csd-visualizer.scss?inline';
 
 export class CsdVisualizer extends HTMLElement {
   private canvasController: CanvasController;
@@ -17,10 +17,10 @@ export class CsdVisualizer extends HTMLElement {
 
     this.canvas = this.canvasController.getCanvasElement();
     // this.canvas = document.createElement("canvas");
-    this.context = this.canvas.getContext("2d");
+    this.context = this.canvas.getContext('2d');
 
     if (!this.context) {
-      throw new Error("Could not get 2D rendering context from canvas.");
+      throw new Error('Could not get 2D rendering context from canvas.');
     }
 
     this.analyserNode = this.audioEngine.getAnalyser(); // use the audio context from AudioEngine
@@ -29,21 +29,21 @@ export class CsdVisualizer extends HTMLElement {
     const styleSheet = new CSSStyleSheet();
     styleSheet.replaceSync(styles);
 
-    const shadowRoot = this.attachShadow({ mode: "open" });
+    const shadowRoot = this.attachShadow({ mode: 'open' });
     shadowRoot.adoptedStyleSheets.push(styleSheet);
     shadowRoot.appendChild(this.canvas);
   }
 
-  connectedCallback() {
+  connectedCallback(): void {
     this.canvasController.resize();
     this.canvasController.draw(0, this.draw.bind(this));
   }
 
-  drawGridOverlay() {
+  drawGridOverlay(): void {
     if (!this.context) return;
     this.context.save();
     this.context.lineWidth = 0.5;
-    this.context.strokeStyle = "#00000066";
+    this.context.strokeStyle = '#00000066';
     this.context.beginPath();
     // this.context.translate(, 2)
     const cellSize = 24;
@@ -73,7 +73,7 @@ export class CsdVisualizer extends HTMLElement {
     this.context.restore();
   }
 
-  private draw() {
+  private draw(): void {
     if (!this.context) {
       return;
     }
@@ -83,14 +83,14 @@ export class CsdVisualizer extends HTMLElement {
 
     this.analyserNode.getByteTimeDomainData(this.audioEngine.getAudioData());
 
-    this.context.fillStyle = "#333433";
+    this.context.fillStyle = '#333433';
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.context.lineWidth = 3;
-    this.context.strokeStyle = "#1f1";
+    this.context.strokeStyle = '#1f1';
 
     this.context.shadowBlur = 20;
-    this.context.shadowColor = "#1f1";
+    this.context.shadowColor = '#1f1';
 
     this.context.beginPath();
 
@@ -119,4 +119,4 @@ export class CsdVisualizer extends HTMLElement {
   }
 }
 
-customElements.define("csd-visualizer", CsdVisualizer);
+customElements.define('csd-visualizer', CsdVisualizer);

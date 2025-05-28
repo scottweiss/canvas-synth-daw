@@ -1,4 +1,4 @@
-import { AudioEngine } from "./audio/AudioEngine";
+import { AudioEngine } from './audio/AudioEngine';
 
 export type TimerProps = {
   bpm?: number;

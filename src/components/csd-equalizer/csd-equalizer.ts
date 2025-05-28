@@ -1,7 +1,7 @@
-import { AudioEngine } from "../../audio/AudioEngine";
+import { AudioEngine } from '../../audio/AudioEngine';
 
-import { CanvasController } from "../../canvas/CanvasController";
-import styles from "./csd-equalizer.scss?inline";
+import { CanvasController } from '../../canvas/CanvasController';
+import styles from './csd-equalizer.scss?inline';
 
 export class CsdEqualizer extends HTMLElement {
   private canvasController: CanvasController;
@@ -21,7 +21,7 @@ export class CsdEqualizer extends HTMLElement {
     this.context = this.canvasController.getCtx();
 
     if (!this.context) {
-      throw new Error("Could not get 2D rendering context from canvas.");
+      throw new Error('Could not get 2D rendering context from canvas.');
     }
 
     this.analyserNode = this.audioEngine.getAnalyser(); // use the audio context from AudioEngine
@@ -30,21 +30,21 @@ export class CsdEqualizer extends HTMLElement {
     const styleSheet = new CSSStyleSheet();
     styleSheet.replaceSync(styles);
 
-    const shadowRoot = this.attachShadow({ mode: "open" });
+    const shadowRoot = this.attachShadow({ mode: 'open' });
     shadowRoot.adoptedStyleSheets.push(styleSheet);
     shadowRoot.appendChild(this.canvas);
   }
 
-  connectedCallback() {
+  connectedCallback(): void {
     this.canvasController.draw(0, this.draw.bind(this));
     this.canvasController.resize();
   }
 
-  drawGridOverlay() {
+  drawGridOverlay(): void {
     if (!this.context) return;
     this.context.save();
     this.context.lineWidth = 0.5;
-    this.context.strokeStyle = "#00000066";
+    this.context.strokeStyle = '#00000066';
     this.context.beginPath();
     // this.context.translate(, 2)
     const cellSize = 24;
@@ -72,7 +72,7 @@ export class CsdEqualizer extends HTMLElement {
     this.context.restore();
   }
 
-  private draw() {
+  private draw(): void {
     if (!this.context) return;
 
     const bufferLength = this.analyserNode.frequencyBinCount;
@@ -83,14 +83,14 @@ export class CsdEqualizer extends HTMLElement {
 
     this.analyserNode.getByteFrequencyData(this.audioEngine.getAudioData());
 
-    this.context.fillStyle = "#333433";
+    this.context.fillStyle = '#333433';
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.context.lineWidth = 3;
-    this.context.strokeStyle = "#1f1";
+    this.context.strokeStyle = '#1f1';
 
     this.context.shadowBlur = 20;
-    this.context.shadowColor = "#1f1";
+    this.context.shadowColor = '#1f1';
 
     this.context.beginPath();
 
@@ -122,4 +122,4 @@ export class CsdEqualizer extends HTMLElement {
   }
 }
 
-customElements.define("csd-equalizer", CsdEqualizer);
+customElements.define('csd-equalizer', CsdEqualizer);

@@ -1,5 +1,5 @@
-import { CanvasController } from "../../canvas/CanvasController";
-import styles from "./csd-range.scss?inline";
+import { CanvasController } from '../../canvas/CanvasController';
+import styles from './csd-range.scss?inline';
 
 export type CsdRangeProps = {
   min?: number;
@@ -32,7 +32,7 @@ export class CsdRange extends HTMLElement {
     this.#ctx = this.canvasController.getCtx();
 
     this._value = props.value || 0;
-    this.min = props.min || 0.1;
+    this.min = props.min || 0;
     this.max = props.max || 1;
     this.stepSize = props.stepSize || 0.01;
     this.label = props.label;
@@ -40,15 +40,15 @@ export class CsdRange extends HTMLElement {
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(styles);
 
-    const shadowRoot = this.attachShadow({ mode: "open" });
+    const shadowRoot = this.attachShadow({ mode: 'open' });
 
     this.rangeElement = this.renderRangeElement();
     this.outputElement = this.renderRangeValueDisplayElement();
 
-    const rangeLabel = document.createElement("label");
-    const labelSpan = document.createElement("span");
-    rangeLabel.classList.add("sr-only");
-    labelSpan.classList.add("sr-only");
+    const rangeLabel = document.createElement('label');
+    const labelSpan = document.createElement('span');
+    rangeLabel.classList.add('sr-only');
+    labelSpan.classList.add('sr-only');
     labelSpan.innerText = this.label;
 
     rangeLabel.append(labelSpan, this.rangeElement);
@@ -71,11 +71,11 @@ export class CsdRange extends HTMLElement {
 
     requestAnimationFrame(() => {
       this.dispatchEvent(
-        new CustomEvent("csdRange", {
+        new CustomEvent('csdRange', {
           detail: {
             value: this.value,
           },
-        }),
+        })
       );
     });
     this.drawCanvas();
@@ -86,8 +86,8 @@ export class CsdRange extends HTMLElement {
   }
 
   renderRangeValueDisplayElement(): HTMLOutputElement {
-    const rangeValueInput = document.createElement("output");
-    rangeValueInput.setAttribute("type", "text");
+    const rangeValueInput = document.createElement('output');
+    rangeValueInput.setAttribute('type', 'text');
     rangeValueInput.value = String(this.value);
 
     // rangeValueInput.addEventListener('input', (event) => {
@@ -98,21 +98,21 @@ export class CsdRange extends HTMLElement {
   }
 
   renderRangeElement(): HTMLInputElement {
-    const rangeElement = document.createElement("input");
-    rangeElement.setAttribute("type", "range");
-    rangeElement.setAttribute("min", String(this.min));
-    rangeElement.setAttribute("max", String(this.max));
-    rangeElement.setAttribute("step", String(this.stepSize));
+    const rangeElement = document.createElement('input');
+    rangeElement.setAttribute('type', 'range');
+    rangeElement.setAttribute('min', String(this.min));
+    rangeElement.setAttribute('max', String(this.max));
+    rangeElement.setAttribute('step', String(this.stepSize));
     rangeElement.value = String(this.value);
 
-    rangeElement.addEventListener("input", (event) => {
+    rangeElement.addEventListener('input', (event) => {
       this.value = Number((event.target as HTMLInputElement).value);
     });
 
     return rangeElement;
   }
 
-  drawCanvas() {
+  drawCanvas(): void {
     if (this.#ctx == null) {
       return;
     }
@@ -125,8 +125,8 @@ export class CsdRange extends HTMLElement {
     const canvasWidth = this.#canvas.width;
     const canvasHeight = this.#canvas.height;
 
-    this.#ctx.lineJoin = "round";
-    this.#ctx.lineCap = "round";
+    this.#ctx.lineJoin = 'round';
+    this.#ctx.lineCap = 'round';
     // Calculate the radius of the knob
     const radius = Math.min(canvasWidth / 2, canvasHeight / 2) - 30;
 
@@ -150,8 +150,8 @@ export class CsdRange extends HTMLElement {
 
     // Create a new linear gradient with the color stops at 0 and 100%
     const gradient = this.#ctx.createLinearGradient(0, -radius, 0, radius);
-    gradient.addColorStop(0, "rgba(255, 255, 255, 0.3"); // White at the top of circle    (0%)
-    gradient.addColorStop(1, "rgba(0,0,0, .1"); // Black at the bottom of circle    (100%)
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.3'); // White at the top of circle    (0%)
+    gradient.addColorStop(1, 'rgba(0,0,0, .1'); // Black at the bottom of circle    (100%)
     this.#ctx.fillStyle = gradient;
 
     // Draw the circle for the knob
@@ -162,8 +162,8 @@ export class CsdRange extends HTMLElement {
     const x = 0;
     const y = 0;
 
-    const darkGray = "#333";
-    const ligntGray = "#111";
+    const darkGray = '#333';
+    const ligntGray = '#111';
     // Create a radial gradient with multiple colors
     const grd = this.#ctx.createRadialGradient(x, y, 1, x, y, radius);
     grd.addColorStop(0, ligntGray); // #ddd at the center  (0%)
@@ -202,14 +202,14 @@ export class CsdRange extends HTMLElement {
     // this.#ctx.moveTo(canvasWidth / 2, canvasHeight / 2);
     this.#ctx.moveTo(
       canvasWidth / 2 + radius * 0.7 * Math.cos(angle),
-      canvasHeight / 2 - radius * 0.7 * Math.sin(angle),
+      canvasHeight / 2 - radius * 0.7 * Math.sin(angle)
     );
     this.#ctx.lineTo(
       canvasWidth / 2 + radius * 0.7 * Math.cos(angle),
-      canvasHeight / 2 - radius * 0.7 * Math.sin(angle),
+      canvasHeight / 2 - radius * 0.7 * Math.sin(angle)
     );
 
-    this.#ctx.strokeStyle = "orange";
+    this.#ctx.strokeStyle = 'orange';
     this.#ctx.lineWidth = 6;
     this.#ctx.stroke();
     this.#ctx.closePath();
@@ -220,7 +220,7 @@ export class CsdRange extends HTMLElement {
 
       this.#ctx.moveTo(
         canvasWidth / 2 + radius * 1.5 * Math.cos(newAngle),
-        canvasHeight / 2 - radius * 1.5 * Math.sin(newAngle),
+        canvasHeight / 2 - radius * 1.5 * Math.sin(newAngle)
       );
       const longLines = [315, 235, 135, -45, 35];
       let lineWidth = radius * 1.9;
@@ -229,24 +229,24 @@ export class CsdRange extends HTMLElement {
       }
       this.#ctx.lineTo(
         canvasWidth / 2 + lineWidth * Math.cos(newAngle),
-        canvasHeight / 2 - lineWidth * Math.sin(newAngle),
+        canvasHeight / 2 - lineWidth * Math.sin(newAngle)
       );
     }
 
     this.#ctx.lineWidth = 2;
-    this.#ctx.strokeStyle = "white";
+    this.#ctx.strokeStyle = 'white';
     this.#ctx.stroke();
     this.#ctx.closePath();
   }
 
-  connectedCallback() {
+  connectedCallback(): void {
     this.canvasController.draw(0, this.drawCanvas.bind(this));
     this.canvasController.resize();
 
-    this.#canvas.addEventListener("mousedown", (event) => {
+    this.#canvas.addEventListener('mousedown', (event) => {
       this.mousePositionOnMousedown = { x: event.x, y: event.y };
     });
-    this.#canvas.addEventListener("mousemove", (event) => {
+    this.#canvas.addEventListener('mousemove', (event) => {
       if (this.mousePositionOnMousedown == null || this.#ctx === null) {
         return;
       }
@@ -257,7 +257,7 @@ export class CsdRange extends HTMLElement {
       this.#ctx.moveTo(0, 0);
       this.#ctx?.lineTo(
         event.x - this.mousePositionOnMousedown.x,
-        event.y - this.mousePositionOnMousedown.y,
+        event.y - this.mousePositionOnMousedown.y
       );
 
       this.value = Number(
@@ -265,27 +265,27 @@ export class CsdRange extends HTMLElement {
           Math.max(
             Number(this.value) -
               (event.y - this.mousePositionOnMousedown.y) * this.stepSize,
-            this.min,
+            this.min
           ),
-          this.max,
-        ).toFixed(2),
+          this.max
+        ).toFixed(2)
       );
 
-      this.#ctx.lineCap = "round";
+      this.#ctx.lineCap = 'round';
       // this.#ctx.lineWidth = 5;
       this.#ctx?.stroke();
       this.mousePositionOnMousedown = { x: event.x, y: event.y };
       this.#ctx.restore();
     });
 
-    this.#canvas.addEventListener("mouseleave", () => {
+    this.#canvas.addEventListener('mouseleave', () => {
       this.mousePositionOnMousedown = undefined;
     });
-    this.#canvas.addEventListener("mouseup", () => {
+    this.#canvas.addEventListener('mouseup', () => {
       this.mousePositionOnMousedown = undefined;
     });
   }
 }
 
 // Define the new element
-customElements.define("csd-range", CsdRange);
+customElements.define('csd-range', CsdRange);

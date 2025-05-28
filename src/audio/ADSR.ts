@@ -1,13 +1,13 @@
-export type Adsr = {
+export interface IAdsr {
   attack: number;
   decay: number;
   sustain: number;
   release: number;
-};
+}
 
 export class ADSR {
   private static instance: ADSR;
-  #adsr: Adsr;
+  #adsr: IAdsr;
 
   private constructor() {
     this.#adsr = {
@@ -18,11 +18,11 @@ export class ADSR {
     };
   }
 
-  set adsr(adsr: Adsr) {
+  set adsr(adsr: IAdsr) {
     this.#adsr = adsr;
   }
 
-  get adsr(): Adsr {
+  get adsr(): IAdsr {
     return this.#adsr;
   }
 
