@@ -7,23 +7,15 @@ export interface IAdsr {
 
 export class ADSR {
   private static instance: ADSR;
-  #adsr: IAdsr;
+  public adsr: IAdsr;
 
   private constructor() {
-    this.#adsr = {
-      attack: 0.15,
-      decay: 0.5,
-      sustain: 0.7,
-      release: 0.4,
+    this.adsr = {
+      attack: 0.1,
+      decay: 0.2,
+      sustain: 0.4,
+      release: 0.2,
     };
-  }
-
-  set adsr(adsr: IAdsr) {
-    this.#adsr = adsr;
-  }
-
-  get adsr(): IAdsr {
-    return this.#adsr;
   }
 
   public static getInstance(): ADSR {
@@ -31,5 +23,13 @@ export class ADSR {
       ADSR.instance = new ADSR();
     }
     return ADSR.instance;
+  }
+
+  setAdsr(adsr: IAdsr): void {
+    this.adsr = adsr;
+  }
+
+  getAdsr(): IAdsr {
+    return this.adsr;
   }
 }

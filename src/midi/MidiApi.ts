@@ -3,71 +3,82 @@ import { Drum } from './Drum';
 import midiToFrequency from './midi-to-frequency';
 
 export class MidiApi {
+  private midiAccess: MIDIAccess | null = null;
+  private inputs: Map<string, MIDIInput> = new Map();
   audioEngine: AudioEngine = AudioEngine.getInstance();
   oscilators: Array<Drum>;
 
   constructor() {
-    // if (navigator.requestMIDIAccess) {
-    //   navigator
-    //     .requestMIDIAccess({ sysex: false })
-    //     .then(this.onMIDISuccess, this.onMIDIFailure);
-    // } else {
-    //   // WebMIDI is not supported in this browser
-    // }
-    const permissionName = 'midi' as PermissionName;
-    // const sysexPermissionDescripton = true as PermissionDescriptor;
-    navigator.permissions.query({ name: permissionName }).then((result) => {
-      if (result.state === 'granted') {
-        // Access granted.
-        console.warn('MIDI access granted');
-      } else if (result.state === 'prompt') {
-        console.warn('MIDI access requires prompt');
-        // Using API will prompt for permission
-      }
-      // Permission was denied by user prompt or permission policy
-    });
-
+    this.initializeMidi();
     this.oscilators = [];
   }
 
-  onMIDISuccess = (midiAccess: MIDIAccess): void => {
-    for (const input of midiAccess.inputs.values()) {
-      input.onmidimessage = (e): void => {
-        this.getMIDIMessage(e);
-      };
+  private async initializeMidi(): Promise<void> {
+    try {
+      if (navigator.requestMIDIAccess) {
+        this.midiAccess = await navigator.requestMIDIAccess();
+        this.setupMidiInputs();
+      } else {
+        console.warn('Web MIDI API not supported in this browser');
+      }
+    } catch (error) {
+      console.error('Failed to get MIDI access:', error);
     }
-  };
+  }
 
-  getMIDIMessage(message: MIDIMessageEvent): void {
-    if (!message.data) {
-      return;
-    }
+  private setupMidiInputs(): void {
+    if (!this.midiAccess) return;
 
-    const command = message.data[0]; // The first byte is the command number
-    const midiKey = message.data[1]; // The second byte is the note number
-    const velocity = message.data[2]; // The third byte is the velocity
+    this.midiAccess.inputs.forEach((input) => {
+      this.inputs.set(input.id, input);
+      input.addEventListener('midimessage', this.handleMidiMessage.bind(this));
+    });
 
-    console.warn('MIDI message received:', { midiKey, message });
+    this.midiAccess.addEventListener('statechange', (event) => {
+      const port = (event as MIDIConnectionEvent).port;
+      if (port?.type === 'input') {
+        if (port.state === 'connected') {
+          this.inputs.set(port.id, port as MIDIInput);
+          port.addEventListener('midimessage', this.handleMidiMessage.bind(this));
+        } else if (port.state === 'disconnected') {
+          this.inputs.delete(port.id);
+        }
+      }
+    });
+  }
 
-    let drum = this.oscilators[midiKey];
+  private handleMidiMessage(event: Event): void {
+    const midiEvent = event as MIDIMessageEvent;
+    const [status, note, velocity] = midiEvent.data;
 
-    if (command >= 144 && command <= 159 && velocity > 0) {
+    // Emit custom events for MIDI messages
+    const midiCustomEvent = new CustomEvent('midi-message', {
+      detail: { status, note, velocity },
+      bubbles: true,
+    });
+
+    window.dispatchEvent(midiCustomEvent);
+
+    let drum = this.oscilators[note];
+
+    if (status >= 144 && status <= 159 && velocity > 0) {
       // Note-on event with velocity greater than 0
       if (!drum) {
         // If the drum doesn't exist, create a new one and add it to the oscilators array
-        drum = new Drum(midiToFrequency(midiKey), 'square', 0.1, 0.1);
-        this.oscilators[midiKey] = drum;
+        drum = new Drum(midiToFrequency(note), 'square', 0.1, 0.1);
+        this.oscilators[note] = drum;
       }
 
       // Play the drum sound
       drum.play();
     }
 
-    if (command >= 128 && command <= 143) {
-      console.warn('Note-off or channel mode message:', midiKey);
+    if (status >= 128 && status <= 143) {
+      console.warn('Note-off or channel mode message:', note);
     }
   }
-  onMIDIFailure(): void {
-    console.warn('Could not access your MIDI devices.');
+
+  getInputs(): MIDIInput[] {
+    return Array.from(this.inputs.values());
   }
 }

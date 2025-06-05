@@ -1,38 +1,43 @@
 import { AudioEngine } from './audio/AudioEngine';
 
-export type TimerProps = {
-  bpm?: number;
-  bpMeasure?: number;
-};
 export class Timer {
-  private static instance: Timer;
-  private audioEngine: AudioEngine = AudioEngine.getInstance();
-  // private fpsInterval: number = 1000 / 60; // 60 fps
-  private bpmeasure: number;
-  private then: number = this.audioEngine.audioContext.currentTime;
-  private beatCount: number = 0;
+  private intervalId: number | null = null;
+  private audioEngine: AudioEngine;
 
-  constructor(props?: TimerProps) {
-    this.bpmeasure = props?.bpMeasure || 4;
+  constructor() {
+    this.audioEngine = AudioEngine.getInstance();
   }
 
-  public beat(timestamp: number, callback?: (e: number) => void): void {
-    requestAnimationFrame((timestamp) => this.beat(timestamp, callback));
-    const bpm = this.audioEngine.bpm;
-    if (timestamp < this.then + 6000 / (bpm / this.bpmeasure)) return;
+  beat(startBeat: number, callback: () => void): void {
+    let beat = startBeat;
+    const interval = 60000 / (this.audioEngine.bpm * 4); // 16th notes
 
-    this.then = timestamp;
-    // this.then = timestamp - ((timestamp - this.then) % (6000 / bpm));
-    this.beatCount++;
-    if (callback) {
-      callback(this.beatCount);
+    if (this.intervalId !== null) {
+      clearInterval(this.intervalId);
     }
+
+    this.intervalId = window.setInterval(() => {
+      callback();
+      beat++;
+    }, interval);
+
+    // Update interval when BPM changes
+    const originalBpm = this.audioEngine.bpm;
+    const checkBpmChange = (): void => {
+      if (this.audioEngine.bpm !== originalBpm) {
+        this.stop();
+        this.beat(beat, callback);
+      } else {
+        requestAnimationFrame(checkBpmChange);
+      }
+    };
+    checkBpmChange();
   }
 
-  public static getInstance(): Timer {
-    if (!Timer.instance) {
-      Timer.instance = new Timer();
+  stop(): void {
+    if (this.intervalId !== null) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
     }
-    return Timer.instance;
   }
 }
