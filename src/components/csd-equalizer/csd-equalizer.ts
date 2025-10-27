@@ -42,11 +42,12 @@ export class CsdEqualizer extends HTMLElement {
 
   drawGridOverlay(): void {
     if (!this.context) return;
+    const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--color-canvas-grid').trim();
     this.context.save();
     this.context.lineWidth = 0.5;
-    this.context.strokeStyle = '#00000066';
+    this.context.strokeStyle = gridColor;
+    this.context.globalAlpha = 0.3;
     this.context.beginPath();
-    // this.context.translate(, 2)
     const cellSize = 24;
 
     for (let i = 8; i < this.canvas.width; i += cellSize) {
@@ -60,37 +61,30 @@ export class CsdEqualizer extends HTMLElement {
     }
     this.context.stroke();
     this.context.closePath();
-    // this.context.beginPath();
-
-    // this.context.moveTo(0, this.canvas.height / 2);
-    // this.context.lineTo(this.canvas.width, this.canvas.height / 2);
-
-    // this.context.moveTo(this.canvas.width / 2, 0);
-    // this.context.lineTo(this.canvas.width / 2, this.canvas.height);
-    // this.context.strokeStyle = "#00000033";
-    // this.context.stroke();
     this.context.restore();
   }
 
   private draw(): void {
     if (!this.context) return;
 
+    const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--color-canvas-bg').trim();
+    const waveColor = getComputedStyle(document.documentElement).getPropertyValue('--color-accent-primary').trim();
+
     const bufferLength = this.analyserNode.frequencyBinCount;
 
-    // this.canvasController.draw()
     this.context.save();
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.analyserNode.getByteFrequencyData(this.audioEngine.getAudioData());
 
-    this.context.fillStyle = '#333433';
+    this.context.fillStyle = bgColor;
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.context.lineWidth = 3;
-    this.context.strokeStyle = '#1f1';
+    this.context.strokeStyle = waveColor;
 
     this.context.shadowBlur = 20;
-    this.context.shadowColor = '#1f1';
+    this.context.shadowColor = waveColor;
 
     this.context.beginPath();
 

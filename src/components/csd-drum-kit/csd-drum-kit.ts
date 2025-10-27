@@ -36,7 +36,9 @@ export class CsdDrumKit extends HTMLElement {
     const shadowRoot = this.attachShadow({ mode: 'open' });
     shadowRoot.adoptedStyleSheets.push(sheet);
 
-    shadowRoot.append(
+    const container = document.createElement('div');
+    container.className = 'drum-grid';
+    container.append(
       this.renderDrumButton('kick', this.kick),
       this.renderDrumButton('snare', this.snare),
       this.renderDrumButton('lowTom', this.lowTom),
@@ -47,9 +49,11 @@ export class CsdDrumKit extends HTMLElement {
       this.renderDrumButton('maraca', this.maraca),
       this.renderDrumButton('cowbell', this.cowbell),
       this.renderDrumButton('crash', this.crash),
-      this.renderDrumButton('hiHatOpen', this.hiHatClosed),
-      this.renderDrumButton('hiHatClosed', this.hiHatOpen)
+      this.renderDrumButton('hiHatOpen', this.hiHatOpen),
+      this.renderDrumButton('hiHatClosed', this.hiHatClosed)
     );
+
+    shadowRoot.append(container);
   }
 
   renderDrumButton(label: string, drum: Drum): HTMLButtonElement {

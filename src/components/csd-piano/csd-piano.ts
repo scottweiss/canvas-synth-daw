@@ -1,169 +1,146 @@
-import styles from './csd-piano.scss?inline';
-import { CsdPianoKey } from './csd-piano-key/csd-piano-key';
-import { keyboardKeyArray } from '../../midi/midi-to-frequency';
-import { IAdsr } from '../../audio/ADSR';
 import { AudioEngine } from '../../audio/AudioEngine';
 import { MidiApi } from '../../midi/MidiApi';
+import { CsdPianoKey } from './csd-piano-key/csd-piano-key';
+import styles from './csd-piano.scss?inline';
 
-export interface ICsdPianoProps {
-  adsr: IAdsr;
-  waveType?: OscillatorType;
-}
 export class CsdPiano extends HTMLElement {
-  pianoElement: HTMLElement;
   audioEngine: AudioEngine;
   audioContext: AudioContext;
-  #adsr: IAdsr;
-  #waveType: OscillatorType;
-  #octiveOffset: number;
-  octiveUpRef: HTMLElement;
-  octiveDownRef: HTMLElement;
   midiApi: MidiApi;
+  private octaveOffset: number;
+  pianoElement: HTMLElement;
+  octaveUpRef: HTMLButtonElement;
+  octaveDownRef: HTMLButtonElement;
+  private keyComponents: CsdPianoKey[] = [];
+  // Keyboard layout mimics piano: lower row = white keys, upper row = black keys
+  // Pattern matches actual piano: W E _ T Y U _ O P (black keys have gaps)
+  private readonly keyboardMap = [
+    'a',  // C (white)
+    'w',  // C# (black)
+    's',  // D (white)
+    'e',  // D# (black)
+    'd',  // E (white)
+    'f',  // F (white) - no black key between E-F
+    't',  // F# (black)
+    'g',  // G (white)
+    'y',  // G# (black)
+    'h',  // A (white)
+    'u',  // A# (black)
+    'j',  // B (white)
+    'k',  // C (white) - no black key between B-C
+    'o',  // C# (black)
+    'l',  // D (white)
+    'p',  // D# (black)
+    ';',  // E (white)
+    "'",  // F (white) - no black key between E-F
+  ];
 
-  constructor(props: ICsdPianoProps) {
+  constructor() {
     super();
 
     this.audioEngine = AudioEngine.getInstance();
     this.audioContext = this.audioEngine.audioContext;
-    this.#waveType = props.waveType || 'sawtooth';
-    this.#octiveOffset = 0;
-    this.#adsr = props.adsr || {
-      attack: 0.1,
-      decay: 0.2,
-      sustain: 0.4,
-      release: 0.2,
-    };
-    // add styles
+    this.octaveOffset = 0;
+
+    // Add styles
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(styles);
     const shadowRoot = this.attachShadow({ mode: 'open' });
     shadowRoot.adoptedStyleSheets.push(sheet);
 
     this.midiApi = new MidiApi();
-    // add element
+
+    // Render octave buttons first (needed for renderPianoElement)
+    this.octaveUpRef = this.renderOctaveUp();
+    this.octaveDownRef = this.renderOctaveDown();
+
+    // Add element
     this.pianoElement = this.renderPianoElement();
-
-    this.octiveUpRef = this.renderOctiveUp();
-    this.octiveDownRef = this.renderOctiveDown();
-
-    const container = document.createElement('div');
-    container.classList.add('octive-controller');
-
-    container.append(this.octiveUpRef, this.octiveDownRef);
-
-    shadowRoot.append(container, this.pianoElement);
   }
+
   connectedCallback(): void {
-    window.addEventListener('keydown', (event) => {
-      if (event.key === 'z') {
-        this.octiveOffset--;
-        this.octiveDownRef.classList.add('active');
-      }
-      if (event.key === 'x') {
-        this.octiveOffset++;
-        this.octiveUpRef.classList.add('active');
-      }
-    });
-
-    window.addEventListener('keyup', (event) => {
-      if (event.key === 'z') {
-        this.octiveDownRef.classList.remove('active');
-      }
-      if (event.key === 'x') {
-        this.octiveUpRef.classList.remove('active');
-      }
-    });
-  }
-
-  set adsr(value: IAdsr) {
-    this.#adsr = value;
-    // Update piano keys with new ADSR values
-    // this.pianoElement
-    //   .querySelectorAll<CsdPianoKey>("csd-piano-key")
-    //   .forEach((pianoKey) => {
-    //     pianoKey.adsr = this.#adsr;
-    //   });
-  }
-
-  get adsr(): IAdsr {
-    return this.#adsr;
-  }
-
-  set octiveOffset(offset: number) {
-    this.#octiveOffset = offset;
-    this.pianoElement
-      .querySelectorAll<CsdPianoKey>('csd-piano-key')
-      .forEach((pianoKey, index) => {
-        pianoKey.midiKey = 60 + index + this.octiveOffset * 12;
-      });
-  }
-
-  get octiveOffset(): number {
-    return this.#octiveOffset;
-  }
-
-  set waveType(value: OscillatorType) {
-    this.#waveType = value;
-    this.pianoElement
-      .querySelectorAll<CsdPianoKey>('csd-piano-key')
-      .forEach((pianoKey) => {
-        pianoKey.waveType = value;
-      });
-  }
-
-  get waveType(): OscillatorType {
-    return this.#waveType;
-  }
-  renderPianoElement(): HTMLElement {
-    const octives = 1.5;
-    const startingKey = 60 + this.octiveOffset * 12;
-
-    const keyCount = octives * 12 + startingKey;
-
-    const pianoElement = document.createElement('div');
-    pianoElement.className = 'csd-piano';
-
-    for (let i = startingKey; i < keyCount; i++) {
-      const pianoKey = new CsdPianoKey({
-        midiKey: i,
-        keyboardKey: keyboardKeyArray[i - startingKey],
-        waveType: this.waveType,
-      });
-      pianoElement.append(pianoKey);
+    const shadowRoot = this.shadowRoot;
+    if (shadowRoot) {
+      shadowRoot.appendChild(this.pianoElement);
     }
-
-    return pianoElement;
   }
 
-  renderOctiveUp(): HTMLElement {
-    const octiveUp = document.createElement('button');
-    const upkeyLable = document.createElement('kbd');
-    upkeyLable.textContent = 'x';
-    const upSpan = document.createElement('span');
-    upSpan.textContent = '+';
-    octiveUp.append(upSpan, upkeyLable);
+  renderPianoElement(): HTMLElement {
+    const piano = document.createElement('div');
+    piano.className = 'csd-piano';
 
-    octiveUp.addEventListener('click', () => {
-      this.octiveOffset++;
-    });
+    const octaveController = document.createElement('div');
+    octaveController.className = 'octive-controller';
+    octaveController.append(this.octaveUpRef, this.octaveDownRef);
 
-    return octiveUp;
+    piano.appendChild(octaveController);
+
+    // Add piano keys
+    this.keyComponents = this.createPianoKeys();
+    piano.append(...this.keyComponents);
+
+    return piano;
   }
 
-  renderOctiveDown(): HTMLElement {
-    const octivedown = document.createElement('button');
-    const downKeyLabel = document.createElement('kbd');
-    downKeyLabel.textContent = 'z';
-    const downSpan = document.createElement('span');
-    downSpan.textContent = '-';
-    octivedown.append(downSpan, downKeyLabel);
+  createPianoKeys(): CsdPianoKey[] {
+    const baseNote = 60 + this.octaveOffset * 12;
 
-    octivedown.addEventListener('click', () => {
-      this.octiveOffset--;
+    return this.keyboardMap.map((key, index) => {
+      const pianoKey = new CsdPianoKey({
+        midiKey: baseNote + index,
+        keyboardKey: key,
+      });
+      return pianoKey;
+    });
+  }
+
+  updatePianoKeys(): void {
+    const baseNote = 60 + this.octaveOffset * 12;
+    this.keyComponents.forEach((key, index) => {
+      key.midiKey = baseNote + index;
+    });
+  }
+
+  renderOctaveUp(): HTMLButtonElement {
+    const button = document.createElement('button');
+    button.innerHTML = '<span>+</span><kbd>Z</kbd>';
+    button.addEventListener('click', () => {
+      if (this.octaveOffset < 2) {
+        this.octaveOffset++;
+        this.updatePianoKeys();
+      }
     });
 
-    return octivedown;
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'z' && this.octaveOffset < 2) {
+        this.octaveOffset++;
+        this.updatePianoKeys();
+      }
+    });
+
+    return button;
+  }
+
+  renderOctaveDown(): HTMLButtonElement {
+    const button = document.createElement('button');
+    button.innerHTML = '<span>-</span><kbd>X</kbd>';
+    button.addEventListener('click', () => {
+      if (this.octaveOffset > -2) {
+        this.octaveOffset--;
+        this.updatePianoKeys();
+      }
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'x' && this.octaveOffset > -2) {
+        this.octaveOffset--;
+        this.updatePianoKeys();
+      }
+    });
+
+    return button;
   }
 }
 
+// Define the new element
 customElements.define('csd-piano', CsdPiano);

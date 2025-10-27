@@ -1,9 +1,6 @@
 import './style.css';
-import './components/csd-sequencer/csd-sequencer.ts';
-import './components/csd-synth/csd-synth.ts';
+import './components/csd-daw-shell/csd-daw-shell.ts';
+
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <main>
-    <csd-synth></csd-synth>
-    <csd-sequencer></csd-sequencer>
-  </main>
+  <csd-daw-shell></csd-daw-shell>
 `;

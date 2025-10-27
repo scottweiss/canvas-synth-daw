@@ -26,7 +26,7 @@ export class CanvasController {
     }
   }
 
-  draw(timestamp: number, callback: () => void): void {
+  draw(_: number, callback: () => void): void {
     callback();
     this.animationId = requestAnimationFrame((t) => this.draw(t, callback));
   }

@@ -10,33 +10,23 @@ export class Timer {
 
   beat(startBeat: number, callback: () => void): void {
     let beat = startBeat;
-    const interval = 60000 / (this.audioEngine.bpm * 4); // 16th notes
 
-    if (this.intervalId !== null) {
-      clearInterval(this.intervalId);
-    }
-
-    this.intervalId = window.setInterval(() => {
-      callback();
-      beat++;
-    }, interval);
-
-    // Update interval when BPM changes
-    const originalBpm = this.audioEngine.bpm;
-    const checkBpmChange = (): void => {
-      if (this.audioEngine.bpm !== originalBpm) {
-        this.stop();
-        this.beat(beat, callback);
-      } else {
-        requestAnimationFrame(checkBpmChange);
-      }
+    const scheduleNext = () => {
+      const interval = 60000 / (this.audioEngine.bpm * 4); // 16th notes
+      this.intervalId = window.setTimeout(() => {
+        callback();
+        beat += 1;
+        scheduleNext();
+      }, interval);
     };
-    checkBpmChange();
+
+    this.stop();
+    scheduleNext();
   }
 
   stop(): void {
     if (this.intervalId !== null) {
-      clearInterval(this.intervalId);
+      clearTimeout(this.intervalId);
       this.intervalId = null;
     }
   }

@@ -1,0 +1,90 @@
+:host {
+  display: block;
+}
+
+.fader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  height: 100%;
+}
+
+.fader-label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+
+.fader-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 120px;
+}
+
+.fader-track {
+  position: relative;
+  width: 6px;
+  height: 100%;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.fader-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 75%;
+  background: linear-gradient(
+    to top,
+    var(--color-accent-primary),
+    var(--color-accent-hover)
+  );
+  border-radius: var(--radius-lg);
+  transition: height 0.05s ease-out;
+  pointer-events: none;
+}
+
+.fader-thumb {
+  position: absolute;
+  left: 50%;
+  bottom: 75%;
+  transform: translate(-50%, 50%);
+  width: 24px;
+  height: 12px;
+  background: var(--color-text-primary);
+  border: 2px solid var(--color-accent-primary);
+  border-radius: var(--radius-sm);
+  cursor: grab;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-md);
+
+  &:hover {
+    background: var(--color-accent-primary);
+    box-shadow: var(--shadow-glow);
+    transform: translate(-50%, 50%) scale(1.1);
+  }
+
+  &:active {
+    cursor: grabbing;
+    box-shadow: var(--shadow-glow-strong);
+  }
+}
+
+.fader-value {
+  font-size: var(--font-size-xs);
+  font-family: var(--font-family-mono);
+  color: var(--color-text-secondary);
+  min-width: 50px;
+  text-align: center;
+}

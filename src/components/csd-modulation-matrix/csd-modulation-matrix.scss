@@ -1,0 +1,32 @@
+.modulation-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.modulation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.modulation-header h2 {
+  margin: 0;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.waveform-select {
+  padding: 0.25rem 0.5rem;
+  background: transparent;
+  border: 1px solid currentColor;
+  color: inherit;
+}
+
+.modulation-knobs {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}

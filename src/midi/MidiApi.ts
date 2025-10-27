@@ -1,12 +1,10 @@
-import { AudioEngine } from '../audio/AudioEngine';
 import { Drum } from './Drum';
 import midiToFrequency from './midi-to-frequency';
 
 export class MidiApi {
   private midiAccess: MIDIAccess | null = null;
   private inputs: Map<string, MIDIInput> = new Map();
-  audioEngine: AudioEngine = AudioEngine.getInstance();
-  oscilators: Array<Drum>;
+  private oscilators: Array<Drum>;
 
   constructor() {
     this.initializeMidi();
@@ -49,7 +47,8 @@ export class MidiApi {
 
   private handleMidiMessage(event: Event): void {
     const midiEvent = event as MIDIMessageEvent;
-    const [status, note, velocity] = midiEvent.data;
+    const data = midiEvent.data ? Array.from(midiEvent.data) : [0, 0, 0];
+    const [status, note, velocity] = data;
 
     // Emit custom events for MIDI messages
     const midiCustomEvent = new CustomEvent('midi-message', {

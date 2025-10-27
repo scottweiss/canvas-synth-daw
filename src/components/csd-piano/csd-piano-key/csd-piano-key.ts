@@ -1,83 +1,73 @@
 import { AudioEngine } from '../../../audio/AudioEngine';
-import midiToFrequency, { midiToNote } from '../../../midi/midi-to-frequency';
+import { midiToNote } from '../../../midi/midi-to-frequency';
 import styles from './csd-piano-key.scss?inline';
 
 export type CsdPianoKeyProps = {
   midiKey: number;
   keyboardKey: string;
-  waveType: OscillatorType;
 };
+
 export class CsdPianoKey extends HTMLElement {
   pianoKeyElement: HTMLElement;
   keyNoteRef: HTMLElement;
   audioEngine: AudioEngine;
-  oscillator: OscillatorNode;
-  #midiKey: number;
-  #keyboardKey: string;
-  #waveType: OscillatorType;
-  gainNode: GainNode;
-  isPlaying: boolean;
+  private _midiKey: number;
+  private _keyboardKey: string;
+
+  private handleKeyDown = (event: KeyboardEvent): void => {
+    if (event.repeat) {
+      return;
+    }
+    if (event.key === this.keyboardKey) {
+      this.pianoKeyElement.classList.add('active');
+      this.playNote();
+    }
+  };
+
+  private handleKeyUp = (event: KeyboardEvent): void => {
+    if (event.key === this.keyboardKey) {
+      this.pianoKeyElement.classList.remove('active');
+      this.releaseEnvelope();
+    }
+  };
 
   set midiKey(value: number) {
-    this.#midiKey = value;
+    this._midiKey = value;
     this.keyNoteRef.textContent = String(midiToNote(value));
-    this.oscillator.frequency.setValueAtTime(midiToFrequency(value), 0);
     this.pianoKeyElement.setAttribute('aria-label', midiToNote(value));
   }
 
   get midiKey(): number {
-    return this.#midiKey;
+    return this._midiKey;
   }
 
   set keyboardKey(value: string) {
-    this.#keyboardKey = value;
+    this._keyboardKey = value;
   }
 
   get keyboardKey(): string {
-    return this.#keyboardKey;
-  }
-
-  set waveType(value: OscillatorType) {
-    this.#waveType = value;
-    this.oscillator.type = value;
-  }
-
-  get waveType(): OscillatorType {
-    return this.#waveType;
+    return this._keyboardKey;
   }
 
   constructor(props: CsdPianoKeyProps) {
     super();
 
-    this.#midiKey = props.midiKey;
-    this.#keyboardKey = props.keyboardKey;
+    this._midiKey = props.midiKey;
+    this._keyboardKey = props.keyboardKey;
+
     this.keyNoteRef = document.createElement('span');
     this.keyNoteRef.classList.add('key-note');
     this.keyNoteRef.textContent = String(midiToNote(this.midiKey));
 
     this.audioEngine = AudioEngine.getInstance();
-    this.oscillator = this.audioEngine.createOscillator(this.midiKey);
-    this.gainNode = this.audioEngine.audioContext.createGain();
-    this.#waveType = props.waveType || 'sine';
-    // Connect the oscillator to the gain node
-    this.oscillator.type = this.#waveType;
 
-    // Connect the oscillator to the gain node and then to the destination
-    this.oscillator.connect(this.gainNode);
-    // .connect(this.audioEngine.audioContext.destination);
-    this.gainNode.connect(this.audioEngine.audioContext.destination);
-
-    this.gainNode.connect(this.audioEngine.getAnalyser());
-
-    this.isPlaying = false;
-
-    // add styles
+    // Add styles
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(styles);
     const shadowRoot = this.attachShadow({ mode: 'open' });
     shadowRoot.adoptedStyleSheets.push(sheet);
 
-    // add element
+    // Add element
     if (this.isSharp()) {
       this.setAttribute('sharp', '');
     }
@@ -86,32 +76,16 @@ export class CsdPianoKey extends HTMLElement {
   }
 
   connectedCallback(): void {
-    this.gainNode.gain.setValueAtTime(0.001, 0);
-    window.addEventListener('keydown', (event) => {
-      if (event.repeat) {
-        return;
-      }
-      if (event.key === this.keyboardKey) {
-        this.pianoKeyElement.classList.add('active');
-        this.playNote();
-      }
-    });
-    window.addEventListener('keyup', (event) => {
-      if (event.key === this.keyboardKey) {
-        this.pianoKeyElement.classList.remove('active');
-        this.releaseEnvelope();
-      }
-    });
+    window.addEventListener('keydown', this.handleKeyDown);
+    window.addEventListener('keyup', this.handleKeyUp);
+
     this.pianoKeyElement.addEventListener('touchstart', (event) => {
       event.preventDefault();
       event.stopImmediatePropagation();
       this.playNote();
       this.pianoKeyElement.classList.add('active');
-      // if (event.key === this.keyboardKey) {
-      //   this.pianoKeyElement.classList.add("active");
-      //   this.playNote();
-      // }
     });
+
     this.pianoKeyElement.addEventListener('touchend', () => {
       this.releaseEnvelope();
       this.pianoKeyElement.classList.remove('active');
@@ -145,12 +119,26 @@ export class CsdPianoKey extends HTMLElement {
         })
       );
       this.releaseEnvelope();
+      this.pianoKeyElement.classList.remove('active');
+    });
+
+    this.pianoKeyElement.addEventListener('mouseenter', (e: MouseEvent) => {
+      const mouseEvent = e as MouseEvent;
+      if (mouseEvent.buttons === 1) {
+        this.playNote();
+        this.pianoKeyElement.classList.add('active');
+      }
     });
   }
 
+  disconnectedCallback(): void {
+    window.removeEventListener('keydown', this.handleKeyDown);
+    window.removeEventListener('keyup', this.handleKeyUp);
+  }
+
   isSharp(): boolean {
-    const sharps = [1, 3, 6, 8, 10]; // Representing the sharp note steps in an octave
-    return sharps.includes(this.midiKey % 12);
+    const noteInOctave = this.midiKey % 12;
+    return [1, 3, 6, 8, 10].includes(noteInOctave);
   }
 
   getClasses(): string {
@@ -160,28 +148,51 @@ export class CsdPianoKey extends HTMLElement {
     }
     return classes.join(' ');
   }
+
   renderKey(): HTMLButtonElement {
     const key = document.createElement('button');
-    const keyKeyboardLable = document.createElement('kbd');
-    keyKeyboardLable.textContent = this.keyboardKey;
+    const keyKeyboardLabel = document.createElement('kbd');
+    keyKeyboardLabel.textContent = this.keyboardKey;
     key.className = this.getClasses();
     key.setAttribute('aria-label', String(midiToNote(this.midiKey)));
 
-    key.append(this.keyNoteRef, keyKeyboardLable);
+    key.append(this.keyNoteRef, keyKeyboardLabel);
 
     return key;
   }
 
   playNote(): void {
-    if (!this.isPlaying) {
-      this.oscillator.start();
-      this.isPlaying = true;
-    }
-    this.audioEngine.playNote(this.oscillator, this.gainNode);
+    this.audioEngine.noteOn(this.midiKey);
+    this.dispatchEvent(
+      new CustomEvent('CsdPianoKeyStart', {
+        bubbles: true,
+        detail: { midiKey: this.midiKey },
+      })
+    );
+
+    // Dispatch global note on event for clip recording
+    window.dispatchEvent(
+      new CustomEvent('noteOn', {
+        detail: { pitch: this.midiKey, velocity: 100 }
+      })
+    );
   }
 
   releaseEnvelope(): void {
-    this.audioEngine.releaseEnvelope(this.gainNode);
+    this.audioEngine.noteOff(this.midiKey);
+    this.dispatchEvent(
+      new CustomEvent('CsdPianoKeyStop', {
+        bubbles: true,
+        detail: { midiKey: this.midiKey },
+      })
+    );
+
+    // Dispatch global note off event for clip recording
+    window.dispatchEvent(
+      new CustomEvent('noteOff', {
+        detail: { pitch: this.midiKey }
+      })
+    );
   }
 }
 

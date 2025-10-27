@@ -1,81 +1,103 @@
 :host {
-  box-sizing: border-box;
   display: block;
-  // transform: rotateX(15deg);
-  // transform-style: preserve-3d;
-  // border-radius: 8px;
-  border-end-end-radius: 16px;
-  // margin: 0 auto;
-  width: min-content;
-  position: relative;
-  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.synth-grid {
   display: grid;
-  gap: 12px;
-  // padding: 8px 8px 0;
-  padding: 12px;
-  height: min-content;
-  grid-template-areas:
-    'viz eq . .'
-    'adsr adsr . .'
-    'piano piano  piano  wave ';
+  gap: 1.25rem;
+  padding: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  background: linear-gradient(145deg, rgba(24, 24, 32, 0.9), rgba(12, 12, 18, 0.9));
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
+}
 
-  // grid-template-areas:
-  // "viz eq "
-  // "adsr adsr "
-  // "piano wave";
+.synth-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(10, 10, 16, 0.75);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(6px);
+}
 
-  // justify-items: center;
-  // align-items: center;
+.synth-section h2 {
+  margin: 0;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.8);
+}
 
-  *,
-  *::before,
-  *::after {
-    box-sizing: inherit;
-  }
+.synth-section__header {
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
 
-  svg {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-  }
+.synth-section__header csd-radio-button-group {
+  flex: 1;
+}
 
-  csd-radio-button-group {
-    grid-area: wave;
-    height: 100%;
-  }
+.synth-section__header csd-knob {
+  flex-shrink: 0;
+}
 
-  csd-visualizer {
-    grid-area: viz;
-  }
-  csd-equalizer {
-    grid-area: eq;
-  }
-  csd-adsr {
-    grid-area: adsr;
-  }
+.synth-section__oscillators .oscillator-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
 
-  csd-piano {
-    grid-area: piano;
-    align-self: end;
-  }
-  csd-drum-kit {
-    grid-area: dk;
-  }
-  csd-sequencer {
-    grid-area: seq;
-    align-self: start;
-    align-items: start;
-  }
-  .sr-only {
-    display: block;
-    width: 1px !important;
-    height: 1px !important;
-    padding: 0 !important;
-    margin: -1px !important; // Fix for https://github.com/twbs/bootstrap/issues/25686
-    overflow: hidden !important;
-    clip: rect(0, 0, 0, 0) !important;
-    white-space: nowrap !important;
-    border: 0 !important;
-    flex: 0 0 0;
+.synth-section__effects {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+}
+
+.synth-section__effects h2 {
+  grid-column: 1 / -1;
+}
+
+.synth-section__filter {
+  gap: 1rem;
+}
+
+.synth-section__performance {
+  gap: 1rem;
+}
+
+.synth-section__performance csd-piano {
+  width: 100%;
+}
+
+.synth-section__performance csd-drum-kit {
+  width: 100%;
+}
+
+.synth-section__analysis {
+  gap: 1rem;
+}
+
+.synth-section__analysis csd-visualizer,
+.synth-section__analysis csd-equalizer {
+  width: 100%;
+  min-height: 180px;
+}
+
+.synth-section__mixer csd-mixer {
+  width: 100%;
+}
+
+@media (max-width: 960px) {
+  .synth-grid {
+    padding: 1rem;
+    gap: 1rem;
   }
 }

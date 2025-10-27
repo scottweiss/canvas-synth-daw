@@ -1,15 +1,30 @@
+import { AudioEngine } from '../../../audio/AudioEngine';
 import { Drum } from '../../../midi/Drum';
-import midiToFrequency, { midiToNote } from '../../../midi/midi-to-frequency';
-// import styles from "./index.scss?inline";
+import midiToFrequency from '../../../midi/midi-to-frequency';
+// import styles from './index.scss?inline';
 
-export type CsdSequencerTrackProps = {
-  note: number | string;
+export interface CsdSequencerTrackProps {
+  note: string | number;
   drum?: Drum;
-};
+}
+
 export class CsdSequencerTrack {
-  note: number | string;
-  track: Array<boolean> = [];
+  note: string | number;
   drum: Drum;
+  track: boolean[] = new Array(16).fill(false);
+  private audioEngine: AudioEngine = AudioEngine.getInstance();
+
+  private static midiToNote(midiNote: number): string {
+    const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const octave = Math.floor(midiNote / 12) - 1;
+    const noteName = noteNames[midiNote % 12];
+
+    if (midiNote === 60) {
+      return `${noteName}${octave} (Middle C)`;
+    }
+
+    return `${noteName}${octave}`;
+  }
 
   constructor(props: CsdSequencerTrackProps) {
     this.note = props.note;
@@ -44,7 +59,7 @@ export class CsdSequencerTrack {
     const sharps = [1, 3, 6, 8, 10];
     switch (typeof this.note) {
       case 'number':
-        th.textContent = midiToNote(this.note);
+        th.textContent = CsdSequencerTrack.midiToNote(this.note);
         if (sharps.includes(this.note % 12)) {
           row.classList.add('is-sharp');
         }
@@ -63,7 +78,16 @@ export class CsdSequencerTrack {
     return row;
   }
 
-  public play(): void {
+  public isStepActive(step: number): boolean {
+    return this.track[step % this.track.length] === true;
+  }
+
+  public trigger(_time: number, bpm: number): void {
+    if (typeof this.note === 'number') {
+      this.triggerSynthNote(bpm);
+      return;
+    }
+
     this.drum.play();
   }
 
@@ -72,7 +96,9 @@ export class CsdSequencerTrack {
 
     const label = document.createElement('label');
     const noteLabel =
-      typeof this.note === 'string' ? this.note : midiToNote(this.note);
+      typeof this.note === 'string'
+        ? this.note
+        : CsdSequencerTrack.midiToNote(this.note);
     label.setAttribute('aria-label', `${noteLabel}, Step ${index + 1} of 16`);
 
     const check = document.createElement('input');
@@ -95,6 +121,20 @@ export class CsdSequencerTrack {
     cell.append(label);
 
     return cell;
+  }
+
+  private triggerSynthNote(bpm: number): void {
+    if (typeof this.note !== 'number') {
+      return;
+    }
+
+    const velocity = 100;
+    this.audioEngine.noteOn(this.note, velocity);
+
+    const sixteenthMs = 60000 / (bpm * 4);
+    window.setTimeout(() => {
+      this.audioEngine.noteOff(this.note as number);
+    }, sixteenthMs * 0.9);
   }
 }
 

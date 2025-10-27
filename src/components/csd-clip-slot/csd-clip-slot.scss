@@ -1,0 +1,119 @@
+.clip-slot {
+  aspect-ratio: 2 / 1;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+
+  &.empty {
+    background: var(--color-bg-primary);
+    border-style: dashed;
+
+    &:hover {
+      background: var(--color-bg-secondary);
+      border-color: var(--color-accent-primary);
+    }
+
+    .empty-hint {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-disabled);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+  }
+
+  &.stopped {
+    background: var(--clip-color, var(--color-bg-tertiary));
+    border-color: var(--color-border-subtle);
+
+    &:hover {
+      border-color: var(--color-accent-primary);
+      transform: scale(1.02);
+    }
+  }
+
+  &.playing {
+    background: var(--clip-color, var(--color-accent-primary));
+    border-color: var(--color-accent-primary);
+    box-shadow: 0 0 12px var(--clip-color, var(--color-accent-primary));
+    animation: pulse 1s ease-in-out infinite;
+
+    &:hover {
+      transform: scale(1.02);
+    }
+  }
+
+  &.recording {
+    background: #ff4444;
+    border-color: #ff0000;
+    box-shadow: 0 0 12px rgba(255, 0, 0, 0.5);
+    animation: record-pulse 0.5s ease-in-out infinite;
+  }
+
+  &.queued {
+    background: var(--clip-color, var(--color-bg-tertiary));
+    border-color: var(--color-accent-secondary);
+    border-style: dashed;
+    animation: queue-pulse 1s ease-in-out infinite;
+  }
+}
+
+.clip-content {
+  width: 100%;
+  height: 100%;
+  padding: var(--spacing-xs);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.clip-name {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.clip-indicator {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  align-self: flex-end;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes record-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes queue-pulse {
+  0%, 100% {
+    border-opacity: 1;
+  }
+  50% {
+    border-opacity: 0.5;
+  }
+}

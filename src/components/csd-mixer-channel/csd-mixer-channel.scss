@@ -1,0 +1,126 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.mixer-channel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 80px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xs);
+  gap: var(--spacing-xs);
+
+  &.master {
+    width: 90px;
+    background: var(--color-bg-tertiary);
+    border-color: var(--color-accent-primary);
+  }
+}
+
+.channel-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-accent-primary);
+  text-align: center;
+  padding: var(--spacing-xs);
+}
+
+.channel-name {
+  width: 100%;
+  background: var(--color-bg-input);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  padding: var(--spacing-xs);
+  font-size: var(--font-size-xs);
+  text-align: center;
+  transition: border-color var(--transition-fast);
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-accent-primary);
+    box-shadow: 0 0 0 2px rgba(78, 205, 196, 0.2);
+  }
+}
+
+.color-indicator {
+  width: 100%;
+  height: 4px;
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--spacing-xs);
+}
+
+.controls-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+
+  csd-knob {
+    width: 100%;
+  }
+}
+
+.meters-section {
+  flex: 1;
+  display: flex;
+  gap: var(--spacing-xs);
+  align-items: stretch;
+  min-height: 80px;
+
+  csd-peak-meter {
+    flex-shrink: 0;
+  }
+
+  csd-fader {
+    flex: 1;
+  }
+}
+
+.buttons-section {
+  display: flex;
+  gap: var(--spacing-xs);
+  justify-content: center;
+
+  button {
+    flex: 1;
+    padding: var(--spacing-xs);
+    background: var(--color-bg-elevated);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+
+    &:hover {
+      background: var(--color-border-strong);
+      box-shadow: var(--shadow-sm);
+    }
+
+    &.active {
+      background: var(--color-accent-primary);
+      border-color: var(--color-accent-primary);
+      color: #000;
+      box-shadow: var(--shadow-glow);
+    }
+
+    &.solo-button.active {
+      background: var(--color-warning);
+      border-color: var(--color-warning);
+    }
+
+    &.mute-button.active {
+      background: var(--color-danger);
+      border-color: var(--color-danger);
+      color: #fff;
+    }
+  }
+}

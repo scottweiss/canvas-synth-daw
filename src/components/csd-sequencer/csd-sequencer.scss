@@ -1,0 +1,36 @@
+:host {
+  display: block;
+  padding: 1rem;
+}
+
+.csd-sequencer-step-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: inherit;
+}
+
+.csd-sequencer-step-table th,
+.csd-sequencer-step-table td {
+  padding: 0.25rem;
+  text-align: center;
+  border: 1px solid currentColor;
+}
+
+.csd-sequencer-step-table thead th {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.csd-sequencer-step-table input[type='checkbox'] {
+  width: 1rem;
+  height: 1rem;
+}
+
+.is-sharp {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+button.is-playing {
+  background: var(--accent-color, orange);
+  color: #000;
+}

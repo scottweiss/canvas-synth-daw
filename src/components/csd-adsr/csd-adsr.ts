@@ -131,6 +131,14 @@ export class CsdAdsr extends HTMLElement {
     );
   }
 
+  public setAdsr(adsr: IAdsr): void {
+    this.adsr = adsr;
+    this.attackRange.value = adsr.attack;
+    this.decayRange.value = adsr.decay;
+    this.sustainRange.value = adsr.sustain;
+    this.releaseRange.value = adsr.release;
+  }
+
   private drawEnvelope(): void {
     if (!this.ctx || !this.canvas) return;
 
@@ -139,10 +147,15 @@ export class CsdAdsr extends HTMLElement {
     const padding = 20;
     const maxTime = this.adsr.attack + this.adsr.decay + 1 + this.adsr.release;
 
+    // Get colors from CSS variables
+    const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--color-canvas-grid').trim();
+    const envelopeColor = getComputedStyle(document.documentElement).getPropertyValue('--color-accent-primary').trim();
+    const textColor = getComputedStyle(document.documentElement).getPropertyValue('--color-text-primary').trim();
+
     this.ctx.clearRect(0, 0, width, height);
 
     // Draw grid
-    this.ctx.strokeStyle = '#444';
+    this.ctx.strokeStyle = gridColor;
     this.ctx.lineWidth = 1;
 
     // Vertical lines
@@ -164,10 +177,10 @@ export class CsdAdsr extends HTMLElement {
     }
 
     // Draw envelope
-    this.ctx.strokeStyle = '#1f1';
+    this.ctx.strokeStyle = envelopeColor;
     this.ctx.lineWidth = 3;
     this.ctx.shadowBlur = 10;
-    this.ctx.shadowColor = '#1f1';
+    this.ctx.shadowColor = envelopeColor;
 
     this.ctx.beginPath();
 
@@ -197,7 +210,7 @@ export class CsdAdsr extends HTMLElement {
     this.ctx.stroke();
 
     // Draw labels
-    this.ctx.fillStyle = '#fff';
+    this.ctx.fillStyle = textColor;
     this.ctx.font = '12px monospace';
     this.ctx.shadowBlur = 0;
 

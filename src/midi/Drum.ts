@@ -28,8 +28,7 @@ export class Drum {
     oscillator.frequency.value = this.frequency;
 
     oscillator.connect(gainNode);
-    gainNode.connect(this.audioEngine.audioContext.destination);
-    gainNode.connect(this.audioEngine.getAnalyser());
+    gainNode.connect(this.audioEngine.getMasterInput());
 
     const now = this.audioEngine.audioContext.currentTime;
 

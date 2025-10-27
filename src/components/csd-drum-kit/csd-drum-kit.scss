@@ -1,24 +1,27 @@
 :host {
-  box-sizing: border-box;
+  display: block;
+  width: 100%;
+}
 
+.drum-grid {
   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 0.5rem;
+}
 
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  width: nim-content;
+button {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: background 0.15s ease-in-out;
+}
 
-  *,
-  *::before,
-  *::after {
-    box-sizing: inherit;
-  }
-  button {
-    aspect-ratio: 1;
-
-    width: 100%;
-    height: 100%;
-  }
+button:hover,
+button:focus-visible {
+  background: rgba(255, 255, 255, 0.12);
+  outline: none;
 }

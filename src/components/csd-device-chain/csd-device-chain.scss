@@ -1,0 +1,130 @@
+.device-chain {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 160px); /* Constrain height to allow scrolling */
+  overflow-y: auto;
+  background: #1a1a1a;
+  color: #fff;
+
+  /* Custom scrollbar */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #1a1a1a;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #3a3a3a;
+    border-radius: 4px;
+
+    &:hover {
+      background: #4a4a4a;
+    }
+  }
+}
+
+.device-section {
+  border-bottom: 1px solid #2a2a2a;
+  transition: all 0.2s ease;
+
+  &.collapsed {
+    .device-content {
+      max-height: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .chevron {
+      transform: rotate(-90deg);
+    }
+  }
+}
+
+.device-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: #1e1e1e;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: #252525;
+  }
+
+  &:active {
+    background: #2a2a2a;
+  }
+
+  h4 {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #4ecdc4;
+  }
+
+  .chevron {
+    font-size: 10px;
+    color: #888;
+    transition: transform 0.2s ease;
+  }
+}
+
+.device-content {
+  max-height: 2000px;
+  padding: 0.5rem 0.75rem;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+/* Oscillators Grid */
+.oscillators-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.5rem;
+
+  csd-oscillator-panel {
+    background: #232323;
+    border-radius: 4px;
+    padding: 0.5rem;
+  }
+}
+
+/* Filter Content */
+.filter-content {
+  csd-filter {
+    display: block;
+  }
+}
+
+/* Envelope Content */
+.envelope-content {
+  csd-adsr {
+    display: block;
+  }
+}
+
+/* Effects Grid */
+.effects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.5rem;
+
+  csd-knob {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+/* Modulation Content */
+.modulation-content {
+  csd-modulation-matrix {
+    display: block;
+  }
+}
