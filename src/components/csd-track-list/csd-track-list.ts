@@ -3,12 +3,12 @@ import styles from './csd-track-list.scss?inline';
 
 export class CsdTrackList extends HTMLElement {
   private trackManager: TrackManager;
-  private shadowRoot: ShadowRoot;
+  private shadowRootRef: ShadowRoot;
   private trackListContainer: HTMLDivElement;
 
   constructor() {
     super();
-    this.shadowRoot = this.attachShadow({ mode: 'open' });
+    this.shadowRootRef = this.attachShadow({ mode: 'open' });
     this.trackManager = TrackManager.getInstance();
     this.trackListContainer = document.createElement('div');
 
@@ -59,8 +59,8 @@ export class CsdTrackList extends HTMLElement {
     container.appendChild(header);
     container.appendChild(this.trackListContainer);
 
-    this.shadowRoot.appendChild(style);
-    this.shadowRoot.appendChild(container);
+    this.shadowRootRef.appendChild(style);
+    this.shadowRootRef.appendChild(container);
   }
 
   private attachEventListeners(): void {
@@ -180,11 +180,11 @@ export class CsdTrackList extends HTMLElement {
     this.renderTracks();
   }
 
-  private handleTrackSelected(track: ITrack): void {
+  private handleTrackSelected(): void {
     this.renderTracks();
   }
 
-  private handleTrackUpdated(track: ITrack): void {
+  private handleTrackUpdated(): void {
     this.renderTracks();
   }
 }

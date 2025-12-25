@@ -3,32 +3,39 @@
   height: 100%;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 .mixer-channel {
   display: flex;
   flex-direction: column;
   height: 100%;
-  width: 80px;
+  width: 100px;
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-md);
-  padding: var(--spacing-xs);
-  gap: var(--spacing-xs);
+  padding: 2px;
+  gap: 2px;
+  box-sizing: border-box;
 
   &.master {
-    width: 90px;
+    width: 110px;
     background: var(--color-bg-tertiary);
     border-color: var(--color-accent-primary);
   }
 }
 
 .channel-label {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--color-accent-primary);
   text-align: center;
-  padding: var(--spacing-xs);
+  padding: 2px;
+  height: 20px;
+  line-height: 16px;
 }
 
 .channel-name {
@@ -37,10 +44,11 @@
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-sm);
   color: var(--color-text-primary);
-  padding: var(--spacing-xs);
+  padding: 1px 2px;
   font-size: var(--font-size-xs);
   text-align: center;
   transition: border-color var(--transition-fast);
+  height: 20px;
 
   &:focus {
     outline: none;
@@ -51,16 +59,16 @@
 
 .color-indicator {
   width: 100%;
-  height: 4px;
+  height: 2px;
   border-radius: var(--radius-sm);
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: 1px;
 }
 
 .controls-section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: 2px;
 
   csd-knob {
     width: 100%;
@@ -70,9 +78,9 @@
 .meters-section {
   flex: 1;
   display: flex;
-  gap: var(--spacing-xs);
+  gap: 2px;
   align-items: stretch;
-  min-height: 80px;
+  min-height: 100px;
 
   csd-peak-meter {
     flex-shrink: 0;
@@ -85,12 +93,12 @@
 
 .buttons-section {
   display: flex;
-  gap: var(--spacing-xs);
+  gap: 2px;
   justify-content: center;
 
   button {
     flex: 1;
-    padding: var(--spacing-xs);
+    padding: 2px;
     background: var(--color-bg-elevated);
     color: var(--color-text-primary);
     border: 1px solid var(--color-border-default);

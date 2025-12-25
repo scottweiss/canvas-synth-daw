@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { ClipPlayer } from './ClipPlayer';
-import { Clip, INote } from './Clip';
+import { Clip } from './Clip';
 import { Transport } from './Transport';
 import { AudioEngine } from './AudioEngine';
 import { TrackManager } from './TrackManager';

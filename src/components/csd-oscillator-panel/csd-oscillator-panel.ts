@@ -1,10 +1,10 @@
 import { CsdKnob } from '../csd-knob/csd-knob';
-import { OscillatorPatch } from '../../audio/SynthPatch';
+import { IOscillatorPatch } from '../../audio/SynthPatch';
 import styles from './csd-oscillator-panel.scss?inline';
 
-export interface CsdOscillatorPanelProps {
+export interface ICsdOscillatorPanelProps {
   oscillatorIndex: number;
-  initial?: OscillatorPatch;
+  initial?: IOscillatorPatch;
   label?: string;
 }
 
@@ -16,9 +16,9 @@ export class CsdOscillatorPanel extends HTMLElement {
   private levelKnob: CsdKnob;
   private pendingFrame: number | null = null;
   private labelText: string;
-  private settings: OscillatorPatch;
+  private settings: IOscillatorPatch;
   
-  constructor(props: CsdOscillatorPanelProps) {
+  constructor(props: ICsdOscillatorPanelProps) {
     super();
     
     this.oscillatorIndex = props.oscillatorIndex;
@@ -95,7 +95,7 @@ export class CsdOscillatorPanel extends HTMLElement {
   }
 
   private setupEventListeners(): void {
-    const schedule = () => this.scheduleDispatch();
+    const schedule = (): void => this.scheduleDispatch();
 
     this.waveformSelect.addEventListener('change', schedule);
     this.octaveKnob.addEventListener('change', schedule);
@@ -103,7 +103,7 @@ export class CsdOscillatorPanel extends HTMLElement {
     this.levelKnob.addEventListener('change', schedule);
   }
 
-  setSettings(settings: OscillatorPatch): void {
+  setSettings(settings: IOscillatorPatch): void {
     this.settings = { ...settings };
     if (this.waveformSelect.value !== settings.type) {
       this.waveformSelect.value = settings.type;

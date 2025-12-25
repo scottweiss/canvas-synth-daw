@@ -4,6 +4,7 @@ import '../csd-transport-bar/csd-transport-bar';
 import '../csd-track-list/csd-track-list';
 import '../csd-arrangement-view/csd-arrangement-view';
 import '../csd-session-view/csd-session-view';
+import '../csd-piano-roll/csd-piano-roll';
 import '../csd-device-chain/csd-device-chain';
 import '../csd-piano/csd-piano';
 import '../csd-mixer/csd-mixer';
@@ -12,10 +13,10 @@ import { Transport } from '../../audio/Transport';
 import { ArrangementPlayer } from '../../audio/ArrangementPlayer';
 
 export class CsdDawShell extends HTMLElement {
-  private shadowRoot: ShadowRoot;
+  private shadowRootRef: ShadowRoot;
   private horizontalSplit: Split.Instance | null = null;
   private verticalSplit: Split.Instance | null = null;
-  private currentView: ViewMode = 'arrangement';
+  private pianoRollView: HTMLElement | null = null;
   private arrangementView: HTMLElement | null = null;
   private sessionView: HTMLElement | null = null;
   private viewChangeHandler: (e: Event) => void;
@@ -24,7 +25,7 @@ export class CsdDawShell extends HTMLElement {
 
   constructor() {
     super();
-    this.shadowRoot = this.attachShadow({ mode: 'open' });
+    this.shadowRootRef = this.attachShadow({ mode: 'open' });
 
     // Initialize audio systems
     this.transport = Transport.getInstance();
@@ -44,9 +45,9 @@ export class CsdDawShell extends HTMLElement {
       this.initializeSplits();
     });
 
-    // Initialize arrangement player for default view
-    this.transport.setMode('arrangement');
-    this.arrangementPlayer.start();
+    // Initialize for default piano roll view
+    this.transport.setMode('pattern');
+    this.arrangementPlayer.stop();
 
     // Listen for view changes from the transport bar
     // Use window-level listener since event crosses shadow DOM boundaries
@@ -94,13 +95,17 @@ export class CsdDawShell extends HTMLElement {
     centerStage.className = 'center-stage split-panel';
     centerStage.id = 'center-stage';
 
-    // Create both views
+    // Create all three views
+    this.pianoRollView = document.createElement('csd-piano-roll');
+    this.pianoRollView.className = 'view-content active';
+
     this.arrangementView = document.createElement('csd-arrangement-view');
-    this.arrangementView.className = 'view-content active';
+    this.arrangementView.className = 'view-content';
 
     this.sessionView = document.createElement('csd-session-view');
     this.sessionView.className = 'view-content';
 
+    centerStage.appendChild(this.pianoRollView);
     centerStage.appendChild(this.arrangementView);
     centerStage.appendChild(this.sessionView);
 
@@ -150,17 +155,17 @@ export class CsdDawShell extends HTMLElement {
     container.appendChild(transportBar);
     container.appendChild(verticalContainer);
 
-    this.shadowRoot.appendChild(style);
-    this.shadowRoot.appendChild(container);
+    this.shadowRootRef.appendChild(style);
+    this.shadowRootRef.appendChild(container);
   }
 
   private initializeSplits(): void {
-    const leftSidebar = this.shadowRoot.getElementById('left-sidebar');
-    const centerStage = this.shadowRoot.getElementById('center-stage');
-    const rightSidebar = this.shadowRoot.getElementById('right-sidebar');
-    const topPanel = this.shadowRoot.getElementById('top-panel');
-    const pianoSection = this.shadowRoot.getElementById('piano-section');
-    const bottomSection = this.shadowRoot.getElementById('bottom-section');
+    const leftSidebar = this.shadowRootRef.getElementById('left-sidebar');
+    const centerStage = this.shadowRootRef.getElementById('center-stage');
+    const rightSidebar = this.shadowRootRef.getElementById('right-sidebar');
+    const topPanel = this.shadowRootRef.getElementById('top-panel');
+    const pianoSection = this.shadowRootRef.getElementById('piano-section');
+    const bottomSection = this.shadowRootRef.getElementById('bottom-section');
 
     if (leftSidebar && centerStage && rightSidebar) {
       // Horizontal split (left | center | right)
@@ -170,10 +175,10 @@ export class CsdDawShell extends HTMLElement {
         gutterSize: 8,
         cursor: 'col-resize',
         direction: 'horizontal',
-        elementStyle: (dimension, size, gutterSize) => ({
+        elementStyle: (_dimension, size, gutterSize) => ({
           'flex-basis': `calc(${size}% - ${gutterSize}px)`,
         }),
-        gutterStyle: (dimension, gutterSize) => ({
+        gutterStyle: (_dimension, gutterSize) => ({
           'flex-basis': `${gutterSize}px`,
         }),
       });
@@ -182,15 +187,15 @@ export class CsdDawShell extends HTMLElement {
     if (topPanel && pianoSection && bottomSection) {
       // Vertical split (main content / piano / mixer)
       this.verticalSplit = Split([topPanel, pianoSection, bottomSection], {
-        sizes: [65, 15, 20], // Initial sizes in percentages
-        minSize: [300, 100, 100], // Minimum sizes in pixels
+        sizes: [50, 15, 35], // Initial sizes in percentages - increased mixer to 35%
+        minSize: [300, 100, 250], // Minimum sizes in pixels - increased mixer min to 250px
         gutterSize: 8,
         cursor: 'row-resize',
         direction: 'vertical',
-        elementStyle: (dimension, size, gutterSize) => ({
+        elementStyle: (_dimension, size, gutterSize) => ({
           'flex-basis': `calc(${size}% - ${gutterSize}px)`,
         }),
-        gutterStyle: (dimension, gutterSize) => ({
+        gutterStyle: (_dimension, gutterSize) => ({
           'flex-basis': `${gutterSize}px`,
         }),
       });
@@ -198,20 +203,25 @@ export class CsdDawShell extends HTMLElement {
   }
 
   private handleViewChange(view: ViewMode): void {
-    console.log('View change requested:', view);
-    this.currentView = view;
+    // Hide all views first
+    if (this.pianoRollView) this.pianoRollView.classList.remove('active');
+    if (this.arrangementView) this.arrangementView.classList.remove('active');
+    if (this.sessionView) this.sessionView.classList.remove('active');
 
-    if (view === 'arrangement' && this.arrangementView && this.sessionView) {
-      console.log('Switching to Arrangement view');
+    // Show the selected view and configure transport
+    if (view === 'piano-roll' && this.pianoRollView) {
+      this.pianoRollView.classList.add('active');
+
+      // Switch transport to pattern mode for piano roll
+      this.transport.setMode('pattern');
+      this.arrangementPlayer.stop();
+    } else if (view === 'arrangement' && this.arrangementView) {
       this.arrangementView.classList.add('active');
-      this.sessionView.classList.remove('active');
 
       // Switch transport to arrangement mode
       this.transport.setMode('arrangement');
       this.arrangementPlayer.start();
-    } else if (view === 'session' && this.arrangementView && this.sessionView) {
-      console.log('Switching to Session view');
-      this.arrangementView.classList.remove('active');
+    } else if (view === 'session' && this.sessionView) {
       this.sessionView.classList.add('active');
 
       // Switch transport to session mode

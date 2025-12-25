@@ -15,9 +15,9 @@ export class CsdMixerChannel extends HTMLElement {
   private fader: CsdFader;
   private peakMeter: CsdPeakMeter;
   private panKnob: CsdKnob;
-  private soloButton: HTMLButtonElement;
-  private muteButton: HTMLButtonElement;
-  private trackNameInput: HTMLInputElement;
+  private soloButton: HTMLButtonElement | null = null;
+  private muteButton: HTMLButtonElement | null = null;
+  private trackNameInput: HTMLInputElement | null = null;
 
   constructor(props: ICsdMixerChannelProps) {
     super();
@@ -64,8 +64,9 @@ export class CsdMixerChannel extends HTMLElement {
       label: 'Pan',
       min: -1,
       max: 1,
-      value: 0
+      value: this.track.pan ?? 0
     });
+    this.panKnob.classList.add('compact');
     controlsSection.appendChild(this.panKnob);
 
     container.appendChild(controlsSection);
@@ -81,7 +82,7 @@ export class CsdMixerChannel extends HTMLElement {
     // Fader
     this.fader = new CsdFader({
       label: 'Vol',
-      value: 0.75
+      value: this.track.volume ?? 0.75
     });
     metersSection.appendChild(this.fader);
 
@@ -102,6 +103,14 @@ export class CsdMixerChannel extends HTMLElement {
       this.muteButton.textContent = 'M';
       this.muteButton.title = 'Mute';
 
+      if (this.track.soloed) {
+        this.soloButton.classList.add('active');
+      }
+
+      if (this.track.muted) {
+        this.muteButton.classList.add('active');
+      }
+
       buttonsSection.append(this.soloButton, this.muteButton);
       container.appendChild(buttonsSection);
     }
@@ -119,6 +128,7 @@ export class CsdMixerChannel extends HTMLElement {
           volume: e.detail.value
         }
       }));
+      this.track.volume = e.detail.value;
     }) as EventListener);
 
     // Pan changes
@@ -129,40 +139,52 @@ export class CsdMixerChannel extends HTMLElement {
           pan: e.detail.value
         }
       }));
+      this.track.pan = e.detail.value;
     }) as EventListener);
 
     if (!this.isMaster) {
       // Track name changes
-      this.trackNameInput?.addEventListener('change', () => {
-        this.dispatchEvent(new CustomEvent('nameChange', {
-          detail: {
-            trackId: this.track.id,
-            name: this.trackNameInput.value
-          }
-        }));
-      });
+      const nameInput = this.trackNameInput;
+      if (nameInput) {
+        nameInput.addEventListener('change', () => {
+          this.dispatchEvent(new CustomEvent('nameChange', {
+            detail: {
+              trackId: this.track.id,
+              name: nameInput.value
+            }
+          }));
+        });
+      }
 
       // Solo button
-      this.soloButton?.addEventListener('click', () => {
-        const isSolo = this.soloButton.classList.toggle('active');
-        this.dispatchEvent(new CustomEvent('soloChange', {
-          detail: {
-            trackId: this.track.id,
-            solo: isSolo
-          }
-        }));
-      });
+      const soloButton = this.soloButton;
+      if (soloButton) {
+        soloButton.addEventListener('click', () => {
+          const isSolo = soloButton.classList.toggle('active');
+          this.dispatchEvent(new CustomEvent('soloChange', {
+            detail: {
+              trackId: this.track.id,
+              solo: isSolo
+            }
+          }));
+          this.track.soloed = isSolo;
+        });
+      }
 
       // Mute button
-      this.muteButton?.addEventListener('click', () => {
-        const isMuted = this.muteButton.classList.toggle('active');
-        this.dispatchEvent(new CustomEvent('muteChange', {
-          detail: {
-            trackId: this.track.id,
-            mute: isMuted
-          }
-        }));
-      });
+      const muteButton = this.muteButton;
+      if (muteButton) {
+        muteButton.addEventListener('click', () => {
+          const isMuted = muteButton.classList.toggle('active');
+          this.dispatchEvent(new CustomEvent('muteChange', {
+            detail: {
+              trackId: this.track.id,
+              mute: isMuted
+            }
+          }));
+          this.track.muted = isMuted;
+        });
+      }
     }
   }
 
@@ -171,6 +193,7 @@ export class CsdMixerChannel extends HTMLElement {
   }
 
   public setMute(muted: boolean): void {
+    this.track.muted = muted;
     if (this.muteButton) {
       if (muted) {
         this.muteButton.classList.add('active');
@@ -181,6 +204,7 @@ export class CsdMixerChannel extends HTMLElement {
   }
 
   public setSolo(solo: boolean): void {
+    this.track.soloed = solo;
     if (this.soloButton) {
       if (solo) {
         this.soloButton.classList.add('active');

@@ -1,14 +1,14 @@
 import styles from './csd-view-toggle.scss?inline';
 
-export type ViewMode = 'session' | 'arrangement';
+export type ViewMode = 'piano-roll' | 'session' | 'arrangement';
 
 export class CsdViewToggle extends HTMLElement {
-  private shadowRoot: ShadowRoot;
-  private currentView: ViewMode = 'arrangement';
+  private shadowRootRef: ShadowRoot;
+  private currentView: ViewMode = 'piano-roll';
 
   constructor() {
     super();
-    this.shadowRoot = this.attachShadow({ mode: 'open' });
+    this.shadowRootRef = this.attachShadow({ mode: 'open' });
     this.render();
   }
 
@@ -19,37 +19,42 @@ export class CsdViewToggle extends HTMLElement {
     const container = document.createElement('div');
     container.className = 'view-toggle';
 
+    const pianoRollButton = document.createElement('button');
+    pianoRollButton.className = 'view-button active';
+    pianoRollButton.textContent = 'Piano Roll';
+    pianoRollButton.dataset.view = 'piano-roll';
+
     const sessionButton = document.createElement('button');
     sessionButton.className = 'view-button';
     sessionButton.textContent = 'Session';
     sessionButton.dataset.view = 'session';
 
     const arrangementButton = document.createElement('button');
-    arrangementButton.className = 'view-button active';
+    arrangementButton.className = 'view-button';
     arrangementButton.textContent = 'Arrangement';
     arrangementButton.dataset.view = 'arrangement';
 
+    pianoRollButton.addEventListener('click', () => this.setView('piano-roll'));
     sessionButton.addEventListener('click', () => this.setView('session'));
     arrangementButton.addEventListener('click', () => this.setView('arrangement'));
 
+    container.appendChild(pianoRollButton);
     container.appendChild(sessionButton);
     container.appendChild(arrangementButton);
 
-    this.shadowRoot.appendChild(style);
-    this.shadowRoot.appendChild(container);
+    this.shadowRootRef.appendChild(style);
+    this.shadowRootRef.appendChild(container);
   }
 
   private setView(view: ViewMode): void {
-    console.log('View toggle clicked:', view);
     if (this.currentView === view) {
-      console.log('Already on this view, ignoring');
       return;
     }
 
     this.currentView = view;
 
     // Update button states
-    const buttons = this.shadowRoot.querySelectorAll('.view-button');
+    const buttons = this.shadowRootRef.querySelectorAll('.view-button');
     buttons.forEach((button) => {
       const buttonView = (button as HTMLElement).dataset.view;
       if (buttonView === view) {
@@ -60,7 +65,6 @@ export class CsdViewToggle extends HTMLElement {
     });
 
     // Dispatch custom event
-    console.log('Dispatching viewChange event:', view);
     this.dispatchEvent(
       new CustomEvent('viewChange', {
         bubbles: true,

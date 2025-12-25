@@ -1,4 +1,4 @@
-import { Clip, IClip, ClipState, INote } from './Clip';
+import { Clip, IClip, INote } from './Clip';
 
 /**
  * Interface for arrangement clip JSON serialization
@@ -86,7 +86,7 @@ export class ArrangementClip extends Clip {
   /**
    * Get notes that should play at a specific timeline position
    */
-  getNotesAtTime(timelinePosition: number, tolerance: number = 0.1): INote[] {
+  getNotesAtTime(timelinePosition: number): INote[] {
     if (!this.containsTime(timelinePosition)) {
       return [];
     }

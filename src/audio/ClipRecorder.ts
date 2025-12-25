@@ -1,11 +1,9 @@
 import { Clip, INote } from './Clip';
 import { Transport } from './Transport';
-import { AudioEngine } from './AudioEngine';
 
 export class ClipRecorder {
   private static instance: ClipRecorder;
   private transport: Transport;
-  private audioEngine: AudioEngine;
   private activeClip: Clip | null = null;
   private recordingStartBeat: number = 0;
   private activeNotes: Map<number, { pitch: number; startBeat: number; velocity: number }> = new Map();
@@ -13,7 +11,6 @@ export class ClipRecorder {
 
   private constructor() {
     this.transport = Transport.getInstance();
-    this.audioEngine = AudioEngine.getInstance();
     this.setupListeners();
   }
 
@@ -59,15 +56,13 @@ export class ClipRecorder {
 
     // Set clip state
     clip.startRecording();
-
-    console.log('Started recording clip:', clip.getId());
   }
 
   public stopRecording(): void {
     if (!this.isRecording || !this.activeClip) return;
 
     // Finish any active notes
-    this.activeNotes.forEach((noteData, pitch) => {
+    this.activeNotes.forEach((noteData) => {
       const currentBeat = this.transport.getCurrentBeat();
       const relativeBeat = currentBeat - this.recordingStartBeat;
       const duration = relativeBeat - noteData.startBeat;
@@ -87,7 +82,6 @@ export class ClipRecorder {
 
     // Stop recording state
     this.activeClip.stopRecording();
-    console.log('Stopped recording clip:', this.activeClip.getId());
 
     this.isRecording = false;
     this.activeClip = null;

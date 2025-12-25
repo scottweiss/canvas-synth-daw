@@ -1,10 +1,10 @@
-import { Filter, FilterSettings, FilterType } from './Filter';
+import { Filter, IFilterSettings, FilterType } from './Filter';
 import { LFO, LFOWaveform } from './LFO';
 import { ADSR } from './ADSR';
 import midiToFrequency from '../midi/midi-to-frequency';
-import { SynthPatchState } from './SynthPatch';
+import { ISynthPatchState } from './SynthPatch';
 
-export interface OscillatorSettings {
+export interface IOscillatorSettings {
   type: OscillatorType;
   detune: number;
   octave: number;
@@ -15,7 +15,7 @@ export class SynthVoice {
   private audioContext: AudioContext;
   private oscillators: OscillatorNode[] = [];
   private oscillatorGains: GainNode[] = [];
-  private oscillatorSettings: OscillatorSettings[] = [];
+  private oscillatorSettings: IOscillatorSettings[] = [];
   private filter: Filter;
   private amplitudeEnvelope: GainNode;
   private outputGain: GainNode;
@@ -34,7 +34,7 @@ export class SynthVoice {
     
     const lfoOutput = this.lfo.getOutput();
 
-    const defaultOscSettings: OscillatorSettings[] = [
+    const defaultOscSettings: IOscillatorSettings[] = [
       { type: 'sawtooth', detune: 0, octave: 0, level: 0.5 },
       { type: 'square', detune: -5, octave: -1, level: 0.3 },
       { type: 'triangle', detune: 7, octave: 1, level: 0.2 },
@@ -69,7 +69,7 @@ export class SynthVoice {
     this.outputGain.gain.value = 0.3;
     
     // Prime filter defaults
-    const filterDefaults: FilterSettings = this.filter.getSettings();
+    const filterDefaults: IFilterSettings = this.filter.getSettings();
     this.filter.setType(filterDefaults.type);
     this.filter.setFrequency(filterDefaults.frequency);
     this.filter.setResonance(filterDefaults.resonance);
@@ -93,7 +93,7 @@ export class SynthVoice {
     }
   }
 
-  applyPatch(patch: SynthPatchState): void {
+  applyPatch(patch: ISynthPatchState): void {
     patch.oscillators.forEach((osc, index) => {
       this.setOscillatorSettings(index, osc);
     });
@@ -153,7 +153,7 @@ export class SynthVoice {
     this.currentMidiNote = null;
   }
 
-  setOscillatorSettings(index: number, settings: Partial<OscillatorSettings>): void {
+  setOscillatorSettings(index: number, settings: Partial<IOscillatorSettings>): void {
     if (index < 0 || index >= this.oscillators.length) return;
     this.oscillatorSettings[index] = {
       ...this.oscillatorSettings[index],

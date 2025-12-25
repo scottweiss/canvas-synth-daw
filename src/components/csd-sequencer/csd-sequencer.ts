@@ -1,4 +1,3 @@
-import { AudioEngine } from '../../audio/AudioEngine';
 import { Transport } from '../../audio/Transport';
 import { CanvasController } from '../../canvas/CanvasController';
 import { Drum } from '../../midi/Drum';
@@ -9,7 +8,6 @@ import styles from './csd-sequencer.scss?inline';
 const TOTAL_STEPS = 16;
 
 export class CsdSequencer extends HTMLElement {
-  private readonly audioEngine: AudioEngine = AudioEngine.getInstance();
   private readonly transport: Transport = Transport.getInstance();
   private readonly canvasController: CanvasController = new CanvasController();
   private readonly canvas: HTMLCanvasElement = this.canvasController.getCanvasElement();
@@ -121,14 +119,13 @@ export class CsdSequencer extends HTMLElement {
     return table;
   }
 
-  private handleTick = (tick: number, _time: number): void => {
+  private handleTick = (tick: number): void => {
     this.currentTick = tick % TOTAL_STEPS;
     const bpm = this.transport.getBpm();
-    const time = this.audioEngine.audioContext.currentTime;
 
     this.tracks.forEach((track) => {
       if (track.isStepActive(this.currentTick)) {
-        track.trigger(time, bpm);
+        track.trigger(bpm);
       }
     });
   };

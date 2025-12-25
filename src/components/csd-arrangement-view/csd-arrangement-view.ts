@@ -1,5 +1,5 @@
 import { TrackManager, ITrack } from '../../audio/TrackManager';
-import { Transport } from '../../audio/Transport';
+import { ArrangementClip } from '../../audio/ArrangementClip';
 import { CsdTimeline } from '../csd-timeline/csd-timeline';
 import { CsdArrangementTrack } from '../csd-arrangement-track/csd-arrangement-track';
 import '../csd-timeline/csd-timeline';
@@ -7,9 +7,8 @@ import '../csd-arrangement-track/csd-arrangement-track';
 import styles from './csd-arrangement-view.scss?inline';
 
 export class CsdArrangementView extends HTMLElement {
-  private shadowRoot: ShadowRoot;
+  private shadowRootRef: ShadowRoot;
   private trackManager: TrackManager;
-  private transport: Transport;
   private container: HTMLDivElement;
   private timeline: CsdTimeline;
   private tracksContainer: HTMLDivElement;
@@ -18,9 +17,8 @@ export class CsdArrangementView extends HTMLElement {
 
   constructor() {
     super();
-    this.shadowRoot = this.attachShadow({ mode: 'open' });
+    this.shadowRootRef = this.attachShadow({ mode: 'open' });
     this.trackManager = TrackManager.getInstance();
-    this.transport = Transport.getInstance();
     this.container = document.createElement('div');
     this.timeline = new CsdTimeline();
     this.tracksContainer = document.createElement('div');
@@ -47,9 +45,10 @@ export class CsdArrangementView extends HTMLElement {
     }) as EventListener);
 
     // Listen for clip creation
-    this.shadowRoot.addEventListener('createClip', ((e: CustomEvent) => {
-      this.handleCreateClip(e.detail.trackId, e.detail.startTime);
-    }) as EventListener);
+    this.shadowRootRef.addEventListener('createClip', (event) => {
+      const detail = (event as CustomEvent<{ trackId: string; startTime: number }>).detail;
+      this.handleCreateClip(detail.trackId, detail.startTime);
+    });
 
     // Initial load
     this.loadTracks();
@@ -99,8 +98,8 @@ export class CsdArrangementView extends HTMLElement {
     this.container.appendChild(this.timeline);
     this.container.appendChild(this.tracksContainer);
 
-    this.shadowRoot.appendChild(style);
-    this.shadowRoot.appendChild(this.container);
+    this.shadowRootRef.appendChild(style);
+    this.shadowRootRef.appendChild(this.container);
   }
 
   private loadTracks(): void {
@@ -135,7 +134,7 @@ export class CsdArrangementView extends HTMLElement {
     this.renderTracks();
   }
 
-  private handleClipCreated(trackId: string, clip: any): void {
+  private handleClipCreated(trackId: string, clip: ArrangementClip): void {
     const trackEl = this.trackElements.get(trackId);
     if (trackEl) {
       trackEl.addClip(clip);
@@ -157,8 +156,6 @@ export class CsdArrangementView extends HTMLElement {
   }
 
   private handleCreateClip(trackId: string, startTime: number): void {
-    console.log('Creating clip at', startTime, 'on track', trackId);
-
     // Create a 4-beat clip
     const clip = this.trackManager.createArrangementClip(trackId, startTime, 4);
 

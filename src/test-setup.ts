@@ -1,4 +1,6 @@
 import { vi } from 'vitest';
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 // Mock Web Audio API
 class MockAudioContext {

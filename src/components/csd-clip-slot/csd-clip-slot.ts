@@ -1,22 +1,22 @@
 import { Clip, ClipState } from '../../audio/Clip';
 import styles from './csd-clip-slot.scss?inline';
 
-export interface CsdClipSlotProps {
+export interface ICsdClipSlotProps {
   trackId: string;
   sceneIndex: number;
   clip?: Clip;
 }
 
 export class CsdClipSlot extends HTMLElement {
-  private shadowRoot: ShadowRoot;
+  private shadowRootRef: ShadowRoot;
   private trackId: string;
   private sceneIndex: number;
   private clip: Clip | null = null;
   private container: HTMLElement;
 
-  constructor(props: CsdClipSlotProps) {
+  constructor(props: ICsdClipSlotProps) {
     super();
-    this.shadowRoot = this.attachShadow({ mode: 'open' });
+    this.shadowRootRef = this.attachShadow({ mode: 'open' });
     this.trackId = props.trackId;
     this.sceneIndex = props.sceneIndex;
     this.clip = props.clip || null;
@@ -72,8 +72,8 @@ export class CsdClipSlot extends HTMLElement {
       this.handleContextMenu();
     });
 
-    this.shadowRoot.appendChild(style);
-    this.shadowRoot.appendChild(this.container);
+    this.shadowRootRef.appendChild(style);
+    this.shadowRootRef.appendChild(this.container);
   }
 
   private updateDisplay(): void {

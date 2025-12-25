@@ -9,8 +9,7 @@ import styles from './csd-device-chain.scss?inline';
 
 export class CsdDeviceChain extends HTMLElement {
   private trackManager: TrackManager;
-  private shadowRoot: ShadowRoot;
-  private currentTrack: ITrack | null = null;
+  private shadowRootRef: ShadowRoot;
   private currentPatch: SynthPatch | null = null;
 
   // Device components
@@ -36,7 +35,7 @@ export class CsdDeviceChain extends HTMLElement {
 
   constructor() {
     super();
-    this.shadowRoot = this.attachShadow({ mode: 'open' });
+    this.shadowRootRef = this.attachShadow({ mode: 'open' });
     this.trackManager = TrackManager.getInstance();
 
     // Initialize ADSR with default values
@@ -112,8 +111,8 @@ export class CsdDeviceChain extends HTMLElement {
     container.appendChild(effectsSection);
     container.appendChild(modulationSection);
 
-    this.shadowRoot.appendChild(style);
-    this.shadowRoot.appendChild(container);
+    this.shadowRootRef.appendChild(style);
+    this.shadowRootRef.appendChild(container);
   }
 
   private createDeviceSection(id: string, title: string, content: HTMLElement): HTMLElement {
@@ -235,7 +234,7 @@ export class CsdDeviceChain extends HTMLElement {
   }
 
   private toggleSection(id: string): void {
-    const section = this.shadowRoot.querySelector(`[data-device-id="${id}"]`);
+    const section = this.shadowRootRef.querySelector(`[data-device-id="${id}"]`);
     if (!section) return;
 
     const isCollapsed = section.classList.toggle('collapsed');
@@ -304,7 +303,6 @@ export class CsdDeviceChain extends HTMLElement {
   }
 
   private loadTrack(track: ITrack): void {
-    this.currentTrack = track;
     this.currentPatch = track.patch;
 
     const state = track.patch.getState();

@@ -1,6 +1,6 @@
 import { CanvasController } from '../../canvas/CanvasController';
 import { Drum } from '../../midi/Drum';
-import midiToFrequency, { midiToNote } from '../../midi/midi-to-frequency';
+import { midiToNote } from '../../midi/midi-to-frequency';
 import { Transport } from '../../audio/Transport';
 import { TrackManager, INote } from '../../audio/TrackManager';
 import { AudioEngine } from '../../audio/AudioEngine';
@@ -33,9 +33,6 @@ export class CsdPianoRoll extends HTMLElement {
   private dragStartBeat: number | null = null;
   private dragStartNote: number | null = null;
   private hoveredNote: INote | null = null;
-
-  // Track colors
-  private currentTrackColor = '#4ecdc4';
 
   constructor() {
     super();
@@ -84,11 +81,6 @@ export class CsdPianoRoll extends HTMLElement {
     this.transport.onTick(this.handleTransportTick.bind(this));
     this.transport.onStateChange(this.handleTransportStateChange.bind(this));
 
-    // Initialize with current track
-    const selectedTrack = this.trackManager.getSelectedTrack();
-    if (selectedTrack) {
-      this.currentTrackColor = selectedTrack.color;
-    }
   }
   
   private createControls(): HTMLElement {
@@ -407,8 +399,8 @@ export class CsdPianoRoll extends HTMLElement {
       if (track.muted) return;
 
       // Check for any solo tracks - if any track is soloed, only play soloed tracks
-      const anySolo = allTracks.some(t => t.solo);
-      if (anySolo && !track.solo) return;
+      const anySolo = allTracks.some(t => t.soloed);
+      if (anySolo && !track.soloed) return;
 
       // Stop notes that should end
       track.notes.forEach(note => {
@@ -442,10 +434,7 @@ export class CsdPianoRoll extends HTMLElement {
   }
 
   private handleTrackSelected(): void {
-    const track = this.trackManager.getSelectedTrack();
-    if (track) {
-      this.currentTrackColor = track.color;
-    }
+    // Currently no additional UI adjustments on track selection.
   }
 
   private handleNotesChanged(): void {

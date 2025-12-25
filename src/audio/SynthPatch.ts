@@ -2,59 +2,59 @@ import { FilterType } from './Filter';
 import { IAdsr } from './ADSR';
 import { LFOWaveform } from './LFO';
 
-export interface OscillatorPatch {
+export interface IOscillatorPatch {
   type: OscillatorType;
   detune: number;
   octave: number;
   level: number;
 }
 
-export interface FilterPatch {
+export interface IFilterPatch {
   type: FilterType;
   frequency: number;
   resonance: number;
   envelopeAmount: number;
 }
 
-export interface EffectsPatch {
+export interface IEffectsPatch {
   reverbMix: number;
   delayMix: number;
   delayTime: number;
   delayFeedback: number;
 }
 
-export interface MasterPatch {
+export interface IMasterPatch {
   volume: number;
   waveType: OscillatorType;
 }
 
 export type ModDestination = 'pitch' | 'filter';
 
-export interface ModulationPatch {
+export interface IModulationPatch {
   lfoRate: number;
   waveform: LFOWaveform;
   pitchAmount: number;
   filterAmount: number;
 }
 
-export interface SynthPatchState {
-  oscillators: OscillatorPatch[];
-  filter: FilterPatch;
+export interface ISynthPatchState {
+  oscillators: IOscillatorPatch[];
+  filter: IFilterPatch;
   envelope: IAdsr;
-  effects: EffectsPatch;
-  master: MasterPatch;
-  modulation: ModulationPatch;
+  effects: IEffectsPatch;
+  master: IMasterPatch;
+  modulation: IModulationPatch;
 }
 
 type PatchListener<T> = (value: T) => void;
 
-type PatchSection = keyof SynthPatchState;
+type PatchSection = keyof ISynthPatchState;
 
 type SectionListeners = {
-  [K in PatchSection]: Set<PatchListener<SynthPatchState[K]>>;
+  [K in PatchSection]: Set<PatchListener<ISynthPatchState[K]>>;
 };
 
-const defaultState: SynthPatchState = {
+const defaultState: ISynthPatchState = {
   oscillators: [
     { type: 'sawtooth', detune: 0, octave: 0, level: 0.5 },
     { type: 'square', detune: -5, octave: -1, level: 0.3 },
@@ -91,10 +91,10 @@ const defaultState: SynthPatchState = {
 };
 
 export class SynthPatch {
-  private state: SynthPatchState;
+  private state: ISynthPatchState;
   private listeners: SectionListeners;
 
-  constructor(initialState: Partial<SynthPatchState> = {}) {
+  constructor(initialState: Partial<ISynthPatchState> = {}) {
     this.state = {
       ...defaultState,
       ...initialState,
@@ -116,7 +116,7 @@ export class SynthPatch {
     };
   }
 
-  getState(): SynthPatchState {
+  getState(): ISynthPatchState {
     return {
       oscillators: this.state.oscillators.map((osc) => ({ ...osc })),
       filter: { ...this.state.filter },
@@ -127,16 +127,16 @@ export class SynthPatch {
     };
   }
 
-  getSection<K extends PatchSection>(section: K): SynthPatchState[K] {
+  getSection<K extends PatchSection>(section: K): ISynthPatchState[K] {
     const value = this.state[section];
     return Array.isArray(value)
-      ? (value.map((item) => ({ ...item })) as SynthPatchState[K])
-      : ({ ...value } as SynthPatchState[K]);
+      ? (value.map((item) => ({ ...item })) as ISynthPatchState[K])
+      : ({ ...value } as ISynthPatchState[K]);
   }
 
   on<K extends PatchSection>(
     section: K,
-    listener: PatchListener<SynthPatchState[K]>
+    listener: PatchListener<ISynthPatchState[K]>
   ): () => void {
     const listeners = this.listeners[section];
     listeners.add(listener);
@@ -145,13 +145,13 @@ export class SynthPatch {
 
   off<K extends PatchSection>(
     section: K,
-    listener: PatchListener<SynthPatchState[K]>
+    listener: PatchListener<ISynthPatchState[K]>
   ): void {
     const listeners = this.listeners[section];
     listeners.delete(listener);
   }
 
-  updateOscillator(index: number, patch: Partial<OscillatorPatch>): void {
+  updateOscillator(index: number, patch: Partial<IOscillatorPatch>): void {
     if (!this.state.oscillators[index]) {
       return;
     }
@@ -168,7 +168,7 @@ export class SynthPatch {
     this.emit('oscillators');
   }
 
-  updateFilter(patch: Partial<FilterPatch>): void {
+  updateFilter(patch: Partial<IFilterPatch>): void {
     this.state = {
       ...this.state,
       filter: {
@@ -190,7 +190,7 @@ export class SynthPatch {
     this.emit('envelope');
   }
 
-  updateEffects(patch: Partial<EffectsPatch>): void {
+  updateEffects(patch: Partial<IEffectsPatch>): void {
     this.state = {
       ...this.state,
       effects: {
@@ -201,7 +201,7 @@ export class SynthPatch {
     this.emit('effects');
   }
 
-  updateMaster(patch: Partial<MasterPatch>): void {
+  updateMaster(patch: Partial<IMasterPatch>): void {
     this.state = {
       ...this.state,
       master: {
@@ -212,7 +212,7 @@ export class SynthPatch {
     this.emit('master');
   }
 
-  updateModulation(patch: Partial<ModulationPatch>): void {
+  updateModulation(patch: Partial<IModulationPatch>): void {
     this.state = {
       ...this.state,
       modulation: {
@@ -231,11 +231,11 @@ export class SynthPatch {
 }
 
 export function createSynthPatch(
-  initialState: Partial<SynthPatchState> = {}
+  initialState: Partial<ISynthPatchState> = {}
 ): SynthPatch {
   return new SynthPatch(initialState);
 }
 
-export function getDefaultPatchState(): SynthPatchState {
+export function getDefaultPatchState(): ISynthPatchState {
   return new SynthPatch().getState();
 }

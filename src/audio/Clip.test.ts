@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { Clip, ClipState, INote } from './Clip';
+import { Clip, INote } from './Clip';
 
 describe('Clip', () => {
   let clip: Clip;

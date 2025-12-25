@@ -1,22 +1,24 @@
+type EventCallback = (...args: unknown[]) => void;
+
 // Simple event emitter for browser
 class SimpleEventEmitter {
-  private events: Map<string, Set<Function>> = new Map();
+  private events: Map<string, Set<EventCallback>> = new Map();
 
-  on(event: string, listener: Function): void {
+  on(event: string, listener: EventCallback): void {
     if (!this.events.has(event)) {
       this.events.set(event, new Set());
     }
     this.events.get(event)!.add(listener);
   }
 
-  off(event: string, listener: Function): void {
+  off(event: string, listener: EventCallback): void {
     const listeners = this.events.get(event);
     if (listeners) {
       listeners.delete(listener);
     }
   }
 
-  emit(event: string, ...args: any[]): void {
+  emit(event: string, ...args: unknown[]): void {
     const listeners = this.events.get(event);
     if (listeners) {
       listeners.forEach(listener => listener(...args));
@@ -62,7 +64,6 @@ export class Clip extends SimpleEventEmitter {
   private name: string;
   private color: string;
   private currentPosition: number = 0; // Current playback position in beats
-  private isLooping: boolean = true;
 
   constructor(trackId: string, sceneIndex: number, length: number = 4) {
     super();

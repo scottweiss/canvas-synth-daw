@@ -2,7 +2,7 @@ import { ArrangementClip } from '../../audio/ArrangementClip';
 import styles from './csd-arrangement-clip.scss?inline';
 
 export class CsdArrangementClipElement extends HTMLElement {
-  private shadowRoot: ShadowRoot;
+  private shadowRootRef: ShadowRoot;
   private clip: ArrangementClip;
   private beatsPerPixel: number = 0.1;
   private viewportStart: number = 0;
@@ -15,7 +15,7 @@ export class CsdArrangementClipElement extends HTMLElement {
 
   constructor(clip: ArrangementClip) {
     super();
-    this.shadowRoot = this.attachShadow({ mode: 'open' });
+    this.shadowRootRef = this.attachShadow({ mode: 'open' });
     this.clip = clip;
     this.container = document.createElement('div');
     this.resizeHandle = document.createElement('div');
@@ -57,8 +57,8 @@ export class CsdArrangementClipElement extends HTMLElement {
     this.container.appendChild(notes);
     this.container.appendChild(this.resizeHandle);
 
-    this.shadowRoot.appendChild(style);
-    this.shadowRoot.appendChild(this.container);
+    this.shadowRootRef.appendChild(style);
+    this.shadowRootRef.appendChild(this.container);
   }
 
   private renderNotes(container: HTMLDivElement): void {
@@ -180,7 +180,7 @@ export class CsdArrangementClipElement extends HTMLElement {
 
   private updateContent(): void {
     // Update name
-    const nameEl = this.shadowRoot.querySelector('.clip-name') as HTMLDivElement;
+    const nameEl = this.shadowRootRef.querySelector('.clip-name') as HTMLDivElement;
     if (nameEl) {
       nameEl.textContent = this.clip.getName();
     }
@@ -189,7 +189,7 @@ export class CsdArrangementClipElement extends HTMLElement {
     this.container.style.background = this.clip.getColor();
 
     // Re-render notes
-    const notesContainer = this.shadowRoot.querySelector('.clip-notes') as HTMLDivElement;
+    const notesContainer = this.shadowRootRef.querySelector('.clip-notes') as HTMLDivElement;
     if (notesContainer) {
       notesContainer.innerHTML = '';
       this.renderNotes(notesContainer);

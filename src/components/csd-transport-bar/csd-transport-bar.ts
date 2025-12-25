@@ -7,11 +7,11 @@ export class CsdTransportBar extends HTMLElement {
   private playButton: HTMLButtonElement;
   private bpmInput: HTMLInputElement;
   private positionDisplay: HTMLSpanElement;
-  private shadowRoot: ShadowRoot;
+  private shadowRootRef: ShadowRoot;
 
   constructor() {
     super();
-    this.shadowRoot = this.attachShadow({ mode: 'open' });
+    this.shadowRootRef = this.attachShadow({ mode: 'open' });
     this.transport = Transport.getInstance();
 
     // Create elements
@@ -106,8 +106,8 @@ export class CsdTransportBar extends HTMLElement {
     container.appendChild(bpmSection);
     container.appendChild(positionSection);
 
-    this.shadowRoot.appendChild(style);
-    this.shadowRoot.appendChild(container);
+    this.shadowRootRef.appendChild(style);
+    this.shadowRootRef.appendChild(container);
   }
 
   private attachEventListeners(): void {

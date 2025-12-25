@@ -1,11 +1,12 @@
 import { ADSR } from '../audio/ADSR';
+import type { IAdsr } from '../audio/ADSR';
 import midiToFrequency from '../midi/midi-to-frequency';
 import { SynthVoice } from './SynthVoice';
 import { Reverb, Delay } from './Effects';
-import { createSynthPatch, SynthPatch, SynthPatchState } from './SynthPatch';
-import { FilterPatch, MasterPatch, ModulationPatch, OscillatorPatch } from './SynthPatch';
+import type { SynthPatch, ISynthPatchState, IEffectsPatch } from './SynthPatch';
 import { TrackAudioNode } from './TrackAudioNode';
 import { TrackManager } from './TrackManager';
+import type { ITrack } from './TrackManager';
 
 export class AudioEngine {
   private static instance: AudioEngine;
@@ -247,7 +248,10 @@ export class AudioEngine {
   }
 
   // Track the current patch listeners so we can unsubscribe when switching tracks
-  private currentPatchListeners: Map<string, Function> = new Map();
+  private currentPatchListeners: {
+    effects?: (value: IEffectsPatch) => void;
+    envelope?: (value: IAdsr) => void;
+  } = {};
 
   private subscribeToTrackPatch(trackPatch: SynthPatch): void {
     // Unsubscribe from previous patch if any
@@ -259,34 +263,37 @@ export class AudioEngine {
     // synth settings, and changing Track A's parameters won't affect Track B's playing notes.
 
     // Subscribe to effects changes (these are master/global effects)
-    const effectsListener = (effects: any) => {
+    const effectsListener = (effects: IEffectsPatch): void => {
       this.masterReverb.setMix(effects.reverbMix);
       this.masterDelay.setMix(effects.delayMix);
       this.masterDelay.setTime(effects.delayTime);
       this.masterDelay.setFeedback(effects.delayFeedback);
     };
     trackPatch.on('effects', effectsListener);
-    this.currentPatchListeners.set('effects', effectsListener);
+    this.currentPatchListeners.effects = effectsListener;
 
     // Subscribe to envelope changes (ADSR is a global singleton)
-    const envelopeListener = (adsr: any) => {
+    const envelopeListener = (adsr: IAdsr): void => {
       ADSR.getInstance().adsr = adsr;
     };
     trackPatch.on('envelope', envelopeListener);
-    this.currentPatchListeners.set('envelope', envelopeListener);
+    this.currentPatchListeners.envelope = envelopeListener;
   }
 
   private unsubscribeFromCurrentPatch(): void {
     const track = this.trackManager.getSelectedTrack();
-    if (track && this.currentPatchListeners.size > 0) {
-      this.currentPatchListeners.forEach((listener, event) => {
-        track.patch.off(event, listener);
-      });
-      this.currentPatchListeners.clear();
+    if (track) {
+      if (this.currentPatchListeners.effects) {
+        track.patch.off('effects', this.currentPatchListeners.effects);
+      }
+      if (this.currentPatchListeners.envelope) {
+        track.patch.off('envelope', this.currentPatchListeners.envelope);
+      }
+      this.currentPatchListeners = {};
     }
   }
 
-  private applyPatchSnapshot(patch: SynthPatchState): void {
+  private applyPatchSnapshot(patch: ISynthPatchState): void {
     // Only apply global/master settings when switching tracks.
     // Per-voice settings (oscillators, filters, modulation) are applied at note-on time.
     // This ensures proper track isolation - Track A's settings don't affect Track B.
@@ -307,7 +314,7 @@ export class AudioEngine {
       return this.trackAudioNodes.get(trackId)!;
     }
 
-    const trackNode = new TrackAudioNode(this.audioContext, trackId);
+    const trackNode = new TrackAudioNode(this.audioContext);
     trackNode.connectOutput(this.masterGain);
     this.trackAudioNodes.set(trackId, trackNode);
     return trackNode;

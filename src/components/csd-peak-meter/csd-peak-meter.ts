@@ -7,6 +7,8 @@ export class CsdPeakMeter extends HTMLElement {
   private peakLevel: number = 0;
   private peakHoldTime: number = 0;
   private animationId: number | null = null;
+  private resizeObserver: ResizeObserver | null = null;
+  private container: HTMLDivElement;
 
   constructor() {
     super();
@@ -17,23 +19,40 @@ export class CsdPeakMeter extends HTMLElement {
     shadowRoot.adoptedStyleSheets.push(sheet);
 
     this.canvas = document.createElement('canvas');
-    this.canvas.width = 20;
-    this.canvas.height = 200;
+    this.canvas.width = 12;
+    this.canvas.height = 100; // Default height
     this.ctx = this.canvas.getContext('2d');
 
-    const container = document.createElement('div');
-    container.className = 'meter-container';
-    container.appendChild(this.canvas);
+    this.container = document.createElement('div');
+    this.container.className = 'meter-container';
+    this.container.appendChild(this.canvas);
 
-    shadowRoot.appendChild(container);
+    shadowRoot.appendChild(this.container);
+
+    // Set up resize observer to handle dynamic sizing
+    this.resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const height = Math.min(140, Math.max(60, entry.contentRect.height));
+        if (this.canvas.height !== height) {
+          this.canvas.height = height;
+          this.draw(); // Redraw after resize
+        }
+      }
+    });
   }
 
   connectedCallback(): void {
     this.startAnimation();
+    if (this.resizeObserver) {
+      this.resizeObserver.observe(this.container);
+    }
   }
 
   disconnectedCallback(): void {
     this.stopAnimation();
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
   }
 
   public setLevel(level: number): void {
@@ -46,7 +65,7 @@ export class CsdPeakMeter extends HTMLElement {
   }
 
   private startAnimation(): void {
-    const animate = () => {
+    const animate = (): void => {
       this.draw();
       this.animationId = requestAnimationFrame(animate);
     };
@@ -75,29 +94,32 @@ export class CsdPeakMeter extends HTMLElement {
     this.ctx.fillRect(0, 0, width, height);
 
     // Draw segments
-    const segmentCount = 20;
+    const segmentCount = 16;
     const segmentHeight = height / segmentCount;
     const segmentGap = 2;
     const levelHeight = this.level * height;
+    const filledSegments = Math.min(segmentCount, Math.floor(levelHeight / segmentHeight + 0.0001));
 
     for (let i = 0; i < segmentCount; i++) {
       const y = height - (i + 1) * segmentHeight;
-      const segmentBottom = height - i * segmentHeight;
+      const isFilled = i < filledSegments;
 
-      if (segmentBottom <= levelHeight) {
-        // Determine color based on position
-        let color;
-        if (i < segmentCount * 0.7) {
-          color = '#4ecdc4'; // Green zone
-        } else if (i < segmentCount * 0.9) {
-          color = '#ffaa00'; // Yellow zone
-        } else {
-          color = '#ff4444'; // Red zone
-        }
-
-        this.ctx.fillStyle = color;
-        this.ctx.fillRect(2, y + segmentGap, width - 4, segmentHeight - segmentGap);
+      if (!isFilled) {
+        continue;
       }
+
+      const positionRatio = (i + 1) / segmentCount;
+      let color;
+      if (positionRatio < 0.7) {
+        color = '#4ecdc4'; // Bottom green zone
+      } else if (positionRatio < 0.9) {
+        color = '#ffaa00'; // Mid yellow zone
+      } else {
+        color = '#ff4444'; // Top red zone
+      }
+
+      this.ctx.fillStyle = color;
+      this.ctx.fillRect(2, y + segmentGap, width - 4, segmentHeight - segmentGap);
     }
 
     // Draw peak indicator

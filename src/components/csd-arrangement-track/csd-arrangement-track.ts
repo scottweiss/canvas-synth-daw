@@ -5,7 +5,7 @@ import '../csd-arrangement-clip/csd-arrangement-clip';
 import styles from './csd-arrangement-track.scss?inline';
 
 export class CsdArrangementTrack extends HTMLElement {
-  private shadowRoot: ShadowRoot;
+  private shadowRootRef: ShadowRoot;
   private track: ITrack;
   private beatsPerPixel: number = 0.1;
   private viewportStart: number = 0;
@@ -16,7 +16,7 @@ export class CsdArrangementTrack extends HTMLElement {
 
   constructor(track: ITrack) {
     super();
-    this.shadowRoot = this.attachShadow({ mode: 'open' });
+    this.shadowRootRef = this.attachShadow({ mode: 'open' });
     this.track = track;
     this.container = document.createElement('div');
     this.clipsContainer = document.createElement('div');
@@ -62,8 +62,8 @@ export class CsdArrangementTrack extends HTMLElement {
     this.container.appendChild(this.trackHeader);
     this.container.appendChild(this.clipsContainer);
 
-    this.shadowRoot.appendChild(style);
-    this.shadowRoot.appendChild(this.container);
+    this.shadowRootRef.appendChild(style);
+    this.shadowRootRef.appendChild(this.container);
   }
 
   private renderClips(): void {

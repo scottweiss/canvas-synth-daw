@@ -1,9 +1,9 @@
-import { Clip, INote } from './Clip';
+import { Clip } from './Clip';
 import { Transport } from './Transport';
 import { AudioEngine } from './AudioEngine';
 import { TrackManager } from './TrackManager';
 
-interface PlayingClip {
+interface IPlayingClip {
   clip: Clip;
   trackId: string;
   currentBeat: number;
@@ -15,7 +15,7 @@ export class ClipPlayer {
   private transport: Transport;
   private audioEngine: AudioEngine;
   private trackManager: TrackManager;
-  private playingClips: Map<string, PlayingClip> = new Map(); // Map of clip ID to PlayingClip
+  private playingClips: Map<string, IPlayingClip> = new Map(); // Map of clip ID to PlayingClip
   private lastBeat: number = -1;
 
   private constructor() {
@@ -54,11 +54,9 @@ export class ClipPlayer {
       return;
     }
 
-    console.log('Starting clip playback:', clip.getId());
-
     clip.setState('playing');
 
-    const playingClip: PlayingClip = {
+    const playingClip: IPlayingClip = {
       clip,
       trackId,
       currentBeat: 0,
@@ -76,8 +74,6 @@ export class ClipPlayer {
   public stopClip(clip: Clip): void {
     const playingClip = this.playingClips.get(clip.getId());
     if (!playingClip) return;
-
-    console.log('Stopping clip playback:', clip.getId());
 
     // Release any active notes
     playingClip.activeNotes.forEach(pitch => {

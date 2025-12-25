@@ -1,5 +1,8 @@
 import { TrackManager, ITrack } from '../../audio/TrackManager';
 import { AudioEngine } from '../../audio/AudioEngine';
+import { SynthPatch } from '../../audio/SynthPatch';
+import type { Clip } from '../../audio/Clip';
+import type { ArrangementClip } from '../../audio/ArrangementClip';
 import { CsdMixerChannel } from '../csd-mixer-channel/csd-mixer-channel';
 import styles from './csd-mixer.scss?inline';
 
@@ -7,7 +10,7 @@ export class CsdMixer extends HTMLElement {
   private trackManager: TrackManager;
   private audioEngine: AudioEngine;
   private shadowRootRef: ShadowRoot;
-  private channelsContainer: HTMLDivElement;
+  private channelsContainer!: HTMLDivElement;
   private masterChannel: CsdMixerChannel | null = null;
   private trackChannels: Map<string, CsdMixerChannel> = new Map();
   private meterUpdateInterval: number | null = null;
@@ -24,7 +27,7 @@ export class CsdMixer extends HTMLElement {
 
   connectedCallback(): void {
     // Subscribe to track changes
-    this.trackManager.on('trackAdded', this.handleTrackAdded.bind(this));
+    this.trackManager.on('trackCreated', this.handleTrackCreated.bind(this));
     this.trackManager.on('trackDeleted', this.handleTrackDeleted.bind(this));
     this.trackManager.on('trackUpdated', this.handleTrackUpdated.bind(this));
 
@@ -73,12 +76,16 @@ export class CsdMixer extends HTMLElement {
       id: 'master',
       name: 'Master',
       color: '#4ecdc4',
+      patch: new SynthPatch(),
       notes: [],
-      patch: null as any, // Master doesn't need a patch
-      muted: false,
-      solo: false,
+      clips: new Map<number, Clip>(),
+      arrangementClips: [] as ArrangementClip[],
       volume: 0.75,
-      pan: 0
+      pan: 0,
+      muted: false,
+      soloed: false,
+      armed: false,
+      index: -1
     };
 
     this.masterChannel = new CsdMixerChannel({
@@ -119,7 +126,7 @@ export class CsdMixer extends HTMLElement {
     trackNode.setVolume(track.volume);
     trackNode.setPan(track.pan);
     trackNode.setMute(track.muted);
-    trackNode.setSolo(track.solo);
+    trackNode.setSolo(track.soloed);
 
     // Insert before master channel if it exists and is in the DOM
     if (this.masterChannel && this.masterChannel.parentElement === this.channelsContainer) {
@@ -161,8 +168,8 @@ export class CsdMixer extends HTMLElement {
     }) as EventListener);
 
     channel.addEventListener('soloChange', ((e: CustomEvent) => {
-      track.solo = e.detail.solo;
-      this.trackManager.updateTrack(track.id, { solo: e.detail.solo });
+      track.soloed = e.detail.solo;
+      this.trackManager.updateTrack(track.id, { soloed: e.detail.solo });
       this.audioEngine.setTrackSolo(track.id, e.detail.solo);
       this.updateSoloMuteStates();
     }) as EventListener);
@@ -176,14 +183,15 @@ export class CsdMixer extends HTMLElement {
 
   private updateSoloMuteStates(): void {
     const tracks = this.trackManager.getAllTracks();
-    const anySolo = tracks.some(t => t.solo);
+    const anySolo = tracks.some(t => t.soloed);
 
     tracks.forEach(track => {
       const channel = this.trackChannels.get(track.id);
       if (channel) {
+        channel.setSolo(track.soloed);
         if (anySolo) {
           // If any track is soloed, mute all non-soloed tracks
-          const effectivelyMuted = !track.solo;
+          const effectivelyMuted = !track.soloed;
           channel.setMute(effectivelyMuted);
           this.audioEngine.setTrackMute(track.id, effectivelyMuted);
         } else {
@@ -195,7 +203,7 @@ export class CsdMixer extends HTMLElement {
     });
   }
 
-  private handleTrackAdded(track: ITrack): void {
+  private handleTrackCreated(track: ITrack): void {
     this.addTrackChannel(track);
   }
 
@@ -210,7 +218,8 @@ export class CsdMixer extends HTMLElement {
   private handleTrackUpdated(track: ITrack): void {
     const channel = this.trackChannels.get(track.id);
     if (channel) {
-      // Channel will handle its own updates via events
+      channel.setMute(track.muted);
+      channel.setSolo(track.soloed);
     }
   }
 

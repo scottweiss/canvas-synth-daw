@@ -1,16 +1,16 @@
 import { LFOWaveform } from '../../audio/LFO';
-import { ModulationPatch } from '../../audio/SynthPatch';
+import { IModulationPatch } from '../../audio/SynthPatch';
 import { CsdKnob } from '../csd-knob/csd-knob';
 import styles from './csd-modulation-matrix.scss?inline';
 
-export interface ModulationMatrixState {
+export interface IModulationMatrixState {
   lfoRate: number;
   waveform: LFOWaveform;
   pitchAmount: number;
   filterAmount: number;
 }
 
-const defaultState: ModulationMatrixState = {
+const defaultState: IModulationMatrixState = {
   lfoRate: 2,
   waveform: 'sine',
   pitchAmount: 0,
@@ -22,10 +22,10 @@ export class CsdModulationMatrix extends HTMLElement {
   private pitchKnob: CsdKnob;
   private filterKnob: CsdKnob;
   private waveformSelect: HTMLSelectElement;
-  private state: ModulationMatrixState;
+  private state: IModulationMatrixState;
   private isApplyingPatch: boolean = false;
 
-  constructor(initialState?: Partial<ModulationMatrixState>) {
+  constructor(initialState?: Partial<IModulationMatrixState>) {
     super();
 
     this.state = {
@@ -116,7 +116,7 @@ export class CsdModulationMatrix extends HTMLElement {
     });
   }
 
-  setState(state: ModulationPatch): void {
+  setState(state: IModulationPatch): void {
     this.isApplyingPatch = true;
     this.state = { ...state };
     if (this.waveformSelect.value !== state.waveform) {

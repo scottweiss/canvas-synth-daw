@@ -2,7 +2,7 @@ import { Transport } from '../../audio/Transport';
 import styles from './csd-timeline.scss?inline';
 
 export class CsdTimeline extends HTMLElement {
-  private shadowRoot: ShadowRoot;
+  private shadowRootRef: ShadowRoot;
   private transport: Transport;
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
@@ -14,7 +14,7 @@ export class CsdTimeline extends HTMLElement {
 
   constructor() {
     super();
-    this.shadowRoot = this.attachShadow({ mode: 'open' });
+    this.shadowRootRef = this.attachShadow({ mode: 'open' });
     this.transport = Transport.getInstance();
 
     this.canvas = document.createElement('canvas');
@@ -55,8 +55,8 @@ export class CsdTimeline extends HTMLElement {
     container.appendChild(this.canvas);
     container.appendChild(this.playhead);
 
-    this.shadowRoot.appendChild(style);
-    this.shadowRoot.appendChild(container);
+    this.shadowRootRef.appendChild(style);
+    this.shadowRootRef.appendChild(container);
   }
 
   private setupEventListeners(): void {

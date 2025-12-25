@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { Mixer, MixerState, MixerChannelState } from './Mixer';
+import { Mixer, IMixerChannelState } from './Mixer';
 
 describe('Mixer', () => {
   let mixer: Mixer;
@@ -243,7 +243,7 @@ describe('Mixer', () => {
       mixer.onChannelChange('drums', listener);
 
       mixer.updateChannel('drums', { volume: 0.4 });
-      const receivedChannel = listener.mock.calls[0][0] as MixerChannelState;
+      const receivedChannel = listener.mock.calls[0][0] as IMixerChannelState;
 
       // Modify received object
       receivedChannel.volume = 0.9;

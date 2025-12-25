@@ -1,6 +1,6 @@
 import { ADSR } from '../../audio/ADSR';
 import { AudioEngine } from '../../audio/AudioEngine';
-import { ModulationPatch, SynthPatch, SynthPatchState } from '../../audio/SynthPatch';
+import { IModulationPatch, SynthPatch, ISynthPatchState } from '../../audio/SynthPatch';
 import { CsdAdsr } from '../csd-adsr/csd-adsr';
 import { CsdDrumKit } from '../csd-drum-kit/csd-drum-kit';
 import { CsdEqualizer } from '../csd-equalizer/csd-equalizer';
@@ -17,7 +17,7 @@ import styles from './csd-synth.scss?inline';
 
 export class CsdSynth extends HTMLElement {
   private readonly audioEngine = AudioEngine.getInstance();
-  private readonly patch: SynthPatch = this.audioEngine.getPatch();
+  private readonly patch: SynthPatch;
   private readonly shadowRootRef: ShadowRoot;
 
   private readonly visualizer = new CsdVisualizer();
@@ -47,6 +47,9 @@ export class CsdSynth extends HTMLElement {
     sheet.replaceSync(styles);
     this.shadowRootRef = this.attachShadow({ mode: 'open' });
     this.shadowRootRef.adoptedStyleSheets.push(sheet);
+
+    const existingPatch = this.audioEngine.getPatch();
+    this.patch = existingPatch ?? new SynthPatch();
 
     const state = this.patch.getState();
 
@@ -107,10 +110,7 @@ export class CsdSynth extends HTMLElement {
 
     // Envelope + piano reuse ADSR state from patch
     this.adsrRef = new CsdAdsr({ adsr: state.envelope });
-    this.pianoRef = new CsdPiano({
-      adsr: state.envelope,
-      waveType: state.master.waveType,
-    });
+    this.pianoRef = new CsdPiano();
 
     this.initializeOscillators(state);
     this.initializeFilter(state);
@@ -123,7 +123,7 @@ export class CsdSynth extends HTMLElement {
     this.registerPatchSync();
   }
 
-  private initializeOscillators(state: SynthPatchState): void {
+  private initializeOscillators(state: ISynthPatchState): void {
     this.oscillatorPanels.length = 0;
     state.oscillators.forEach((osc, index) => {
       const panel = new CsdOscillatorPanel({
@@ -134,11 +134,10 @@ export class CsdSynth extends HTMLElement {
     });
   }
 
-  private initializeFilter(state: SynthPatchState): void {
+  private initializeFilter(state: ISynthPatchState): void {
     this.filterControl.setFrequency(state.filter.frequency);
     this.filterControl.setResonance(state.filter.resonance);
     this.filterControl.setType(state.filter.type);
-    this.pianoRef.setFilterSettings(state.filter);
   }
 
   private buildLayout(): HTMLElement {
@@ -267,7 +266,6 @@ export class CsdSynth extends HTMLElement {
     this.waveSelect.addEventListener('CsdRadioButtonGroupValueChange', (event) => {
       const value = (event as CustomEvent).detail.value as OscillatorType;
       this.patch.updateMaster({ waveType: value });
-      this.pianoRef.waveType = value;
     });
 
     this.masterVolumeKnob.addEventListener('change', (event) => {
@@ -298,19 +296,16 @@ export class CsdSynth extends HTMLElement {
     this.filterEnvelopeAmount.addEventListener('change', (event) => {
       const value = (event as CustomEvent).detail.value;
       this.patch.updateFilter({ envelopeAmount: value });
-      this.pianoRef.setFilterEnvelopeAmount(value);
     });
 
     this.filterControl.addEventListener('filterChange', (event) => {
       const { frequency, resonance, type } = (event as CustomEvent).detail;
       this.patch.updateFilter({ frequency, resonance, type });
-      this.pianoRef.setFilterSettings({ frequency, resonance, type });
     });
 
     this.adsrRef.addEventListener('CsdAdsr', (event) => {
       const adsr = (event as CustomEvent).detail.adsr;
       this.patch.updateEnvelope(adsr);
-      this.pianoRef.adsr = adsr;
     });
 
     this.oscillatorPanels.forEach((panel) => {
@@ -321,7 +316,7 @@ export class CsdSynth extends HTMLElement {
     });
 
     this.modulationMatrix.addEventListener('modulationChange', (event) => {
-      const detail = (event as CustomEvent).detail as ModulationPatch;
+      const detail = (event as CustomEvent).detail as IModulationPatch;
       this.patch.updateModulation(detail);
     });
   }
@@ -330,7 +325,6 @@ export class CsdSynth extends HTMLElement {
     this.patch.on('master', (master) => {
       if (this.waveSelect.value !== master.waveType) {
         this.waveSelect.value = master.waveType;
-        this.pianoRef.waveType = master.waveType;
       }
       if (Math.abs(this.masterVolumeKnob.value - master.volume) > 0.001) {
         this.masterVolumeKnob.value = master.volume;
@@ -359,7 +353,6 @@ export class CsdSynth extends HTMLElement {
       this.filterControl.setFrequency(filter.frequency);
       this.filterControl.setResonance(filter.resonance);
       this.filterControl.setType(filter.type);
-      this.pianoRef.setFilterSettings(filter);
     });
 
     this.patch.on('oscillators', (oscillators) => {

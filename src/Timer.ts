@@ -8,14 +8,11 @@ export class Timer {
     this.audioEngine = AudioEngine.getInstance();
   }
 
-  beat(startBeat: number, callback: () => void): void {
-    let beat = startBeat;
-
-    const scheduleNext = () => {
+  beat(callback: () => void): void {
+    const scheduleNext = (): void => {
       const interval = 60000 / (this.audioEngine.bpm * 4); // 16th notes
       this.intervalId = window.setTimeout(() => {
         callback();
-        beat += 1;
         scheduleNext();
       }, interval);
     };

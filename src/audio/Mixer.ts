@@ -1,4 +1,4 @@
-export interface MixerChannelState {
+export interface IMixerChannelState {
   id: string;
   label: string;
   volume: number;
@@ -7,19 +7,19 @@ export interface MixerChannelState {
   solo: boolean;
 }
 
-export interface MixerState {
-  channels: MixerChannelState[];
+export interface IMixerState {
+  channels: IMixerChannelState[];
   masterVolume: number;
 }
 
-type MixerListener = (state: MixerState) => void;
+type MixerListener = (state: IMixerState) => void;
 
-type MixerChannelListener = (channel: MixerChannelState) => void;
+type MixerChannelListener = (channel: IMixerChannelState) => void;
 
 export class Mixer {
   private static instance: Mixer;
 
-  private state: MixerState;
+  private state: IMixerState;
   private listeners: Set<MixerListener> = new Set();
   private channelListeners: Map<string, Set<MixerChannelListener>> = new Map();
 
@@ -62,14 +62,14 @@ export class Mixer {
     return Mixer.instance;
   }
 
-  getState(): MixerState {
+  getState(): IMixerState {
     return {
       channels: this.state.channels.map((channel) => ({ ...channel })),
       masterVolume: this.state.masterVolume,
     };
   }
 
-  updateChannel(id: string, patch: Partial<Omit<MixerChannelState, 'id' | 'label'>>): void {
+  updateChannel(id: string, patch: Partial<Omit<IMixerChannelState, 'id' | 'label'>>): void {
     const channelIndex = this.state.channels.findIndex((channel) => channel.id === id);
     if (channelIndex === -1) {
       return;
@@ -121,7 +121,7 @@ export class Mixer {
     this.listeners.forEach((listener) => listener(snapshot));
   }
 
-  private emitChannel(channel: MixerChannelState): void {
+  private emitChannel(channel: IMixerChannelState): void {
     const listeners = this.channelListeners.get(channel.id);
     if (!listeners) {
       return;

@@ -1,30 +1,45 @@
-import { SynthPatch } from './SynthPatch';
+import { SynthPatch, ISynthPatchState } from './SynthPatch';
 import { Clip, IClip } from './Clip';
 import { ArrangementClip, IArrangementClip } from './ArrangementClip';
 
+type TrackManagerEventMap = {
+  trackCreated: (track: ITrack) => void;
+  tracksChanged: (tracks: ITrack[]) => void;
+  trackSelected: (track: ITrack) => void;
+  trackDeleted: (trackId: string) => void;
+  trackUpdated: (track: ITrack) => void;
+  notesChanged: (trackId: string, notes: INote[]) => void;
+  clipCreated: (trackId: string, sceneIndex: number, clip: Clip) => void;
+  clipDeleted: (trackId: string, sceneIndex: number) => void;
+  arrangementClipCreated: (trackId: string, clip: ArrangementClip) => void;
+  arrangementClipDeleted: (trackId: string, clipId: string) => void;
+  projectImported: () => void;
+};
+
+type TrackManagerEventKey = keyof TrackManagerEventMap;
+
 // Simple event emitter for browser
 class SimpleEventEmitter {
-  private events: Map<string, Set<Function>> = new Map();
+  private events: Partial<Record<TrackManagerEventKey, Set<unknown>>> = {};
 
-  on(event: string, listener: Function): void {
-    if (!this.events.has(event)) {
-      this.events.set(event, new Set());
-    }
-    this.events.get(event)!.add(listener);
+  on<K extends TrackManagerEventKey>(event: K, listener: TrackManagerEventMap[K]): () => void {
+    const listeners = (this.events[event] as Set<TrackManagerEventMap[K]> | undefined) ?? new Set<TrackManagerEventMap[K]>();
+    listeners.add(listener);
+    this.events[event] = listeners;
+    return () => this.off(event, listener);
   }
 
-  off(event: string, listener: Function): void {
-    const listeners = this.events.get(event);
-    if (listeners) {
-      listeners.delete(listener);
-    }
+  off<K extends TrackManagerEventKey>(event: K, listener: TrackManagerEventMap[K]): void {
+    const listeners = this.events[event] as Set<TrackManagerEventMap[K]> | undefined;
+    listeners?.delete(listener);
   }
 
-  emit(event: string, ...args: any[]): void {
-    const listeners = this.events.get(event);
-    if (listeners) {
-      listeners.forEach(listener => listener(...args));
-    }
+  emit<K extends TrackManagerEventKey>(event: K, ...args: Parameters<TrackManagerEventMap[K]>): void {
+    const listeners = this.events[event] as Set<TrackManagerEventMap[K]> | undefined;
+    listeners?.forEach(listener => {
+      const invoke = listener as (...listenerArgs: unknown[]) => void;
+      invoke(...(args as unknown[]));
+    });
   }
 }
 
@@ -65,7 +80,7 @@ interface ITrackData {
   soloed: boolean;
   armed: boolean;
   index: number;
-  patchState: any; // Serialized patch state
+  patchState?: Partial<ISynthPatchState>; // Serialized patch state
 }
 
 export class TrackManager extends SimpleEventEmitter {
@@ -140,7 +155,10 @@ export class TrackManager extends SimpleEventEmitter {
       const remainingTracks = Array.from(this.tracks.values());
       this.selectedTrackId = remainingTracks.length > 0 ? remainingTracks[0].id : null;
       if (this.selectedTrackId) {
-        this.emit('trackSelected', this.getTrack(this.selectedTrackId));
+        const nextTrack = this.getTrack(this.selectedTrackId);
+        if (nextTrack) {
+          this.emit('trackSelected', nextTrack);
+        }
       }
     }
 
@@ -352,7 +370,6 @@ export class TrackManager extends SimpleEventEmitter {
 
     const index = track.arrangementClips.findIndex(c => c.getId() === clipId);
     if (index !== -1) {
-      const clip = track.arrangementClips[index];
       track.arrangementClips.splice(index, 1);
 
       this.emit('arrangementClipDeleted', trackId, clipId);
@@ -513,6 +530,14 @@ export class TrackManager extends SimpleEventEmitter {
           });
         }
 
+        const arrangementClips: ArrangementClip[] = [];
+        if (trackData.arrangementClips) {
+          trackData.arrangementClips.forEach((clipData: IArrangementClip) => {
+            const clip = ArrangementClip.fromJSON(clipData);
+            arrangementClips.push(clip);
+          });
+        }
+
         const track: ITrack = {
           id: trackData.id,
           name: trackData.name,
@@ -520,6 +545,7 @@ export class TrackManager extends SimpleEventEmitter {
           patch,
           notes: trackData.notes || [],
           clips,
+          arrangementClips,
           volume: trackData.volume ?? 0.8,
           pan: trackData.pan ?? 0,
           muted: trackData.muted ?? false,
@@ -536,7 +562,10 @@ export class TrackManager extends SimpleEventEmitter {
       this.emit('projectImported');
       this.emit('tracksChanged', this.getAllTracks());
       if (this.selectedTrackId) {
-        this.emit('trackSelected', this.getTrack(this.selectedTrackId));
+        const selectedTrack = this.getTrack(this.selectedTrackId);
+        if (selectedTrack) {
+          this.emit('trackSelected', selectedTrack);
+        }
       }
 
       this.saveToStorage();

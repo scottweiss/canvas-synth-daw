@@ -12,7 +12,8 @@ export class ArrangementPlayer {
   private transport: Transport;
   private trackManager: TrackManager;
   private audioEngine: AudioEngine;
-  private scheduledNotes: Map<string, number[]> = new Map(); // Track active note IDs per track
+  private activeNotes: Map<string, Set<number>> = new Map();
+  private scheduledNoteTimeouts: Set<number> = new Set();
   private lastBeat: number = -1;
   private tickUnsubscribe: (() => void) | null = null;
 
@@ -39,7 +40,6 @@ export class ArrangementPlayer {
 
     this.lastBeat = -1;
     this.tickUnsubscribe = this.transport.onTick(this.handleTick.bind(this));
-    console.log('ArrangementPlayer started');
   }
 
   /**
@@ -52,14 +52,13 @@ export class ArrangementPlayer {
     }
     this.stopAllNotes();
     this.lastBeat = -1;
-    console.log('ArrangementPlayer stopped');
   }
 
   /**
    * Handle transport tick - check for notes at current position and schedule them
    */
-  private handleTick(tick: number, time: number): void {
-    const currentBeat = this.transport.getCurrentBeat();
+  private handleTick(tick: number): void {
+    const currentBeat = this.transport.tickToBeat(tick);
 
     // Only process on beat changes (4 ticks per beat)
     const beatFloor = Math.floor(currentBeat);
@@ -71,11 +70,21 @@ export class ArrangementPlayer {
 
     // Get all clips that are active at this beat
     const clipsAtTime = this.trackManager.getArrangementClipsAtTime(currentBeat);
+    const allTracks = this.trackManager.getAllTracks();
+    const anySoloed = allTracks.some(track => track.soloed);
 
     // Schedule notes from each active clip
     clipsAtTime.forEach((clips, trackId) => {
       const track = this.trackManager.getTrack(trackId);
-      if (!track || track.muted) {
+      if (!track) {
+        return;
+      }
+
+      if (track.muted) {
+        return;
+      }
+
+      if (anySoloed && !track.soloed) {
         return;
       }
 
@@ -88,7 +97,7 @@ export class ArrangementPlayer {
           const noteStartBeat = clip.getStartTime() + note.start;
           if (Math.abs(noteStartBeat - currentBeat) < 0.01) {
             // Note starts now - schedule it
-            this.scheduleNote(trackId, note, time);
+            this.scheduleNote(trackId, note);
           }
         });
       });
@@ -98,58 +107,62 @@ export class ArrangementPlayer {
   /**
    * Schedule a note to play
    */
-  private scheduleNote(trackId: string, note: INote, time: number): void {
+  private scheduleNote(trackId: string, note: INote): void {
     const track = this.trackManager.getTrack(trackId);
     if (!track) {
       return;
     }
 
-    // Set the track's patch active before playing
-    this.audioEngine.setCurrentPatch(track.patch);
+    const velocity = Math.max(0, Math.min(127, note.velocity ?? 100));
+    this.audioEngine.noteOnWithTrack(trackId, note.pitch, velocity);
+    this.addActiveNote(trackId, note.pitch);
 
-    // Calculate note duration in seconds
     const bpm = this.transport.getBpm();
-    const beatDuration = 60 / bpm; // Seconds per beat
-    const noteDuration = note.duration * beatDuration;
+    const beatDuration = 60 / bpm;
+    const noteDurationSeconds = Math.max(beatDuration * note.duration, 0);
+    const timeoutId = window.setTimeout(() => {
+      this.audioEngine.noteOffWithTrack(trackId, note.pitch);
+      this.removeActiveNote(trackId, note.pitch);
+      this.scheduledNoteTimeouts.delete(timeoutId);
+    }, noteDurationSeconds * 1000);
 
-    // Play the note
-    const noteId = this.audioEngine.noteOn(note.pitch, note.velocity / 127, time);
-
-    // Track active notes for this track
-    if (!this.scheduledNotes.has(trackId)) {
-      this.scheduledNotes.set(trackId, []);
-    }
-    this.scheduledNotes.get(trackId)!.push(noteId);
-
-    // Schedule note off
-    setTimeout(() => {
-      this.audioEngine.noteOff(note.pitch, time + noteDuration);
-
-      // Remove from active notes
-      const activeNotes = this.scheduledNotes.get(trackId);
-      if (activeNotes) {
-        const index = activeNotes.indexOf(noteId);
-        if (index > -1) {
-          activeNotes.splice(index, 1);
-        }
-      }
-    }, noteDuration * 1000);
+    this.scheduledNoteTimeouts.add(timeoutId);
   }
 
   /**
    * Stop all currently playing notes
    */
   private stopAllNotes(): void {
-    const time = this.audioEngine.audioContext.currentTime;
+    this.scheduledNoteTimeouts.forEach(timeoutId => {
+      window.clearTimeout(timeoutId);
+    });
+    this.scheduledNoteTimeouts.clear();
 
-    this.scheduledNotes.forEach((noteIds, trackId) => {
-      noteIds.forEach(noteId => {
-        // Note: noteOff expects a pitch, but we don't have it here
-        // This is a limitation - we might need to track pitch as well
-        // For now, we'll just clear the map
+    this.activeNotes.forEach((notes, trackId) => {
+      notes.forEach(midiNote => {
+        this.audioEngine.noteOffWithTrack(trackId, midiNote);
       });
     });
 
-    this.scheduledNotes.clear();
+    this.activeNotes.clear();
+    this.audioEngine.stopAllNotes();
+  }
+
+  private addActiveNote(trackId: string, midiNote: number): void {
+    if (!this.activeNotes.has(trackId)) {
+      this.activeNotes.set(trackId, new Set());
+    }
+    this.activeNotes.get(trackId)!.add(midiNote);
+  }
+
+  private removeActiveNote(trackId: string, midiNote: number): void {
+    const notes = this.activeNotes.get(trackId);
+    if (!notes) {
+      return;
+    }
+    notes.delete(midiNote);
+    if (notes.size === 0) {
+      this.activeNotes.delete(trackId);
+    }
   }
 }

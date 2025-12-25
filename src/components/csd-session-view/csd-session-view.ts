@@ -2,6 +2,7 @@ import { TrackManager, ITrack } from '../../audio/TrackManager';
 import { ClipRecorder } from '../../audio/ClipRecorder';
 import { ClipPlayer } from '../../audio/ClipPlayer';
 import { Transport } from '../../audio/Transport';
+import { Clip } from '../../audio/Clip';
 import { CsdClipSlot } from '../csd-clip-slot/csd-clip-slot';
 import '../csd-clip-slot/csd-clip-slot';
 import styles from './csd-session-view.scss?inline';
@@ -9,7 +10,7 @@ import styles from './csd-session-view.scss?inline';
 const SCENES_COUNT = 8;
 
 export class CsdSessionView extends HTMLElement {
-  private shadowRoot: ShadowRoot;
+  private shadowRootRef: ShadowRoot;
   private trackManager: TrackManager;
   private clipRecorder: ClipRecorder;
   private clipPlayer: ClipPlayer;
@@ -20,7 +21,7 @@ export class CsdSessionView extends HTMLElement {
 
   constructor() {
     super();
-    this.shadowRoot = this.attachShadow({ mode: 'open' });
+    this.shadowRootRef = this.attachShadow({ mode: 'open' });
     this.trackManager = TrackManager.getInstance();
     this.clipRecorder = ClipRecorder.getInstance();
     this.clipPlayer = ClipPlayer.getInstance();
@@ -40,15 +41,15 @@ export class CsdSessionView extends HTMLElement {
     this.trackManager.on('clipDeleted', this.handleClipDeleted.bind(this));
 
     // Listen for clip slot events
-    this.shadowRoot.addEventListener('clipRecord', ((e: CustomEvent) => {
+    this.shadowRootRef.addEventListener('clipRecord', ((e: CustomEvent) => {
       this.handleClipRecord(e.detail.trackId, e.detail.sceneIndex);
     }) as EventListener);
 
-    this.shadowRoot.addEventListener('clipToggle', ((e: CustomEvent) => {
-      this.handleClipToggle(e.detail.trackId, e.detail.sceneIndex, e.detail.clip);
+    this.shadowRootRef.addEventListener('clipToggle', ((e: CustomEvent) => {
+      this.handleClipToggle(e.detail.trackId, e.detail.clip as Clip | undefined);
     }) as EventListener);
 
-    this.shadowRoot.addEventListener('clipDelete', ((e: CustomEvent) => {
+    this.shadowRootRef.addEventListener('clipDelete', ((e: CustomEvent) => {
       this.handleClipDelete(e.detail.trackId, e.detail.sceneIndex);
     }) as EventListener);
 
@@ -78,8 +79,8 @@ export class CsdSessionView extends HTMLElement {
     this.container.appendChild(header);
     this.container.appendChild(this.clipGrid);
 
-    this.shadowRoot.appendChild(style);
-    this.shadowRoot.appendChild(this.container);
+    this.shadowRootRef.appendChild(style);
+    this.shadowRootRef.appendChild(this.container);
   }
 
   private loadTracks(): void {
@@ -135,13 +136,10 @@ export class CsdSessionView extends HTMLElement {
   }
 
   private launchScene(sceneIndex: number): void {
-    console.log('Launching scene:', sceneIndex);
-
     // Get all clips in this scene
     const clipsInScene = this.trackManager.getClipsInScene(sceneIndex);
 
     if (clipsInScene.size === 0) {
-      console.log('No clips in scene', sceneIndex);
       return;
     }
 
@@ -174,8 +172,6 @@ export class CsdSessionView extends HTMLElement {
   }
 
   private handleClipRecord(trackId: string, sceneIndex: number): void {
-    console.log('Recording clip:', trackId, sceneIndex);
-
     // Create a new clip
     const clip = this.trackManager.createClip(trackId, sceneIndex, 4);
 
@@ -196,9 +192,7 @@ export class CsdSessionView extends HTMLElement {
     }, clipLengthMs);
   }
 
-  private handleClipToggle(trackId: string, sceneIndex: number, clip: any): void {
-    console.log('Toggling clip:', trackId, sceneIndex);
-
+  private handleClipToggle(trackId: string, clip: Clip | undefined): void {
     if (!clip) return;
 
     // Toggle clip playback
@@ -206,7 +200,6 @@ export class CsdSessionView extends HTMLElement {
   }
 
   private handleClipDelete(trackId: string, sceneIndex: number): void {
-    console.log('Deleting clip:', trackId, sceneIndex);
     this.trackManager.deleteClip(trackId, sceneIndex);
   }
 }

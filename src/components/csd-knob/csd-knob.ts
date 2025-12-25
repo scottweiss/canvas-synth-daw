@@ -1,6 +1,6 @@
 import styles from './csd-knob.scss?inline';
 
-export interface CsdKnobProps {
+export interface ICsdKnobProps {
   label: string;
   min: number;
   max: number;
@@ -33,7 +33,7 @@ export class CsdKnob extends HTMLElement {
     }));
   }
   
-  constructor(props: CsdKnobProps) {
+  constructor(props: ICsdKnobProps) {
     super();
     
     this.label = props.label;

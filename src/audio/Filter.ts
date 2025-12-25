@@ -2,7 +2,7 @@ import { IAdsr } from './ADSR';
 
 export type FilterType = 'lowpass' | 'highpass' | 'bandpass' | 'notch';
 
-export interface FilterSettings {
+export interface IFilterSettings {
   frequency: number;
   resonance: number;
   type: FilterType;
@@ -56,7 +56,7 @@ export class Filter {
     return this.envelopeAmount;
   }
 
-  getSettings(): FilterSettings {
+  getSettings(): IFilterSettings {
     return {
       frequency: this.baseCutoff,
       resonance: this.filter.Q.value,

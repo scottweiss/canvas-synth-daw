@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { TrackManager } from './TrackManager';
+import type { ITrack } from './TrackManager';
 
 describe('TrackManager', () => {
   let trackManager: TrackManager;
@@ -147,7 +148,7 @@ describe('TrackManager', () => {
   });
 
   describe('Note Operations', () => {
-    let testTrack: any;
+    let testTrack: ITrack;
 
     beforeEach(() => {
       testTrack = trackManager.createTrack('Note Test Track');
@@ -412,9 +413,9 @@ describe('TrackManager', () => {
 
   describe('Track Reordering', () => {
     it('should reorder tracks', () => {
-      const track1 = trackManager.createTrack('Track 1');
-      const track2 = trackManager.createTrack('Track 2');
-      const track3 = trackManager.createTrack('Track 3');
+      trackManager.createTrack('Track 1');
+      trackManager.createTrack('Track 2');
+      trackManager.createTrack('Track 3');
 
       // Move track1 (index 0) to index 2
       trackManager.reorderTracks(0, 2);
@@ -426,9 +427,9 @@ describe('TrackManager', () => {
     });
 
     it('should update track indices after reordering', () => {
-      const track1 = trackManager.createTrack('A');
-      const track2 = trackManager.createTrack('B');
-      const track3 = trackManager.createTrack('C');
+      trackManager.createTrack('A');
+      trackManager.createTrack('B');
+      trackManager.createTrack('C');
 
       trackManager.reorderTracks(2, 0);
 
@@ -439,8 +440,8 @@ describe('TrackManager', () => {
     });
 
     it('should emit tracksChanged on reorder', () => {
-      const track1 = trackManager.createTrack('1');
-      const track2 = trackManager.createTrack('2');
+      trackManager.createTrack('1');
+      trackManager.createTrack('2');
 
       const listener = vi.fn();
       trackManager.on('tracksChanged', listener);

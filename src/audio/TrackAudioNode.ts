@@ -6,7 +6,6 @@
  */
 export class TrackAudioNode {
   private audioContext: AudioContext;
-  private trackId: string;
 
   // Audio nodes
   private inputGain: GainNode;
@@ -21,9 +20,8 @@ export class TrackAudioNode {
   private _muted: boolean = false;
   private _solo: boolean = false;
 
-  constructor(audioContext: AudioContext, trackId: string) {
+  constructor(audioContext: AudioContext) {
     this.audioContext = audioContext;
-    this.trackId = trackId;
 
     // Create audio nodes
     this.inputGain = audioContext.createGain();

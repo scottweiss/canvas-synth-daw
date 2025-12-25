@@ -51,7 +51,7 @@ export class CsdFilter extends HTMLElement {
   }
   
   private setupEventListeners(): void {
-    const dispatchChange = () => {
+    const dispatchChange = (): void => {
       this.dispatchEvent(new CustomEvent('filterChange', {
         detail: {
           frequency: this.frequencyKnob.value,

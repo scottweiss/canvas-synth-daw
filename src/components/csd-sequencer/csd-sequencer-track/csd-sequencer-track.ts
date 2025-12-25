@@ -3,7 +3,7 @@ import { Drum } from '../../../midi/Drum';
 import midiToFrequency from '../../../midi/midi-to-frequency';
 // import styles from './index.scss?inline';
 
-export interface CsdSequencerTrackProps {
+export interface ICsdSequencerTrackProps {
   note: string | number;
   drum?: Drum;
 }
@@ -26,7 +26,7 @@ export class CsdSequencerTrack {
     return `${noteName}${octave}`;
   }
 
-  constructor(props: CsdSequencerTrackProps) {
+  constructor(props: ICsdSequencerTrackProps) {
     this.note = props.note;
     this.drum =
       props.drum ||
@@ -82,7 +82,7 @@ export class CsdSequencerTrack {
     return this.track[step % this.track.length] === true;
   }
 
-  public trigger(_time: number, bpm: number): void {
+  public trigger(bpm: number): void {
     if (typeof this.note === 'number') {
       this.triggerSynthNote(bpm);
       return;
